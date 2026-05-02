@@ -153,6 +153,9 @@ body {
 <button class="btn spin" onclick="openWheel()">🎰 Spin</button>
 <button class="btn task" onclick="task()">📋 Task</button>
 <button class="btn daily" onclick="daily()">🎁 Daily</button>
+<audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
+<audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+<audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>  
 <div id="wheelBox">
 
  <div style="
@@ -227,6 +230,8 @@ function mine() {
   coins += 5;
   save();
   update();
+
+  document.getElementById("clickSound").play();
 }
 
 // TASK
@@ -256,6 +261,7 @@ function openWheel() {
   document.getElementById("wheelBox").style.display = "flex";
 }
 function spinWheel() {
+  document.getElementById("spinSound").play();
   let now = Date.now();
 
   if (now - lastSpin < 10000) {
@@ -285,6 +291,7 @@ function spinWheel() {
   }, 50);
 
   setTimeout(() => {
+    document.getElementById("winSound").play();
     coins += win;
     save();
     update();
