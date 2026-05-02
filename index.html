@@ -8,32 +8,76 @@
 
 <style>
 body {
-  background: #0f172a;
-  color: white;
+  margin: 0;
   font-family: Arial;
+  background: radial-gradient(circle at center, #020617, #000);
+  color: white;
   text-align: center;
-  margin-top: 50px;
 }
 
-button {
-  padding: 15px 25px;
-  margin: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #00ffff;
+/* Top Bar */
+.topbar {
+  padding: 20px;
+  font-size: 22px;
+  color: #00ffff;
+}
+
+/* Center Machine */
+.machine {
+  margin-top: 40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #00ffff, #0044ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
   color: black;
-  font-size: 18px;
+  box-shadow: 0 0 30px #00ffff;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Buttons */
+.menu {
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn {
+  padding: 15px;
+  border-radius: 12px;
+  background: #0f172a;
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  font-size: 16px;
+  width: 90px;
+}
+
+.btn:active {
+  transform: scale(0.9);
 }
 </style>
 </head>
 
 <body>
 
-<h2>💰 Balance: <span id="balance">0</span></h2>
+<div class="topbar">
+💰 Balance: <span id="balance">0</span>
+</div>
 
-<button onclick="mine()">⛏ Mine</button>
-<button onclick="spin()">🎰 Spin</button>
-<button onclick="task()">📋 Task</button>
+<div class="machine" onclick="mine()">
+⚡ MINE
+</div>
+
+<div class="menu">
+<button class="btn" onclick="spin()">🎰 Spin</button>
+<button class="btn" onclick="task()">📋 Task</button>
+<button class="btn" onclick="daily()">🎁 Daily</button>
+</div>
 
 <script>
 let coins = 0;
@@ -57,6 +101,12 @@ function spin() {
 
 function task() {
   window.open("https://instagram.com/");
+}
+
+function daily() {
+  coins += 25;
+  alert("Daily reward +25");
+  update();
 }
 </script>
 
