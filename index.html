@@ -119,7 +119,28 @@ function save() {
 function update() {
   document.getElementById("balance").innerText = coins;
 }
+let taskDone = false;
 
+function openInsta() {
+  window.open("https://instagram.com/");
+  taskDone = true;
+}
+
+function claimTask() {
+  if (!taskDone) {
+    alert("Complete the task first!");
+    return;
+  }
+
+  coins += 30;
+  save();
+  update();
+
+  alert("Task reward +30");
+
+  document.getElementById("taskBox").style.display = "none";
+  taskDone = false;
+}
 update();
 
 // MINE
@@ -131,9 +152,8 @@ function mine() {
 
 // TASK
 function task() {
-  window.open("https://instagram.com/");
+  document.getElementById("taskBox").style.display = "block";
 }
-
 // DAILY (24h)
 function daily() {
   let now = Date.now();
@@ -181,6 +201,18 @@ function spinWheel() {
   }, 3000);
 }
 </script>
+<div id="taskBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:white; text-align:center; padding-top:100px;">
+  
+  <h2>📋 Complete Task</h2>
 
+  <p>Follow our Instagram</p>
+
+  <button onclick="openInsta()">Open Instagram</button>
+
+  <br><br>
+
+  <button onclick="claimTask()">✅ Claim Reward</button>
+
+</div>
 </body>
 </html>
