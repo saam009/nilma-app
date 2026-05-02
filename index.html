@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Nilma Coin</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body {
+  background: #0f172a;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+  margin-top: 50px;
+}
+
+button {
+  padding: 15px 25px;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #00ffff;
+  color: black;
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>💰 Balance: <span id="balance">0</span></h2>
+
+<button onclick="mine()">⛏ Mine</button>
+<button onclick="spin()">🎰 Spin</button>
+<button onclick="task()">📋 Task</button>
+
+<script>
+let coins = 0;
+
+function update() {
+  document.getElementById("balance").innerText = coins;
+}
+
+function mine() {
+  coins += 5;
+  update();
+}
+
+function spin() {
+  let rewards = [10, 20, 50, 100];
+  let win = rewards[Math.floor(Math.random() * rewards.length)];
+  coins += win;
+  alert("You won " + win);
+  update();
+}
+
+function task() {
+  window.open("https://instagram.com/");
+}
+</script>
+
+</body>
+</html>
