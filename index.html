@@ -182,6 +182,27 @@ function task() {
   document.getElementById("taskBox").style.display = "block";
 }
 // DAILY (24h)
+// DAILY
+function daily() {
+  let now = Date.now();
+
+  if (now - lastDaily < 86400000) {
+    alert("Come back tomorrow!");
+    return;
+  }
+
+  coins += 50;
+  lastDaily = now;
+  localStorage.setItem("lastDaily", lastDaily);
+
+  save();
+  update();
+}
+
+// OPEN WHEEL
+function openWheel() {
+  document.getElementById("wheelBox").style.display = "flex";
+}
 function spinWheel() {
   let now = Date.now();
 
