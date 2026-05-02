@@ -183,25 +183,6 @@ function task() {
 }
 // DAILY (24h)
 function daily() {
-  let now = Date.now();
-  if (now - lastDaily < 86400000) {
-    alert("Come back tomorrow!");
-    return;
-  }
-
-  coins += 50;
-  lastDaily = now;
-  localStorage.setItem("lastDaily", lastDaily);
-
-  save();
-  update();
-}
-
-// SPIN
-function openWheel() {
-  document.getElementById("wheelBox").style.display = "flex";
-}
-
 function spinWheel() {
   let rewards = [0, 10, 20, 50, 100, 200];
   let index = Math.floor(Math.random() * rewards.length);
