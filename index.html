@@ -99,9 +99,18 @@ body {
 <button class="btn spin" onclick="openWheel()">🎰 Spin</button>
 <button class="btn task" onclick="task()">📋 Task</button>
 <button class="btn daily" onclick="daily()">🎁 Daily</button>
-
 <div id="wheelBox">
-<div id="wheel" style="
+
+  <div style="
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid red;
+    margin-bottom: 10px;
+  "></div>
+
+  <div id="wheel" style="
   width:200px;
   height:200px;
   border-radius:50%;
@@ -194,6 +203,28 @@ function openWheel() {
 }
 
 function spinWheel() {
+  let rewards = [0, 10, 20, 50, 100, 200];
+  let index = Math.floor(Math.random() * rewards.length);
+  let win = rewards[index];
+
+  let wheel = document.getElementById("wheel");
+
+  let segmentAngle = 360 / rewards.length;
+  let rotation = (360 * 5) + (index * segmentAngle);
+
+  wheel.style.transition = "transform 3s ease-out";
+  wheel.style.transform = "rotate(" + rotation + "deg)";
+
+  setTimeout(() => {
+    coins += win;
+    save();
+    update();
+
+    alert("You won " + win + " coins");
+
+    document.getElementById("wheelBox").style.display = "none";
+  }, 3000);
+}
   let now = Date.now();
   if (now - lastSpin < 10000) {
     alert("Wait a few seconds!");
