@@ -182,28 +182,6 @@ function task() {
   document.getElementById("taskBox").style.display = "block";
 }
 // DAILY (24h)
-function daily() {
-  let now = Date.now();
-
-  if (now - lastDaily < 86400000) {
-    alert("Come back tomorrow!");
-    return;
-  }
-
-  coins += 50;
-  lastDaily = now;
-  localStorage.setItem("lastDaily", lastDaily);
-
-  save();
-  update();
-}
-
-// OPEN WHEEL
-function openWheel() {
-  document.getElementById("wheelBox").style.display = "flex";
-}
-
-// SPIN
 function spinWheel() {
   let now = Date.now();
 
@@ -221,11 +199,17 @@ function spinWheel() {
 
   let wheel = document.getElementById("wheel");
 
-  let segmentAngle = 360 / rewards.length;
-  let rotation = (360 * 5) + (index * segmentAngle);
+  // RESET FIRST (important)
+  wheel.style.transition = "none";
+  wheel.style.transform = "rotate(0deg)";
 
-  wheel.style.transition = "transform 3s ease-out";
-  wheel.style.transform = "rotate(" + rotation + "deg)";
+  setTimeout(() => {
+    let segmentAngle = 360 / rewards.length;
+    let rotation = (360 * 5) + (index * segmentAngle);
+
+    wheel.style.transition = "transform 3s ease-out";
+    wheel.style.transform = "rotate(" + rotation + "deg)";
+  }, 50);
 
   setTimeout(() => {
     coins += win;
