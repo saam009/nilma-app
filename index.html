@@ -61,7 +61,7 @@ body {
 .task { top: 40%; right: 10%; }
 .daily { bottom: 15%; left: 50%; transform: translateX(-50%); }
 
-/* Wheel popup */
+/* Wheel */
 #wheelBox {
   position: fixed;
   top: 0;
@@ -83,7 +83,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
   transition: transform 3s ease-out;
 }
 </style>
@@ -101,7 +100,6 @@ body {
 <button class="btn task" onclick="task()">📋 Task</button>
 <button class="btn daily" onclick="daily()">🎁 Daily</button>
 
-<!-- Wheel -->
 <div id="wheelBox">
   <div id="wheel">🎰</div>
   <br>
@@ -109,44 +107,76 @@ body {
 </div>
 
 <script>
-let coins = 0;
+// LOAD DATA
+let coins = parseInt(localStorage.getItem("coins")) || 0;
+let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
+let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
+
+function save() {
+  localStorage.setItem("coins", coins);
+}
 
 function update() {
   document.getElementById("balance").innerText = coins;
 }
 
+update();
+
+// MINE
 function mine() {
   coins += 5;
+  save();
   update();
 }
 
+// TASK
 function task() {
   window.open("https://instagram.com/");
 }
 
+// DAILY (24h)
 function daily() {
-  coins += 25;
+  let now = Date.now();
+  if (now - lastDaily < 86400000) {
+    alert("Come back tomorrow!");
+    return;
+  }
+
+  coins += 50;
+  lastDaily = now;
+  localStorage.setItem("lastDaily", lastDaily);
+
+  save();
   update();
 }
 
-// Wheel
+// SPIN
 function openWheel() {
   document.getElementById("wheelBox").style.display = "flex";
 }
 
 function spinWheel() {
+  let now = Date.now();
+  if (now - lastSpin < 10000) {
+    alert("Wait a few seconds!");
+    return;
+  }
+
+  lastSpin = now;
+  localStorage.setItem("lastSpin", lastSpin);
+
   let rewards = [10, 20, 50, 100, 200];
   let win = rewards[Math.floor(Math.random() * rewards.length)];
 
   let wheel = document.getElementById("wheel");
-
   let rotation = Math.floor(Math.random() * 360) + 720;
   wheel.style.transform = "rotate(" + rotation + "deg)";
 
   setTimeout(() => {
     coins += win;
+    save();
     update();
-    alert("You won " + win + " coins!");
+    alert("You won " + win);
     document.getElementById("wheelBox").style.display = "none";
   }, 3000);
 }
