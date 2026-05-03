@@ -164,27 +164,8 @@ body {
 
 <div class="topbar">
 💰 Balance: <span id="balance">0</span><br>
-⚡ Energy: <span id="energy">100</span>
-  <br>
- ⭐ Level: <span id="level">1</span>
-
-<div style="width:80%; height:10px; background:#111; margin:10px auto; border-radius:10px;">
-  <div id="xpBar" style="height:100%; width:0%; background:#00ffff; border-radius:10px;"></div>
-</div>
-
-<div style="text-align:center; font-size:12px;">
-  XP: <span id="xpText">0 / 100</span>
-</div> 
-
-<div style="width:80%; height:10px; background:#111; margin:10px auto; border-radius:10px;">
-  <div id="xpBar" style="height:100%; width:0%; background:#00ffff; border-radius:10px;"></div>
-</div>
-
-<div style="text-align:center; font-size:12px;">
-  XP: <span id="xpText">0 / 100</span>
-</div>
-</div>
-
+⚡ Energy: <span id="energy">100</span><br>
+⭐ Level: <span id="level">1</span>
 <div class="machine" onclick="mine(event)">⚡</div>
 
 <button class="btn spin" onclick="openWheel()">🎰 Spin</button>
@@ -235,8 +216,6 @@ let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 let maxEnergy = 100;
   let level = parseInt(localStorage.getItem("level")) || 1;
 let levelUpCost = parseInt(localStorage.getItem("levelUpCost")) || 100;
-  let xp = parseInt(localStorage.getItem("xp")) || 0;
-let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
   let xp = parseInt(localStorage.getItem("xp")) || 0;
 let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
 function checkLevelUp() {
