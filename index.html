@@ -139,6 +139,24 @@ body {
   filter: blur(80px);
   z-index: -1;
 }
+ .coin {
+  position: fixed;
+  font-size: 20px;
+  color: gold;
+  pointer-events: none;
+  animation: fly 1s ease-out forwards;
+}
+
+@keyframes fly {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, -100px);
+    opacity: 0;
+  }
+} 
 </style>
 </head>
 
@@ -148,7 +166,7 @@ body {
 💰 Balance: <span id="balance">0</span>
 </div>
 
-<div class="machine" onclick="mine()">⚡</div>
+<div class="machine" onclick="mine(event)">⚡</div>
 
 <button class="btn spin" onclick="openWheel()">🎰 Spin</button>
 <button class="btn task" onclick="task()">📋 Task</button>
@@ -194,7 +212,20 @@ let coins = parseInt(localStorage.getItem("coins")) || 0;
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
   let audioUnlocked = false;
+function showCoin(x, y) {
+  let coin = document.createElement("div");
+  coin.className = "coin";
+  coin.innerText = "+5";
 
+  coin.style.left = x + "px";
+  coin.style.top = y + "px";
+
+  document.body.appendChild(coin);
+
+  setTimeout(() => {
+    coin.remove();
+  }, 1000);
+}
 function unlockAudio() {
   if (audioUnlocked) return;
 
@@ -251,12 +282,15 @@ function claimTask() {
   taskDone = false;
 }
 update();
-function mine() {
+function mine(event) {
   coins += 5;
   save();
   update();
 
-  document.getElementById("clickSound").play().catch(()=>{});
+  let x = event.clientX;
+  let y = event.clientY;
+
+  showCoin(x, y);
 }
 // TASK
 function task() {
