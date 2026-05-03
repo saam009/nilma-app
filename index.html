@@ -218,6 +218,22 @@ let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 let maxEnergy = 100;
   let level = parseInt(localStorage.getItem("level")) || 1;
 let levelUpCost = parseInt(localStorage.getItem("levelUpCost")) || 100;
+  function checkLevelUp() {
+  if (coins >= levelUpCost) {
+    coins -= levelUpCost;
+    level += 1;
+
+    levelUpCost = Math.floor(levelUpCost * 1.5);
+
+    localStorage.setItem("level", level);
+    localStorage.setItem("levelUpCost", levelUpCost);
+
+    alert("LEVEL UP! Now level " + level);
+
+    save();
+    update();
+  }
+}
 function showCoin(x, y) {
   let coin = document.createElement("div");
   coin.className = "coin";
@@ -308,22 +324,7 @@ checkLevelUp();
   let y = event.clientY;
   showCoin(x, y);
 }
-  function checkLevelUp() {
-  if (coins >= levelUpCost) {
-    coins -= levelUpCost;
-    level += 1;
 
-    levelUpCost = Math.floor(levelUpCost * 1.5);
-
-    localStorage.setItem("level", level);
-    localStorage.setItem("levelUpCost", levelUpCost);
-
-    alert("LEVEL UP! Now level " + level);
-
-    save();
-    update();
-  }
-}
 // TASK
 function task() {
   document.getElementById("taskBox").style.display = "block";
