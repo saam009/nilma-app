@@ -165,7 +165,24 @@ body {
 <div class="topbar">
 💰 Balance: <span id="balance">0</span><br>
 ⚡ Energy: <span id="energy">100</span>
-  <br>⭐ Level: <span id="level">1</span>
+  <br>
+ ⭐ Level: <span id="level">1</span>
+
+<div style="width:80%; height:10px; background:#111; margin:10px auto; border-radius:10px;">
+  <div id="xpBar" style="height:100%; width:0%; background:#00ffff; border-radius:10px;"></div>
+</div>
+
+<div style="text-align:center; font-size:12px;">
+  XP: <span id="xpText">0 / 100</span>
+</div> 
+
+<div style="width:80%; height:10px; background:#111; margin:10px auto; border-radius:10px;">
+  <div id="xpBar" style="height:100%; width:0%; background:#00ffff; border-radius:10px;"></div>
+</div>
+
+<div style="text-align:center; font-size:12px;">
+  XP: <span id="xpText">0 / 100</span>
+</div>
 </div>
 
 <div class="machine" onclick="mine(event)">⚡</div>
@@ -218,19 +235,23 @@ let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 let maxEnergy = 100;
   let level = parseInt(localStorage.getItem("level")) || 1;
 let levelUpCost = parseInt(localStorage.getItem("levelUpCost")) || 100;
-  function checkLevelUp() {
-  if (coins >= levelUpCost) {
-    coins -= levelUpCost;
-    level += 1;
+  let xp = parseInt(localStorage.getItem("xp")) || 0;
+let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
+  let xp = parseInt(localStorage.getItem("xp")) || 0;
+let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
+function checkLevelUp() {
+  if (xp >= xpMax) {
+    xp = xp - xpMax;   // reduce XP after level up
+    level += 1;        // increase level
 
-    levelUpCost = Math.floor(levelUpCost * 1.5);
+    xpMax = Math.floor(xpMax * 1.5); // next level harder
 
     localStorage.setItem("level", level);
-    localStorage.setItem("levelUpCost", levelUpCost);
+    localStorage.setItem("xp", xp);
+    localStorage.setItem("xpMax", xpMax);
 
     alert("LEVEL UP! Now level " + level);
 
-    save();
     update();
   }
 }
@@ -282,6 +303,11 @@ function update() {
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
   document.getElementById("level").innerText = level;
+
+  document.getElementById("xpText").innerText = xp + " / " + xpMax;
+
+  let percent = (xp / xpMax) * 100;
+  document.getElementById("xpBar").style.width = percent + "%";
 }
 let taskDone = false;
 
@@ -313,6 +339,8 @@ function mine(event) {
   }
   
   coins += 5;
+  xp += 10;
+localStorage.setItem("xp", xp);
   energy -= 1;
 checkLevelUp();
   save();
