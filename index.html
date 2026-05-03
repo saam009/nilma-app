@@ -142,7 +142,7 @@ body {
 </style>
 </head>
 
-<body>
+<body onclick="unlockAudio()">
 
 <div class="topbar">
 💰 Balance: <span id="balance">0</span>
@@ -193,6 +193,25 @@ body {
 let coins = parseInt(localStorage.getItem("coins")) || 0;
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
+  let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  const sounds = ["spinSound", "winSound", "clickSound"];
+
+  sounds.forEach(id => {
+    let sound = document.getElementById(id);
+    sound.muted = true;
+    sound.play().then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+      sound.muted = false;
+    }).catch(()=>{});
+  });
+
+  audioUnlocked = true;
+}
 document.addEventListener("click", () => {
 let spin = document.getElementById("spinSound");
 spin.currentTime = 0;
