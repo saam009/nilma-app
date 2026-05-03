@@ -88,11 +88,10 @@ body {
   transform: translateX(-50%);
   animation: float 3s ease-in-out infinite 2s;
 }
-
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-10px) scale(1.05); }
+  100% { transform: translateY(0px) scale(1); }
 }
 
 /* Wheel */
@@ -139,12 +138,13 @@ body {
   filter: blur(80px);
   z-index: -1;
 }
- .coin {
+.coin {
   position: fixed;
   font-size: 20px;
   color: gold;
   pointer-events: none;
   animation: fly 1s ease-out forwards;
+  z-index: 9999;   /* Makes sure the coin shows on top */
 }
 
 @keyframes fly {
@@ -238,7 +238,7 @@ function checkLevelUp() {
 function showCoin(x, y) {
   let coin = document.createElement("div");
   coin.className = "coin";
-  coin.innerText = "+5";
+  coin.innerText = "+5 💰";
 
   coin.style.left = x + "px";
   coin.style.top = y + "px";
@@ -328,8 +328,8 @@ checkLevelUp();
 
   update();
 
-  let x = event.clientX;
-  let y = event.clientY;
+let x = e.touches ? e.touches[0].clientX : e.clientX;
+let y = e.touches ? e.touches[0].clientY : e.clientY; 
   showCoin(x, y);
 }
 
