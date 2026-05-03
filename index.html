@@ -163,7 +163,8 @@ body {
 <body onclick="unlockAudio()">
 
 <div class="topbar">
-💰 Balance: <span id="balance">0</span>
+💰 Balance: <span id="balance">0</span><br>
+⚡ Energy: <span id="energy">100</span>
 </div>
 
 <div class="machine" onclick="mine(event)">⚡</div>
@@ -212,6 +213,8 @@ let coins = parseInt(localStorage.getItem("coins")) || 0;
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
   let audioUnlocked = false;
+  let energy = parseInt(localStorage.getItem("energy")) || 100;
+let maxEnergy = 100;
 function showCoin(x, y) {
   let coin = document.createElement("div");
   coin.className = "coin";
@@ -258,6 +261,7 @@ function save() {
 
 function update() {
   document.getElementById("balance").innerText = coins;
+  document.getElementById("energy").innerText = energy;
 }
 let taskDone = false;
 
@@ -283,13 +287,21 @@ function claimTask() {
 }
 update();
 function mine(event) {
+  if (energy <= 0) {
+    alert("No energy!");
+    return;
+  }
+
   coins += 5;
+  energy -= 1;
+
   save();
+  localStorage.setItem("energy", energy);
+
   update();
 
   let x = event.clientX;
   let y = event.clientY;
-
   showCoin(x, y);
 }
 // TASK
@@ -359,6 +371,13 @@ document.getElementById("spinSound").play().catch(()=>{});
     document.getElementById("wheelBox").style.display = "none";
   }, 3000);
 }
+  setInterval(() => {
+  if (energy < maxEnergy) {
+    energy += 1;
+    localStorage.setItem("energy", energy);
+    update();
+  }
+}, 3000);
 </script>
 <div id="taskBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:white; text-align:center; padding-top:100px;">
   
