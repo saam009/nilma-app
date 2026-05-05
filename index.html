@@ -284,11 +284,8 @@ function update() {
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
   document.getElementById("level").innerText = level;
-
-  document.getElementById("xpText").innerText = xp + " / " + xpMax;
-
-  let percent = (xp / xpMax) * 100;
-  document.getElementById("xpBar").style.width = percent + "%";
+let x = event.touches ? event.touches[0].clientX : event.clientX;
+let y = event.touches ? event.touches[0].clientY : event.clientY;
 }
 let taskDone = false;
 
@@ -328,9 +325,8 @@ checkLevelUp();
   localStorage.setItem("energy", energy);
 
   update();
-
-let x = e.touches ? e.touches[0].clientX : e.clientX;
-let y = e.touches ? e.touches[0].clientY : e.clientY; 
+ let x = event.clientX;
+let y = event.clientY;
   showCoin(x, y);
 }
 
