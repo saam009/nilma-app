@@ -6,57 +6,72 @@
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<style>
 body {
   margin: 0;
-  font-family: Arial;
-  background: radial-gradient(circle at center, #020617, #000);
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #0a0f1f, #000);
   color: white;
-  overflow: hidden;
-}
-.bottomNav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 75px;
-  background: rgba(10, 15, 30, 0.9);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid rgba(0,255,255,0.2);
-  backdrop-filter: blur(15px);
 }
 
-.bottomNav div {
-  color: #00ffff;
-  font-size: 13px;
+/* TOP PANEL */
+.topbar {
+  padding: 20px;
   text-align: center;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(0,255,255,0.2);
+  backdrop-filter: blur(20px);
+  border-radius: 18px;
+  padding: 15px;
+  margin: 10px;
+  box-shadow: 0 0 20px rgba(0,255,255,0.1);
+}
+
+.balance {
+  font-size: 24px;
+  color: #00ffff;
+}
+
+.stat {
+  font-size: 14px;
   opacity: 0.8;
 }
 
-.bottomNav div:active {
-  transform: scale(0.9);
-  opacity: 1;
-}  
-
-/* Balance */
-.topbar {
-  position: absolute;
-  top: 20px;
-  width: 100%;
-  text-align: center;
-  font-size: 22px;
-  color: #00ffff;
+/* ENERGY BAR */
+.bar {
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
 }
 
-/* Machine */
+.fill {
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, #00ffff, #0044ff);
+  transition: width 0.3s;
+}
+
+/* XP BAR */
+.xpFill {
+  height: 100%;
+  width: 10%;
+  background: linear-gradient(90deg, #ff00ff, #00ffff);
+}
+
+/* CENTER BUTTON */
+.center {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
 .machine {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   background: radial-gradient(circle, #00ffff, #0033ff);
   display: flex;
@@ -65,113 +80,79 @@ body {
   font-size: 40px;
   box-shadow:
     0 0 30px #00ffff,
-    0 0 80px #00ffff;
+    inset 0 0 20px rgba(255,255,255,0.2);
+  transition: all 0.15s ease;
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 20px #00ffff; }
-  50% { box-shadow: 0 0 50px #00ffff; }
-  100% { box-shadow: 0 0 20px #00ffff; }
+.machine:active {
+  transform: scale(0.9);
+  box-shadow: 0 0 15px #00ffff;
 }
 
-/* Buttons */
-.btn {
-  position: absolute;
-  padding: 14px 18px;
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(0,255,255,0.5);
-  color: #00ffff;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 10px rgba(0,255,255,0.3);
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px #00ffff;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-10px) scale(1.05); }
-  100% { transform: translateY(0px) scale(1); }
-}
-
-/* Wheel */
-#wheelBox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.9);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-#wheel {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  border: 6px solid cyan;
-  position: relative;
-  overflow: hidden;
-  transition: transform 3s ease-out;
-
-  background: conic-gradient(
-    #00ffff 0deg 60deg,
-    #0044ff 60deg 120deg,
-    #00ffff 120deg 180deg,
-    #0044ff 180deg 240deg,
-    #00ffff 240deg 300deg,
-    #0044ff 300deg 360deg
-  );
-}
- body::before {
-  content: "";
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(0,255,255,0.2), transparent);
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  filter: blur(80px);
-  z-index: -1;
-}
+/* FLOAT COIN */
 .coin {
   position: fixed;
-  font-size: 18px;
   color: gold;
-  font-weight: bold;
-  pointer-events: none;
-  animation: flyUp 0.8s ease-out forwards;
+  animation: flyUp 0.8s forwards;
 }
 
 @keyframes flyUp {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
+  to {
     transform: translateY(-80px);
     opacity: 0;
   }
 }
-</style>
+
+/* NAV */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(10,15,30,0.9);
+  border-top: 1px solid rgba(0,255,255,0.2);
+  backdrop-filter: blur(15px);
+}
+
+.bottomNav div {
+  text-align: center;
+  font-size: 12px;
+  color: #00ffff;
+  opacity: 0.7;
+}
+
+.bottomNav div:active {
+  transform: scale(0.9);
+  opacity: 1;
+}
 </head>
 
 <body onclick="unlockAudio()">
 
 <div class="topbar">
-💰 Balance: <span id="balance">0</span><br>
-⚡ Energy: <span id="energy">100</span><br>
-⭐ Level: <span id="level">1</span>
+
+  <div class="card">
+    <div class="balance">💰 <span id="balance">0</span></div>
+
+    <div class="stat">⚡ Energy: <span id="energy">100</span></div>
+    <div class="bar">
+      <div class="fill" id="energyBar"></div>
+    </div>
+
+    <div class="stat">⭐ Level: <span id="level">1</span></div>
+    <div class="bar">
+      <div class="xpFill" id="xpBar"></div>
+    </div>
+  </div>
+
 </div>
-<div class="machine" onclick="mine(event)">⚡</div>
+
+<div class="center">
+  <div class="machine" onclick="mine(event)">⚡</div>
+</div>
 
 <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
 <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
@@ -284,8 +265,14 @@ function update() {
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
   document.getElementById("level").innerText = level;
-let x = event.touches ? event.touches[0].clientX : event.clientX;
-let y = event.touches ? event.touches[0].clientY : event.clientY;
+
+  // ENERGY BAR
+  let energyPercent = (energy / maxEnergy) * 100;
+  document.getElementById("energyBar").style.width = energyPercent + "%";
+
+  // XP BAR
+  let xpPercent = (xp / xpMax) * 100;
+  document.getElementById("xpBar").style.width = xpPercent + "%";
 }
 let taskDone = false;
 
