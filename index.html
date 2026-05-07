@@ -33,10 +33,23 @@ body::before {
 /* SCREEN SYSTEM */
 .screen {
   display: none;
+  animation: fade 0.3s ease;
 }
 
 .screen.active {
   display: block;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* TOP */
@@ -243,9 +256,9 @@ button {
   </div>
 
   <div class="center">
-    <div class="machine" onclick="mine(event)">⚡</div>
-  </div>
-
+  <div class="machine" onclick="mine(event)">
+  <img src="logo.png" width="90">
+</div>
 </div>
 
 <!-- SPIN SCREEN -->
@@ -325,7 +338,22 @@ button {
   </div>
 
 </div>
+<!-- SHOP SCREEN -->
+<div id="shopScreen" class="screen">
 
+  <h2 style="text-align:center; margin-top:40px;">
+    💎 Upgrades Shop
+  </h2>
+
+  <div style="text-align:center; margin-top:40px;">
+
+    <button onclick="buyUpgrade()">
+      Upgrade Mining (+1)
+    </button>
+
+  </div>
+
+</div>
 <!-- AUDIO -->
 <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
 
@@ -351,7 +379,9 @@ button {
   <div onclick="showScreen('dailyScreen')">
     🎁 Daily
   </div>
-
+<div onclick="showScreen('shopScreen')">
+  💎 Shop
+</div>
 </div>
 
 <script>
@@ -370,6 +400,7 @@ let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 
 let maxEnergy = 100;
 let taskDone = false;
+  let minePower = 5;
 
 update();
 
@@ -419,7 +450,7 @@ function mine(event) {
     return;
   }
 
-  coins += 5;
+  let minePower = 5;
   xp += 10;
   energy -= 1;
 
