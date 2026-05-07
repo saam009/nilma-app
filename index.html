@@ -260,6 +260,7 @@ button {
   <img src="logo.png" width="90">
 </div>
 </div>
+  </div>
 
 <!-- SPIN SCREEN -->
 <div id="spinScreen" class="screen">
@@ -400,8 +401,7 @@ let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 
 let maxEnergy = 100;
 let taskDone = false;
-  let minePower = 5;
-
+let minePower = 5;
 update();
 
 /* SCREEN SYSTEM */
@@ -442,7 +442,6 @@ function save() {
 }
 
 /* MINE */
-
 function mine(event) {
 
   if (energy <= 0) {
@@ -450,7 +449,7 @@ function mine(event) {
     return;
   }
 
-  let minePower = 5;
+  coins += minePower;
   xp += 10;
   energy -= 1;
 
@@ -621,6 +620,16 @@ setInterval(() => {
   }
 
 }, 3000);
+  /* PASSIVE MINING */
+
+setInterval(() => {
+
+  coins += level;
+
+  save();
+  update();
+
+}, 5000);
 
 /* AUDIO */
 
