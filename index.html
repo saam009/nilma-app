@@ -7,6 +7,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -15,7 +16,7 @@ body {
   overflow: hidden;
 }
 
-/* ADD THIS DIRECTLY BELOW body */
+/* BACKGROUND GLOW */
 body::before {
   content: "";
   position: fixed;
@@ -29,104 +30,16 @@ body::before {
   z-index: -1;
 }
 
-.machine {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #00ffff, #0033ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-
-  box-shadow:
-    0 0 20px #00ffff,
-    0 0 60px rgba(0,255,255,0.6),
-    inset 0 0 20px rgba(255,255,255,0.2);
-
-  animation: pulse 2s infinite;
-  transition: all 0.15s ease;
+/* SCREEN SYSTEM */
+.screen {
+  display: none;
 }
 
-.machine:active {
-  transform: scale(0.88);
+.screen.active {
+  display: block;
 }
 
-/* ADD THIS RIGHT BELOW IT */
-@keyframes pulse {
-  0% { box-shadow: 0 0 20px #00ffff; }
-  50% { box-shadow: 0 0 60px #00ffff; }
-  100% { box-shadow: 0 0 20px #00ffff; }
-}
-
-/* NAV */
-.bottomNav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 70px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background: rgba(10,15,30,0.9);
-  border-top: 1px solid rgba(0,255,255,0.2);
-  backdrop-filter: blur(15px);
-}
-
-.bottomNav div {
-  text-align: center;
-  font-size: 12px;
-  color: #00ffff;
-  opacity: 0.7;
-}
-
-.bottomNav div:active {
-  transform: scale(0.9);
-  opacity: 1;
-}
-  #wheelBox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none; /* IMPORTANT */
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  background: rgba(0,0,0,0.9);
-  z-index: 999;
-}
-
-/* WHEEL */
-#wheel {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  border: 5px solid cyan;
-  background: conic-gradient(
-    #00ffff 0deg 60deg,
-    #0044ff 60deg 120deg,
-    #00ffff 120deg 180deg,
-    #0044ff 180deg 240deg,
-    #00ffff 240deg 300deg,
-    #0044ff 300deg 360deg
-  );
-  transition: transform 3s ease-out;
-}
-
-/* SPIN BUTTON */
-.spinBtn {
-  margin-top: 20px;
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(90deg, #00ffff, #0044ff);
-  color: black;
-  font-weight: bold;
-}
-  /* ===== FIX MISSING UI STRUCTURE ===== */
-
+/* TOP */
 .topbar {
   padding: 20px;
   text-align: center;
@@ -174,96 +87,377 @@ body::before {
   background: linear-gradient(90deg, #ff00ff, #00ffff);
 }
 
+/* CENTER */
 .center {
   display: flex;
   justify-content: center;
   margin-top: 40px;
 }
 
-/* OPTIONAL: smooth hover feel */
-.machine:hover {
-  transform: scale(1.05);
-}
-</style>
+/* MACHINE */
+.machine {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00ffff, #0033ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
 
+  box-shadow:
+    0 0 20px #00ffff,
+    0 0 60px rgba(0,255,255,0.6),
+    inset 0 0 20px rgba(255,255,255,0.2);
+
+  animation: pulse 2s infinite;
+  transition: all 0.15s ease;
+}
+
+.machine:active {
+  transform: scale(0.88);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 20px #00ffff; }
+  50% { box-shadow: 0 0 60px #00ffff; }
+  100% { box-shadow: 0 0 20px #00ffff; }
+}
+
+/* FLOAT COIN */
+.coin {
+  position: fixed;
+  color: gold;
+  font-weight: bold;
+  animation: flyUp 0.8s forwards;
+}
+
+@keyframes flyUp {
+  to {
+    transform: translateY(-80px);
+    opacity: 0;
+  }
+}
+
+/* WHEEL */
+#wheel {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 5px solid cyan;
+  background: conic-gradient(
+    #00ffff 0deg 60deg,
+    #0044ff 60deg 120deg,
+    #00ffff 120deg 180deg,
+    #0044ff 180deg 240deg,
+    #00ffff 240deg 300deg,
+    #0044ff 300deg 360deg
+  );
+  transition: transform 3s ease-out;
+  margin-top: 20px;
+}
+
+/* BUTTON */
+.spinBtn {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(90deg, #00ffff, #0044ff);
+  color: black;
+  font-weight: bold;
+}
+
+/* NAV */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(10,15,30,0.9);
+  border-top: 1px solid rgba(0,255,255,0.2);
+  backdrop-filter: blur(15px);
+}
+
+.bottomNav div {
+  text-align: center;
+  font-size: 12px;
+  color: #00ffff;
+  opacity: 0.8;
+}
+
+.bottomNav div:active {
+  transform: scale(0.9);
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg,#00ffff,#0044ff);
+  color: black;
+  font-weight: bold;
+}
+
+</style>
 </head>
+
 <body onclick="unlockAudio()">
 
-<div class="topbar">
+<!-- HOME SCREEN -->
+<div id="homeScreen" class="screen active">
 
-  <div class="card">
-    <div class="balance">💰 <span id="balance">0</span></div>
+  <div class="topbar">
 
-    <div class="stat">⚡ Energy: <span id="energy">100</span></div>
-    <div class="bar">
-      <div class="fill" id="energyBar"></div>
+    <div class="card">
+
+      <div class="balance">
+        💰 <span id="balance">0</span>
+      </div>
+
+      <br>
+
+      <div class="stat">
+        ⚡ Energy: <span id="energy">100</span>
+      </div>
+
+      <div class="bar">
+        <div class="fill" id="energyBar"></div>
+      </div>
+
+      <br>
+
+      <div class="stat">
+        ⭐ Level: <span id="level">1</span>
+      </div>
+
+      <div class="bar">
+        <div class="xpFill" id="xpBar"></div>
+      </div>
+
     </div>
 
-    <div class="stat">⭐ Level: <span id="level">1</span></div>
-    <div class="bar">
-      <div class="xpFill" id="xpBar"></div>
-    </div>
+  </div>
+
+  <div class="center">
+    <div class="machine" onclick="mine(event)">⚡</div>
   </div>
 
 </div>
 
-<div class="center">
-  <div class="machine" onclick="mine(event)">⚡</div>
-</div>
+<!-- SPIN SCREEN -->
+<div id="spinScreen" class="screen">
 
-<audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
-<audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
-<audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>  
-  <div id="wheelBox">
+  <h2 style="text-align:center; margin-top:40px;">
+    🎰 Spin Wheel
+  </h2>
 
-  <!-- pointer -->
   <div style="
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 25px solid #00ffff;
-    margin-bottom: 15px;
-  "></div>
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-top:40px;
+  ">
 
-  <!-- wheel -->
-  <div id="wheel"></div>
+    <!-- POINTER -->
+    <div style="
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 25px solid #00ffff;
+      margin-bottom: 15px;
+    "></div>
 
-  <!-- button -->
-  <button class="spinBtn" onclick="spinWheel()">SPIN</button>
+    <!-- WHEEL -->
+    <div id="wheel"></div>
+
+    <!-- BUTTON -->
+    <button class="spinBtn" onclick="spinWheel()">
+      SPIN
+    </button>
 
   </div>
+
+</div>
+
+<!-- TASK SCREEN -->
+<div id="taskScreen" class="screen">
+
+  <h2 style="text-align:center; margin-top:40px;">
+    📋 Tasks
+  </h2>
+
+  <div style="text-align:center; margin-top:40px;">
+
+    <p>Follow our Instagram</p>
+
+    <button onclick="openInsta()">
+      Open Instagram
+    </button>
+
+    <br><br>
+
+    <button onclick="claimTask()">
+      Claim Reward
+    </button>
+
+  </div>
+
+</div>
+
+<!-- DAILY SCREEN -->
+<div id="dailyScreen" class="screen">
+
+  <h2 style="text-align:center; margin-top:40px;">
+    🎁 Daily Reward
+  </h2>
+
+  <div style="text-align:center; margin-top:40px;">
+
+    <button onclick="daily()">
+      Claim Daily Reward
+    </button>
+
+  </div>
+
+</div>
+
+<!-- AUDIO -->
+<audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
+
+<audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+
+<audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>
+
+<!-- NAV -->
+<div class="bottomNav">
+
+  <div onclick="showScreen('homeScreen')">
+    ⚡ Mine
+  </div>
+
+  <div onclick="showScreen('spinScreen')">
+    🎰 Spin
+  </div>
+
+  <div onclick="showScreen('taskScreen')">
+    📋 Tasks
+  </div>
+
+  <div onclick="showScreen('dailyScreen')">
+    🎁 Daily
+  </div>
+
+</div>
 
 <script>
-// LOAD DATA
+
+/* DATA */
+
 let coins = parseInt(localStorage.getItem("coins")) || 0;
+let energy = parseInt(localStorage.getItem("energy")) || 100;
+let level = parseInt(localStorage.getItem("level")) || 1;
+let xp = parseInt(localStorage.getItem("xp")) || 0;
+
+let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
+
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
-  let audioUnlocked = false;
-  let energy = parseInt(localStorage.getItem("energy")) || 100;
+
 let maxEnergy = 100;
-  let level = parseInt(localStorage.getItem("level")) || 1;
-let levelUpCost = parseInt(localStorage.getItem("levelUpCost")) || 100;
-  let xp = parseInt(localStorage.getItem("xp")) || 0;
-let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
+let taskDone = false;
+
+update();
+
+/* SCREEN SYSTEM */
+
+function showScreen(screenId) {
+
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.style.display = "none";
+  });
+
+  document.getElementById(screenId).style.display = "block";
+}
+
+/* UPDATE UI */
+
+function update() {
+
+  document.getElementById("balance").innerText = coins;
+  document.getElementById("energy").innerText = energy;
+  document.getElementById("level").innerText = level;
+
+  let energyPercent = (energy / maxEnergy) * 100;
+  document.getElementById("energyBar").style.width = energyPercent + "%";
+
+  let xpPercent = (xp / xpMax) * 100;
+  document.getElementById("xpBar").style.width = xpPercent + "%";
+}
+
+/* SAVE */
+
+function save() {
+
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("energy", energy);
+  localStorage.setItem("level", level);
+  localStorage.setItem("xp", xp);
+  localStorage.setItem("xpMax", xpMax);
+}
+
+/* MINE */
+
+function mine(event) {
+
+  if (energy <= 0) {
+    alert("No energy!");
+    return;
+  }
+
+  coins += 5;
+  xp += 10;
+  energy -= 1;
+
+  checkLevelUp();
+
+  save();
+  update();
+
+  showCoin(event.clientX, event.clientY);
+
+  document.getElementById("clickSound").play().catch(()=>{});
+}
+
+/* LEVEL */
+
 function checkLevelUp() {
+
   if (xp >= xpMax) {
-    xp = xp - xpMax;   // reduce XP after level up
-    level += 1;        // increase level
 
-    xpMax = Math.floor(xpMax * 1.5); // next level harder
+    xp -= xpMax;
 
-    localStorage.setItem("level", level);
-    localStorage.setItem("xp", xp);
-    localStorage.setItem("xpMax", xpMax);
+    level += 1;
 
-    alert("LEVEL UP! Now level " + level);
+    xpMax = Math.floor(xpMax * 1.5);
 
+    alert("LEVEL UP! ⭐");
+
+    save();
     update();
   }
 }
+
+/* FLOAT COIN */
+
 function showCoin(x, y) {
+
   let coin = document.createElement("div");
+
   coin.className = "coin";
   coin.innerText = "+5";
 
@@ -276,185 +470,162 @@ function showCoin(x, y) {
     coin.remove();
   }, 800);
 }
-function unlockAudio() {
-  if (audioUnlocked) return;
 
-  const sounds = ["spinSound", "winSound", "clickSound"];
+/* DAILY */
 
-  sounds.forEach(id => {
-    let sound = document.getElementById(id);
-    sound.muted = true;
-    sound.play().then(() => {
-      sound.pause();
-      sound.currentTime = 0;
-      sound.muted = false;
-    }).catch(()=>{});
-  });
-
-  audioUnlocked = true;
-}
-document.addEventListener("click", () => {
-let spin = document.getElementById("spinSound");
-spin.currentTime = 0;
-spin.play().catch(()=>{});
-let winS = document.getElementById("winSound");
-winS.currentTime = 0;
-winS.play().catch(()=>{});
-  document.getElementById("clickSound").play().catch(()=>{});
-}, { once: true });
-function save() {
-  localStorage.setItem("coins", coins);
-}
-
-function update() {
-  document.getElementById("balance").innerText = coins;
-  document.getElementById("energy").innerText = energy;
-  document.getElementById("level").innerText = level;
-
-  // ENERGY BAR
-  let energyPercent = (energy / maxEnergy) * 100;
-  document.getElementById("energyBar").style.width = energyPercent + "%";
-
-  // XP BAR
-  let xpPercent = (xp / xpMax) * 100;
-  document.getElementById("xpBar").style.width = xpPercent + "%";
-}
-let taskDone = false;
-
-function openInsta() {
-  window.open("https://instagram.com/");
-  taskDone = true;
-}
-
-function claimTask() {
-  if (!taskDone) {
-    alert("Complete the task first!");
-    return;
-  }
-
-  coins += 30;
-  save();
-  update();
-
-  alert("Task reward +30");
-
-  document.getElementById("taskBox").style.display = "none";
-  taskDone = false;
-}
-update();
-function mine(event) {
-  if (energy <= 0) {
-    alert("No energy!");
-    return;
-  }
-  
-  coins += 5;
-  xp += 10;
-localStorage.setItem("xp", xp);
-  energy -= 1;
-checkLevelUp();
-  save();
-  localStorage.setItem("energy", energy);
-
-  update();
- let x = event.clientX;
-let y = event.clientY;
-  showCoin(x, y);
-}
-
-// TASK
-function task() {
-  document.getElementById("taskBox").style.display = "block";
-}
-// DAILY (24h)
-// DAILY
 function daily() {
+
   let now = Date.now();
 
   if (now - lastDaily < 86400000) {
+
     alert("Come back tomorrow!");
     return;
   }
 
   coins += 50;
+
   lastDaily = now;
+
   localStorage.setItem("lastDaily", lastDaily);
 
   save();
   update();
+
+  alert("+50 Coins");
 }
 
-// OPEN WHEEL
-function openWheel() {
-  document.getElementById("wheelBox").style.display = "flex";
+/* TASK */
+
+function openInsta() {
+
+  window.open("https://instagram.com/");
+  taskDone = true;
 }
+
+function claimTask() {
+
+  if (!taskDone) {
+
+    alert("Complete task first!");
+    return;
+  }
+
+  coins += 30;
+
+  save();
+  update();
+
+  alert("+30 Coins");
+
+  taskDone = false;
+}
+
+/* SPIN */
+
 function spinWheel() {
-document.getElementById("spinSound").play().catch(()=>{});
+
   let now = Date.now();
 
   if (now - lastSpin < 10000) {
+
     alert("Wait a few seconds!");
     return;
   }
 
   lastSpin = now;
+
   localStorage.setItem("lastSpin", lastSpin);
 
-  let rewards = [0, 10, 20, 50, 100, 200];
+  document.getElementById("spinSound").play().catch(()=>{});
+
+  let rewards = [0,10,20,50,100,200];
+
   let index = Math.floor(Math.random() * rewards.length);
+
   let win = rewards[index];
 
   let wheel = document.getElementById("wheel");
 
-  // RESET FIRST (important)
   wheel.style.transition = "none";
   wheel.style.transform = "rotate(0deg)";
 
   setTimeout(() => {
+
     let segmentAngle = 360 / rewards.length;
+
     let rotation = (360 * 5) + (index * segmentAngle);
 
     wheel.style.transition = "transform 3s ease-out";
-    wheel.style.transform = "rotate(" + rotation + "deg)";
+
+    wheel.style.transform =
+      "rotate(" + rotation + "deg)";
+
   }, 50);
 
   setTimeout(() => {
-  document.getElementById("winSound").play().catch(()=>{});
+
+    document.getElementById("winSound").play().catch(()=>{});
+
     coins += win;
+
     save();
     update();
 
     alert("You won " + win + " coins");
 
-    document.getElementById("wheelBox").style.display = "none";
   }, 3000);
 }
-  setInterval(() => {
+
+/* ENERGY REGEN */
+
+setInterval(() => {
+
   if (energy < maxEnergy) {
+
     energy += 1;
-    localStorage.setItem("energy", energy);
+
+    save();
     update();
   }
+
 }, 3000);
-  </script>
-<div id="taskBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:white; text-align:center; padding-top:100px;">
-  
-  <h2>📋 Complete Task</h2>
 
-  <p>Follow our Instagram</p>
+/* AUDIO */
 
-  <button onclick="openInsta()">Open Instagram</button>
+let audioUnlocked = false;
 
-  <br><br>
+function unlockAudio() {
 
-  <button onclick="claimTask()">✅ Claim Reward</button>
+  if (audioUnlocked) return;
 
-</div>
-<div class="bottomNav">
-  <div onclick="mine(event)">⚡ Mine</div>
-  <div onclick="openWheel()">🎰 Spin</div>
-  <div onclick="task()">📋 Tasks</div>
-  <div onclick="daily()">🎁 Daily</div>
-</div>
+  const sounds = [
+    "spinSound",
+    "winSound",
+    "clickSound"
+  ];
+
+  sounds.forEach(id => {
+
+    let sound = document.getElementById(id);
+
+    sound.muted = true;
+
+    sound.play().then(() => {
+
+      sound.pause();
+
+      sound.currentTime = 0;
+
+      sound.muted = false;
+
+    }).catch(()=>{});
+  });
+
+  audioUnlocked = true;
+}
+
+</script>
+
 </body>
 </html>
