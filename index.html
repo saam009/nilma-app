@@ -8,321 +8,343 @@
 
 <style>
 
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at top, #0a0f1f, #000);
-  color: white;
-  overflow: hidden;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-/* BACKGROUND GLOW */
-body::before {
-  content: "";
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(0,255,255,0.15), transparent);
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  filter: blur(100px);
-  z-index: -1;
+body{
+  font-family:Segoe UI,sans-serif;
+  background:
+  linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.85)),
+  url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200');
+  background-size:cover;
+  background-position:center;
+  color:white;
+  min-height:100vh;
+  overflow-x:hidden;
+  padding-bottom:90px;
 }
 
-/* SCREEN SYSTEM */
-.screen {
-  display: none;
-  animation: fade 0.3s ease;
+/* SCREENS */
+
+.screen{
+  display:none;
+  padding-bottom:100px;
 }
 
-.screen.active {
-  display: block;
+.screen.active{
+  display:block;
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+/* TOP BAR */
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.topHeader{
+  padding:14px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(10px);
 }
 
-/* TOP */
-.topbar {
-  padding: 20px;
-  text-align: center;
+.balanceRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
 }
 
-.card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(0,255,255,0.25);
-  backdrop-filter: blur(25px);
-  border-radius: 20px;
-  padding: 18px;
-  margin: 12px;
+.balanceBox{
+  background:rgba(255,215,0,.12);
+  border:1px solid rgba(255,215,0,.3);
+  border-radius:14px;
+  padding:10px 14px;
+  flex:1;
+}
+
+.balanceTitle{
+  font-size:13px;
+  opacity:.8;
+}
+
+.balanceValue{
+  font-size:22px;
+  font-weight:bold;
+  color:#ffd54a;
+}
+
+/* HERO */
+
+.heroCard{
+  margin:15px;
+  padding:18px;
+  border-radius:22px;
+  background:
+  linear-gradient(135deg,
+  rgba(255,215,0,.16),
+  rgba(255,140,0,.08));
+
+  border:1px solid rgba(255,215,0,.25);
+
+  backdrop-filter:blur(12px);
+}
+
+.heroTitle{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.heroSub{
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* LEVEL */
+
+.levelBox{
+  margin-top:15px;
+}
+
+.progress{
+  height:12px;
+  background:rgba(255,255,255,.1);
+  border-radius:30px;
+  overflow:hidden;
+}
+
+.progressFill{
+  height:100%;
+  width:40%;
+  border-radius:30px;
+  background:linear-gradient(90deg,#ffd54a,#ff9800);
+}
+
+/* MAIN BUTTON */
+
+.mineWrap{
+  display:flex;
+  justify-content:center;
+  margin-top:35px;
+}
+
+.mineBtn{
+  width:190px;
+  height:190px;
+  border-radius:50%;
+  border:none;
+
+  background:
+  radial-gradient(circle at top,
+  #ffe082,
+  #ff9800,
+  #7a3e00);
+
+  color:white;
+  font-size:60px;
+  font-weight:bold;
+
   box-shadow:
-    0 0 30px rgba(0,255,255,0.1),
-    inset 0 0 10px rgba(255,255,255,0.05);
+  0 0 40px rgba(255,170,0,.7),
+  0 0 100px rgba(255,140,0,.5);
+
+  transition:.15s;
 }
 
-.balance {
-  font-size: 24px;
-  color: #00ffff;
+.mineBtn:active{
+  transform:scale(.92);
 }
 
-.stat {
-  font-size: 14px;
-  opacity: 0.8;
+/* SECTION */
+
+.section{
+  margin:18px;
 }
 
-.bar {
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 8px;
+.sectionTitle{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:14px;
 }
 
-.fill {
-  height: 100%;
-  width: 50%;
-  background: linear-gradient(90deg, #00ffff, #0044ff);
+/* GAME GRID */
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
 }
 
-.xpFill {
-  height: 100%;
-  width: 10%;
-  background: linear-gradient(90deg, #ff00ff, #00ffff);
+.gameCard{
+  background:rgba(255,255,255,.06);
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
 }
 
-/* CENTER */
-.center {
-  display: flex;
-  justify-content: center;
-  margin-top: 40px;
+.gameCard img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
 }
 
-/* MACHINE */
-.machine {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #00ffff, #0033ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-
-  box-shadow:
-    0 0 20px #00ffff,
-    0 0 60px rgba(0,255,255,0.6),
-    inset 0 0 20px rgba(255,255,255,0.2);
-
-  animation: pulse 2s infinite;
-  transition: all 0.15s ease;
+.gameInfo{
+  padding:12px;
 }
 
-.machine:active {
-  transform: scale(0.88);
+.gameTitle{
+  font-weight:700;
+  margin-bottom:8px;
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 20px #00ffff; }
-  50% { box-shadow: 0 0 60px #00ffff; }
-  100% { box-shadow: 0 0 20px #00ffff; }
+.playBtn{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+
+  background:linear-gradient(90deg,#ffd54a,#ff9800);
+
+  color:black;
+  font-weight:bold;
 }
 
-/* FLOAT COIN */
-.coin {
-  position: fixed;
-  color: gold;
-  font-weight: bold;
-  animation: flyUp 0.8s forwards;
-}
+/* CARDS */
 
-@keyframes flyUp {
-  to {
-    transform: translateY(-80px);
-    opacity: 0;
-  }
-}
-
-/* WHEEL */
- .wheelContainer{
-  position:relative;
-  width:240px;
-  height:240px;
-} 
-#wheel {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  border: 5px solid cyan;
-  background: conic-gradient(
-    #00ffff 0deg 60deg,
-    #0044ff 60deg 120deg,
-    #00ffff 120deg 180deg,
-    #0044ff 180deg 240deg,
-    #00ffff 240deg 300deg,
-    #0044ff 300deg 360deg
-  );
-  transition: transform 3s ease-out;
-  margin-top: 20px;
+.card{
+  background:rgba(255,255,255,.06);
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:15px;
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);
 }
 
 /* BUTTON */
-.spinBtn {
-  margin-top: 20px;
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(90deg, #00ffff, #0044ff);
-  color: black;
-  font-weight: bold;
+
+button{
+  cursor:pointer;
 }
 
-/* NAV */
-.bottomNav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 70px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background: rgba(10,15,30,0.9);
-  border-top: 1px solid rgba(0,255,255,0.2);
-  backdrop-filter: blur(15px);
-}
+/* BOTTOM NAV */
 
-.bottomNav div {
-  text-align: center;
-  font-size: 12px;
-  color: #00ffff;
-  opacity: 0.8;
-}
-
-.bottomNav div:active {
-  transform: scale(0.9);
-}
-
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(90deg,#00ffff,#0044ff);
-  color: black;
-  font-weight: bold;
-}
-  /* NEW CYBER BACKGROUND */
-.cyberBg{
+.bottomNav{
   position:fixed;
-  width:100%;
-  height:100%;
-  top:0;
+  bottom:0;
   left:0;
+  width:100%;
+  height:80px;
 
-  background:
-  repeating-linear-gradient(
-    90deg,
-    rgba(0,255,255,0.05) 0px,
-    rgba(0,255,255,0.05) 2px,
-    transparent 2px,
-    transparent 80px
-  );
+  background:rgba(0,0,0,.85);
 
-  animation:bgMove 10s linear infinite;
+  border-top:1px solid rgba(255,255,255,.08);
 
-  z-index:-2;
-}
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
 
-@keyframes bgMove{
-  from{
-    transform:translateY(0);
-  }
-
-  to{
-    transform:translateY(100px);
-  }
-}
-
-/* WHEEL */
-#wheel {
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  border: 5px solid cyan;
-  position: relative;
-  overflow: hidden;
-
-  background: conic-gradient(
-    #00ffff 0deg 60deg,
-    #0044ff 60deg 120deg,
-    #00ffff 120deg 180deg,
-    #0044ff 180deg 240deg,
-    #00ffff 240deg 300deg,
-    #0044ff 300deg 360deg
-  );
-
-  transition: transform 3s ease-out;
-
-  box-shadow:
-    0 0 40px rgba(0,255,255,0.5),
-    inset 0 0 20px rgba(255,255,255,0.2);
-}
-
-.wheelText{
-  position:absolute;
-  color:white;
-  font-weight:bold;
-  font-size:18px;
-  text-shadow:0 0 10px black;
-}
-
-.wheelArrow{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:0;
-  height:0;
-
-  border-left:18px solid transparent;
-  border-right:18px solid transparent;
-  border-top:35px solid #00ffff;
+  backdrop-filter:blur(20px);
 
   z-index:999;
 }
 
-/* wheel number positions */
-.t1{ top:15px; left:100px; }
-.t2{ top:55px; right:25px; }
-.t3{ bottom:55px; right:25px; }
-.t4{ bottom:15px; left:100px; }
-.t5{ bottom:55px; left:25px; }
-.t6{ top:55px; left:25px; }
-
-/* SMALLER NAV ITEMS */
-.bottomNav div{
+.navItem{
+  text-align:center;
+  font-size:12px;
+  color:#bbb;
   flex:1;
-  font-size:11px;
 }
 
-/* BACK BUTTON */
-.backBtn{
-  margin:15px;
+.navItem.active{
+  color:#ffd54a;
 }
 
-/* MACHINE LOGO */
-.machine img{
-  width:90px;
-  height:90px;
-  object-fit:contain;
+.navIcon{
+  font-size:24px;
+  margin-bottom:4px;
+}
+
+/* TOAST */
+
+#toast{
+  position:fixed;
+  top:30px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  border:1px solid #ff9800;
+  padding:14px 22px;
+  border-radius:14px;
+  color:#ffd54a;
+  display:none;
+  z-index:99999;
+}
+
+/* SPIN WHEEL */
+
+#wheel{
+  width:260px;
+  height:260px;
+  border-radius:50%;
+
+  background:conic-gradient(
+  #ff9800 0deg 60deg,
+  #ffd54a 60deg 120deg,
+  #ff9800 120deg 180deg,
+  #ffd54a 180deg 240deg,
+  #ff9800 240deg 300deg,
+  #ffd54a 300deg 360deg
+  );
+
+  border:8px solid rgba(255,255,255,.15);
+
+  box-shadow:
+  0 0 30px rgba(255,152,0,.5);
+
+  transition:transform 4s cubic-bezier(.17,.67,.18,1);
+}
+
+.wheelContainer{
+  position:relative;
+  width:260px;
+  height:260px;
+  margin:auto;
+}
+
+.wheelArrow{
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+
+  border-left:20px solid transparent;
+  border-right:20px solid transparent;
+  border-top:40px solid #fff;
+
+  z-index:20;
+}
+
+/* FLOAT COIN */
+
+.coin{
+  position:fixed;
+  color:#ffd54a;
+  font-size:24px;
+  font-weight:bold;
+  pointer-events:none;
+  animation:floatCoin .8s forwards;
+}
+
+@keyframes floatCoin{
+  to{
+    transform:translateY(-80px);
+    opacity:0;
+  }
 }
 
 </style>
@@ -333,49 +355,90 @@ button {
 
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
-  <button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
+
+<div class="topHeader">
+
+<div class="balanceRow">
+
+<div class="balanceBox">
+<div class="balanceTitle">Coins</div>
+<div class="balanceValue">💰 <span id="balance">0</span></div>
+</div>
+
+<div class="balanceBox">
+<div class="balanceTitle">Energy</div>
+<div class="balanceValue">⚡ <span id="energy">100</span></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="heroCard">
+
+<div class="heroTitle">
+Ready To Get RICH?
+</div>
+
+<div class="heroSub">
+Mine coins, level up, spin rewards and dominate leaderboard.
+</div>
+
+<div class="levelBox">
+
+<div style="margin-bottom:8px;">
+Level <span id="level">1</span>
+</div>
+
+<div class="progress">
+<div class="progressFill" id="xpBar"></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="mineWrap">
+
+<button class="mineBtn" onclick="mine(event)">
+💰
 </button>
 
-  <div class="topbar">
-
-    <div class="card">
-
-      <div class="balance">
-        💰 <span id="balance">0</span>
-      </div>
-
-      <br>
-
-      <div class="stat">
-        ⚡ Energy: <span id="energy">100</span>
-      </div>
-
-      <div class="bar">
-        <div class="fill" id="energyBar"></div>
-      </div>
-
-      <br>
-
-      <div class="stat">
-        ⭐ Level: <span id="level">1</span>
-      </div>
-
-      <div class="bar">
-        <div class="xpFill" id="xpBar"></div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <div class="center">
- <div class="machine" onclick="mine(event)">
-  ⚡
-</div> 
 </div>
-  </div>
+
+<div class="section">
+
+<div class="sectionTitle">
+Mini Games
+</div>
+
+<div class="grid">
+
+<div class="gameCard">
+<img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800">
+<div class="gameInfo">
+<div class="gameTitle">Spin Wheel</div>
+<button class="playBtn" onclick="showScreen('spinScreen')">
+PLAY
+</button>
+</div>
+</div>
+
+<div class="gameCard">
+<img src="https://images.unsplash.com/photo-1511884642898-4c92249e20b6?q=80&w=800">
+<div class="gameInfo">
+<div class="gameTitle">Tasks</div>
+<button class="playBtn" onclick="showScreen('taskScreen')">
+OPEN
+</button>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 <!-- SPIN SCREEN -->
 <div id="spinScreen" class="screen">
@@ -383,6 +446,10 @@ onclick="showScreen('homeScreen')">
 onclick="showScreen('homeScreen')">
 ⬅ Back
 </button> 
+  <div class="heroCard" style="text-align:center;">
+<h2>Lucky Spin</h2>
+<p>Win massive rewards instantly</p>
+</div>
 
   <h2 style="text-align:center; margin-top:40px;">
     🎰 Spin Wheel
@@ -549,27 +616,31 @@ onclick="showScreen('homeScreen')">
 <!-- NAV -->
 <div class="bottomNav">
 
-  <div onclick="showScreen('homeScreen')">
-    ⚡ Mine
-  </div>
-
-  <div onclick="showScreen('spinScreen')">
-    🎰 Spin
-  </div>
-
-  <div onclick="showScreen('taskScreen')">
-    📋 Tasks
-  </div>
-
-  <div onclick="showScreen('dailyScreen')">
-    🎁 Daily
-  </div>
-<div onclick="showScreen('shopScreen')">
-  💎 Shop
+<div class="navItem active" onclick="showScreen('homeScreen')">
+<div class="navIcon">🏠</div>
+Home
 </div>
-  <div onclick="showScreen('leaderboardScreen')">
-  🏆 Top
+
+<div class="navItem" onclick="showScreen('spinScreen')">
+<div class="navIcon">🎰</div>
+Spin
 </div>
+
+<div class="navItem" onclick="showScreen('taskScreen')">
+<div class="navIcon">📋</div>
+Tasks
+</div>
+
+<div class="navItem" onclick="showScreen('shopScreen')">
+<div class="navIcon">💎</div>
+Shop
+</div>
+
+<div class="navItem" onclick="showScreen('leaderboardScreen')">
+<div class="navIcon">🏆</div>
+Top
+</div>
+
 </div>
 <!-- TOAST -->
 
@@ -614,14 +685,20 @@ update();
 
 
 /* SCREEN SYSTEM */
+function showScreen(screenId){
 
-function showScreen(screenId) {
-
-  document.querySelectorAll(".screen").forEach(screen => {
-    screen.style.display = "none";
+  document.querySelectorAll(".screen").forEach(screen=>{
+    screen.classList.remove("active");
   });
 
-  document.getElementById(screenId).style.display = "block";
+  document.getElementById(screenId)
+  .classList.add("active");
+
+  document.querySelectorAll(".navItem")
+  .forEach(item=>{
+    item.classList.remove("active");
+  });
+
 }
 
 /* UPDATE UI */
@@ -637,6 +714,8 @@ function update() {
 
   let xpPercent = (xp / xpMax) * 100;
   document.getElementById("xpBar").style.width = xpPercent + "%";
+  document.querySelector(".progressFill").style.width =
+xpPercent + "%";
 }
 
 /* SAVE */
@@ -697,7 +776,7 @@ function showCoin(x, y) {
   let coin = document.createElement("div");
 
   coin.className = "coin";
-  coin.innerText = "+5";
+ coin.innerText = "+ " + minePower; 
 
   coin.style.left = x + "px";
   coin.style.top = y + "px";
