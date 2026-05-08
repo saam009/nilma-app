@@ -214,14 +214,124 @@ button {
   color: black;
   font-weight: bold;
 }
+  /* NEW CYBER BACKGROUND */
+.cyberBg{
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0;
+  left:0;
+
+  background:
+  repeating-linear-gradient(
+    90deg,
+    rgba(0,255,255,0.05) 0px,
+    rgba(0,255,255,0.05) 2px,
+    transparent 2px,
+    transparent 80px
+  );
+
+  animation:bgMove 10s linear infinite;
+
+  z-index:-2;
+}
+
+@keyframes bgMove{
+  from{
+    transform:translateY(0);
+  }
+
+  to{
+    transform:translateY(100px);
+  }
+}
+
+/* WHEEL */
+#wheel {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  border: 5px solid cyan;
+  position: relative;
+  overflow: hidden;
+
+  background: conic-gradient(
+    #00ffff 0deg 60deg,
+    #0044ff 60deg 120deg,
+    #00ffff 120deg 180deg,
+    #0044ff 180deg 240deg,
+    #00ffff 240deg 300deg,
+    #0044ff 300deg 360deg
+  );
+
+  transition: transform 3s ease-out;
+
+  box-shadow:
+    0 0 40px rgba(0,255,255,0.5),
+    inset 0 0 20px rgba(255,255,255,0.2);
+}
+
+.wheelText{
+  position:absolute;
+  color:white;
+  font-weight:bold;
+  font-size:18px;
+  text-shadow:0 0 10px black;
+}
+
+.wheelArrow{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:0;
+  height:0;
+
+  border-left:18px solid transparent;
+  border-right:18px solid transparent;
+  border-top:35px solid #00ffff;
+
+  z-index:999;
+}
+
+/* wheel number positions */
+.t1{ top:15px; left:100px; }
+.t2{ top:55px; right:25px; }
+.t3{ bottom:55px; right:25px; }
+.t4{ bottom:15px; left:100px; }
+.t5{ bottom:55px; left:25px; }
+.t6{ top:55px; left:25px; }
+
+/* SMALLER NAV ITEMS */
+.bottomNav div{
+  flex:1;
+  font-size:11px;
+}
+
+/* BACK BUTTON */
+.backBtn{
+  margin:15px;
+}
+
+/* MACHINE LOGO */
+.machine img{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
 
 </style>
 </head>
 
 <body onclick="unlockAudio()">
+ <div class="cyberBg"></div> 
 
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
+  <button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
 
   <div class="topbar">
 
@@ -264,6 +374,10 @@ button {
 
 <!-- SPIN SCREEN -->
 <div id="spinScreen" class="screen">
+ <button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button> 
 
   <h2 style="text-align:center; margin-top:40px;">
     🎰 Spin Wheel
@@ -276,18 +390,19 @@ button {
     margin-top:40px;
   ">
 
-    <!-- POINTER -->
-    <div style="
-      width: 0;
-      height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-bottom: 25px solid #00ffff;
-      margin-bottom: 15px;
-    "></div>
 
     <!-- WHEEL -->
-    <div id="wheel"></div>
+    <div id="wheel">
+    <div class="wheelArrow"></div>
+
+  <div class="wheelText t1">10</div>
+  <div class="wheelText t2">20</div>
+  <div class="wheelText t3">50</div>
+  <div class="wheelText t4">100</div>
+  <div class="wheelText t5">200</div>
+  <div class="wheelText t6">0</div>
+
+</div>
 
     <!-- BUTTON -->
     <button class="spinBtn" onclick="spinWheel()">
@@ -300,6 +415,10 @@ button {
 
 <!-- TASK SCREEN -->
 <div id="taskScreen" class="screen">
+ <button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button> 
 
   <h2 style="text-align:center; margin-top:40px;">
     📋 Tasks
@@ -325,6 +444,10 @@ button {
 
 <!-- DAILY SCREEN -->
 <div id="dailyScreen" class="screen">
+  <button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
 
   <h2 style="text-align:center; margin-top:40px;">
     🎁 Daily Reward
@@ -341,6 +464,10 @@ button {
 </div>
  <!-- LEADERBOARD SCREEN -->
 <div id="leaderboardScreen" class="screen">
+  <button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
 
   <h2 style="text-align:center; margin-top:40px;">
     🏆 Leaderboard
@@ -357,6 +484,10 @@ button {
 </div> 
 <!-- SHOP SCREEN -->
 <div id="shopScreen" class="screen">
+  <button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
 
   <h2 style="text-align:center; margin-top:40px;">
     💎 Upgrades Shop
@@ -403,6 +534,26 @@ button {
   🏆 Top
 </div>
 </div>
+<!-- TOAST -->
+
+<div id="toast" style="
+position:fixed;
+top:30px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,255,255,0.15);
+border:1px solid #00ffff;
+padding:14px 24px;
+border-radius:15px;
+backdrop-filter:blur(15px);
+color:#00ffff;
+font-weight:bold;
+display:none;
+z-index:99999;
+box-shadow:0 0 20px rgba(0,255,255,0.4);
+">
+TEXT
+</div>  
 
 <script>
 
@@ -422,6 +573,7 @@ let maxEnergy = 100;
 let taskDone = false;
 let minePower = 5;
 update();
+
 
 /* SCREEN SYSTEM */
 
@@ -464,7 +616,7 @@ function save() {
 function mine(event) {
 
   if (energy <= 0) {
-    alert("No energy!");
+    showToast("No energy!");
     return;
   }
 
@@ -493,8 +645,7 @@ function checkLevelUp() {
     level += 1;
 
     xpMax = Math.floor(xpMax * 1.5);
-
-    alert("LEVEL UP! ⭐");
+showToast("LEVEL UP!");
 
     save();
     update();
@@ -528,7 +679,7 @@ function daily() {
 
   if (now - lastDaily < 86400000) {
 
-    alert("Come back tomorrow!");
+   showToast("Come back tomorrow!");
     return;
   }
 
@@ -541,7 +692,7 @@ function daily() {
   save();
   update();
 
-  alert("+50 Coins");
+  showToast("+50 Coins");
 }
 
 /* TASK */
@@ -556,7 +707,7 @@ function claimTask() {
 
   if (!taskDone) {
 
-    alert("Complete task first!");
+   showToast("Complete task first!");
     return;
   }
 
@@ -565,7 +716,7 @@ function claimTask() {
   save();
   update();
 
-  alert("+30 Coins");
+  showToast("+30 Coins");
 
   taskDone = false;
 }
@@ -578,7 +729,7 @@ function spinWheel() {
 
   if (now - lastSpin < 10000) {
 
-    alert("Wait a few seconds!");
+    showToast("Wait a few seconds!");
     return;
   }
 
@@ -621,7 +772,7 @@ function spinWheel() {
     save();
     update();
 
-    alert("You won " + win + " coins");
+    showToast("You won " + win + " coins");
 
   }, 3000);
 }
@@ -649,6 +800,39 @@ setInterval(() => {
   update();
 
 }, 5000);
+  /* TOAST */
+
+function showToast(text){
+
+  let toast = document.getElementById("toast");
+
+  toast.innerText = text;
+
+  toast.style.display = "block";
+
+  setTimeout(()=>{
+    toast.style.display = "none";
+  },2000);
+}
+  /* SHOP */
+
+function buyUpgrade(){
+
+  if(coins < 100){
+
+    showToast("Need 100 coins!");
+    return;
+  }
+
+  coins -= 100;
+
+  minePower += 1;
+
+  save();
+  update();
+
+  showToast("Mining upgraded!");
+}
 
 /* AUDIO */
 
