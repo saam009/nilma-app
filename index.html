@@ -157,6 +157,9 @@ body{
 .mineBtn:active{
   transform:scale(.92);
 }
+ .mineBtn:hover{
+  transform:scale(1.03);
+} 
 
 /* SECTION */
 
@@ -228,6 +231,34 @@ body{
 
 button{
   cursor:pointer;
+}
+  .spinBtn{
+  margin-top:30px;
+  padding:14px 30px;
+  border:none;
+  border-radius:14px;
+
+  background:
+  linear-gradient(90deg,#ffd54a,#ff9800);
+
+  color:black;
+  font-size:18px;
+  font-weight:bold;
+
+  box-shadow:
+  0 0 20px rgba(255,152,0,.5);
+}
+  .backBtn{
+  margin:15px;
+  padding:10px 18px;
+  border:none;
+  border-radius:12px;
+
+  background:rgba(255,255,255,.08);
+
+  color:white;
+
+  backdrop-filter:blur(10px);
 }
 
 /* BOTTOM NAV */
@@ -330,6 +361,19 @@ button{
 
   z-index:20;
 }
+  .wheelNumber{
+  position:absolute;
+  font-weight:bold;
+  color:black;
+  font-size:22px;
+}
+
+.n1{ top:15px; left:110px; }
+.n2{ top:55px; right:30px; }
+.n3{ bottom:55px; right:20px; }
+.n4{ bottom:15px; left:105px; }
+.n5{ bottom:55px; left:20px; }
+.n6{ top:55px; left:30px; }
 
 /* FLOAT COIN */
 .coin{
@@ -475,10 +519,16 @@ onclick="showScreen('homeScreen')">
 
 <div class="wheelArrow"></div>
 
-<div id="wheel"></div>
+<div id="wheel">
 
-</div>
-</div>  
+<div class="wheelNumber n1">5</div>
+<div class="wheelNumber n2">10</div>
+<div class="wheelNumber n3">25</div>
+<div class="wheelNumber n4">50</div>
+<div class="wheelNumber n5">100</div>
+<div class="wheelNumber n6">250</div>
+
+</div> 
 
     <!-- BUTTON -->
     <button class="spinBtn" onclick="spinWheel()">
@@ -692,7 +742,8 @@ update();
 /* SCREEN SYSTEM */
 function showScreen(screenId){
 
-  document.querySelectorAll(".screen").forEach(screen=>{
+  document.querySelectorAll(".screen")
+  .forEach(screen=>{
     screen.classList.remove("active");
   });
 
@@ -704,6 +755,31 @@ function showScreen(screenId){
     item.classList.remove("active");
   });
 
+  if(screenId === "homeScreen"){
+    document.querySelectorAll(".navItem")[0]
+    .classList.add("active");
+  }
+
+  if(screenId === "spinScreen"){
+    document.querySelectorAll(".navItem")[1]
+    .classList.add("active");
+  }
+
+  if(screenId === "taskScreen"){
+    document.querySelectorAll(".navItem")[2]
+    .classList.add("active");
+  }
+
+  if(screenId === "shopScreen"){
+    document.querySelectorAll(".navItem")[3]
+    .classList.add("active");
+  }
+
+  if(screenId === "leaderboardScreen"){
+    document.querySelectorAll(".navItem")[4]
+    .classList.add("active");
+  }
+
 }
 
 /* UPDATE UI */
@@ -713,9 +789,6 @@ function update() {
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
   document.getElementById("level").innerText = level;
-
-  let energyPercent = (energy / maxEnergy) * 100;
-  document.getElementById("energyBar").style.width = energyPercent + "%";
 
   let xpPercent = (xp / xpMax) * 100;
   document.getElementById("xpBar").style.width = xpPercent + "%";
@@ -746,7 +819,7 @@ function mine(event) {
   }
 
   coins += minePower;
-  xp += 10 * xpBoost;
+  xp += 2 * xpBoost;
   energy -= 1;
 
   checkLevelUp();
@@ -901,8 +974,7 @@ setInterval(() => {
   /* PASSIVE MINING */
 
 setInterval(() => {
-
-  coins += level;
+coins += Math.max(1, Math.floor(level / 2));
 
   save();
   update();
@@ -1030,6 +1102,8 @@ function unlockAudio() {
 
   audioUnlocked = true;
 }
+  update();
+showScreen("homeScreen");
 
 </script>
 
