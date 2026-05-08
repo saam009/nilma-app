@@ -361,40 +361,48 @@ button{
 
   z-index:20;
 }
-  .wheelNumber{
-  position:absolute;
-  font-weight:bold;
-  color:black;
-  font-size:22px;
+.wheelNumber{
+position:absolute;
+font-weight:bold;
+color:black;
+font-size:18px;
+width:40px;
+text-align:center;
 }
 
+/* TOP */
 .n1{
-top:20px;
-left:112px;
+top:18px;
+left:110px;
 }
 
+/* TOP RIGHT */
 .n2{
-top:65px;
-right:38px;
+top:68px;
+right:35px;
 }
 
+/* BOTTOM RIGHT */
 .n3{
-bottom:65px;
-right:38px;
+bottom:68px;
+right:35px;
 }
 
+/* BOTTOM */
 .n4{
-bottom:20px;
-left:105px;
+bottom:18px;
+left:110px;
 }
 
+/* BOTTOM LEFT */
 .n5{
-bottom:65px;
+bottom:68px;
 left:35px;
 }
 
+/* TOP LEFT */
 .n6{
-top:65px;
+top:68px;
 left:35px;
 }
 
@@ -515,37 +523,31 @@ OPEN
 </div>
 
 <!-- SPIN SCREEN -->
+<!-- SPIN SCREEN -->
 <div id="spinScreen" class="screen">
- <button class="backBtn"
+
+<button class="backBtn"
 onclick="showScreen('homeScreen')">
 ⬅ Back
-</button> 
-  <div class="heroCard" style="text-align:center;">
+</button>
+
+<div class="heroCard" style="text-align:center;">
 <h2>Lucky Spin</h2>
 <p>Win massive rewards instantly</p>
 </div>
 
-  <h2 style="text-align:center; margin-top:40px;">
-    🎰 Spin Wheel
-  </h2>
+<h2 style="text-align:center; margin-top:20px;">
+🎰 Spin Wheel
+</h2>
 
-  <div style="
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin-top:40px;
-  ">
+<div style="
+display:flex;
+flex-direction:column;
+align-items:center;
+margin-top:20px;
+">
 
-
-    <!-- WHEEL -->
-<div class="wheelContainer">
-
-<div class="wheelArrow"></div>
-
-<div class="wheelContainer">
-
-<div class="wheelArrow"></div>
-
+<!-- WHEEL CONTAINER -->
 <div class="wheelContainer">
 
 <div class="wheelArrow"></div>
@@ -563,7 +565,9 @@ onclick="showScreen('homeScreen')">
 
 </div>
 
-<button class="spinBtn" onclick="spinWheel()">
+<!-- SPIN BUTTON -->
+<button class="spinBtn"
+onclick="spinWheel()">
 SPIN
 </button>
 
@@ -979,83 +983,108 @@ function claimTask() {
 /* SPIN */
 function spinWheel(){
 
-  let now = Date.now();
+let today = new Date().toDateString();
 
-  let today =
-  new Date().toDateString();
+let savedDay =
+localStorage.getItem("spinDay");
 
-  let savedDay =
-  localStorage.getItem("spinDay");
+/* RESET DAILY FREE SPIN */
 
-  /* RESET DAILY SPIN */
+if(savedDay !== today){
 
-  if(savedDay !== today){
+localStorage.setItem("spinDay", today);
 
-    localStorage.setItem("spinDay", today);
+freeSpinUsed = "no";
 
-    freeSpinUsed = "no";
+localStorage.setItem(
+"freeSpinUsed",
+"no"
+);
 
-    localStorage.setItem(
-      "freeSpinUsed",
-      "no"
-    );
-  }
+}
 
-  /* AFTER FREE SPIN */
+/* PAID SPIN AFTER FREE */
 
-  if(freeSpinUsed === "yes"){
+if(freeSpinUsed === "yes"){
 
-    if(coins < 20){
-      showToast("Need 20 coins");
-      return;
-    }
+if(coins < 20){
 
-    coins -= 20;
-  }
+showToast("Need 20 coins");
 
-  /* USE FREE SPIN */
+return;
 
-  if(freeSpinUsed === "no"){
+}
 
-    freeSpinUsed = "yes";
+coins -= 20;
 
-    localStorage.setItem(
-      "freeSpinUsed",
-      "yes"
-    );
+}
 
-    showToast("Free Daily Spin");
-  }
+/* USE FREE SPIN */
 
-  let rewards = [5,10,25,50,100,250];
+if(freeSpinUsed === "no"){
 
-  let randomIndex =
-  Math.floor(Math.random()*rewards.length);
+freeSpinUsed = "yes";
 
-  let reward =
-  rewards[randomIndex];
+localStorage.setItem(
+"freeSpinUsed",
+"yes"
+);
 
-  let wheel =
-  document.getElementById("wheel");
+showToast("Free Daily Spin");
 
-  let degree =
-  3600 + (randomIndex * 60);
+}
 
-  wheel.style.transform =
-  "rotate(" + degree + "deg)";
+let rewards = [5,10,25,50,100,250];
 
-  setTimeout(()=>{
+let randomIndex =
+Math.floor(Math.random()*rewards.length);
 
-    coins += reward;
+let reward = rewards[randomIndex];
 
-    save();
-    update();
+let wheel =
+document.getElementById("wheel");
 
-    showToast(
-      "Won " + reward + " coins"
-    );
+/* PERFECT SPIN ANGLES */
 
-  },4000);
+let angles = [
+0,
+60,
+120,
+180,
+240,
+300
+];
+
+let degree =
+3600 - angles[randomIndex];
+
+wheel.style.transform =
+"rotate(" + degree + "deg)";
+
+/* SOUND */
+
+document.getElementById("spinSound")
+.play()
+.catch(()=>{});
+
+setTimeout(()=>{
+
+coins += reward;
+
+save();
+
+update();
+
+document.getElementById("winSound")
+.play()
+.catch(()=>{});
+
+showToast(
+"Won " + reward + " coins"
+);
+
+},4000);
+
 }
 
 /* ENERGY REGEN */
