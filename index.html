@@ -32,10 +32,11 @@ body{
 .screen{
   display:none;
   padding-bottom:100px;
+  min-height:100vh;
 }
 
 .screen.active{
-  display:block;
+  display:block !important;
 }
 
 /* TOP BAR */
@@ -284,13 +285,14 @@ button{
 }
 
 /* SPIN WHEEL */
-
 #wheel{
   width:260px;
   height:260px;
   border-radius:50%;
+  position:relative;
 
-  background:conic-gradient(
+  background:
+  conic-gradient(
   #ff9800 0deg 60deg,
   #ffd54a 60deg 120deg,
   #ff9800 120deg 180deg,
@@ -301,10 +303,10 @@ button{
 
   border:8px solid rgba(255,255,255,.15);
 
-  box-shadow:
-  0 0 30px rgba(255,152,0,.5);
-
   transition:transform 4s cubic-bezier(.17,.67,.18,1);
+
+  box-shadow:
+  0 0 40px rgba(255,152,0,.5);
 }
 
 .wheelContainer{
@@ -316,28 +318,33 @@ button{
 
 .wheelArrow{
   position:absolute;
-  top:-10px;
+  top:-12px;
   left:50%;
   transform:translateX(-50%);
   width:0;
   height:0;
 
-  border-left:20px solid transparent;
-  border-right:20px solid transparent;
-  border-top:40px solid #fff;
+  border-left:18px solid transparent;
+  border-right:18px solid transparent;
+  border-top:40px solid white;
 
   z-index:20;
 }
 
 /* FLOAT COIN */
-
 .coin{
   position:fixed;
   color:#ffd54a;
-  font-size:24px;
-  font-weight:bold;
+  font-size:28px;
+  font-weight:900;
   pointer-events:none;
-  animation:floatCoin .8s forwards;
+  z-index:99999;
+
+  text-shadow:
+  0 0 10px #ff9800,
+  0 0 20px #ff9800;
+
+  animation:floatCoin 1s forwards;
 }
 
 @keyframes floatCoin{
@@ -468,17 +475,9 @@ onclick="showScreen('homeScreen')">
 
 <div class="wheelArrow"></div>
 
-<div id="wheel">
-
-  <div class="wheelText t1">10</div>
-  <div class="wheelText t2">20</div>
-  <div class="wheelText t3">50</div>
-  <div class="wheelText t4">100</div>
-  <div class="wheelText t5">200</div>
-  <div class="wheelText t6">0</div>
+<div id="wheel"></div>
 
 </div>
-
 </div>  
 
     <!-- BUTTON -->
@@ -677,10 +676,16 @@ let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 
-let maxEnergy = 100;
+let maxEnergy =
+parseInt(localStorage.getItem("maxEnergy")) || 100;
+
 let taskDone = false;
-let minePower = 5;
- let xpBoost = 1; 
+
+let minePower =
+parseInt(localStorage.getItem("minePower")) || 1;
+
+let xpBoost =
+parseInt(localStorage.getItem("xpBoost")) || 1;  
 update();
 
 
@@ -727,6 +732,9 @@ function save() {
   localStorage.setItem("level", level);
   localStorage.setItem("xp", xp);
   localStorage.setItem("xpMax", xpMax);
+  localStorage.setItem("maxEnergy", maxEnergy);
+localStorage.setItem("minePower", minePower);
+localStorage.setItem("xpBoost", xpBoost);
 }
 
 /* MINE */
@@ -770,22 +778,22 @@ showToast("LEVEL UP!");
 }
 
 /* FLOAT COIN */
-
-function showCoin(x, y) {
+function showCoin(x,y){
 
   let coin = document.createElement("div");
 
   coin.className = "coin";
- coin.innerText = "+ " + minePower; 
+
+  coin.innerHTML = "+" + minePower;
 
   coin.style.left = x + "px";
   coin.style.top = y + "px";
 
   document.body.appendChild(coin);
 
-  setTimeout(() => {
+  setTimeout(()=>{
     coin.remove();
-  }, 800);
+  },1000);
 }
 
 /* DAILY */
@@ -839,59 +847,42 @@ function claimTask() {
 }
 
 /* SPIN */
-
-function spinWheel() {
+function spinWheel(){
 
   let now = Date.now();
 
-  if (now - lastSpin < 10000) {
-
-    showToast("Wait a few seconds!");
+  if(now - lastSpin < 5000){
+    showToast("Wait 5 seconds");
     return;
   }
 
   lastSpin = now;
 
-  localStorage.setItem("lastSpin", lastSpin);
+  let rewards = [5,10,25,50,100,250];
 
-  document.getElementById("spinSound").play().catch(()=>{});
+  let randomIndex =
+  Math.floor(Math.random()*rewards.length);
 
-  let rewards = [0,10,20,50,100,200];
-
-  let index = Math.floor(Math.random() * rewards.length);
-
-  let win = rewards[index];
+  let reward = rewards[randomIndex];
 
   let wheel = document.getElementById("wheel");
 
-  wheel.style.transition = "none";
-  wheel.style.transform = "rotate(0deg)";
+  let degree =
+  3600 + (randomIndex * 60);
 
-  setTimeout(() => {
+  wheel.style.transform =
+  "rotate(" + degree + "deg)";
 
-    let segmentAngle = 360 / rewards.length;
+  setTimeout(()=>{
 
-    let rotation = (360 * 5) + (index * segmentAngle);
-
-    wheel.style.transition = "transform 3s ease-out";
-
-    wheel.style.transform =
-      "rotate(" + rotation + "deg)";
-
-  }, 50);
-
-  setTimeout(() => {
-
-    document.getElementById("winSound").play().catch(()=>{});
-
-    coins += win;
+    coins += reward;
 
     save();
     update();
 
-    showToast("You won " + win + " coins");
+    showToast("Won " + reward + " coins");
 
-  }, 3000);
+  },4000);
 }
 
 /* ENERGY REGEN */
@@ -955,18 +946,19 @@ function buyUpgrade(){
 function buyTurbo(){
 
   if(coins < 200){
-    showToast("Not enough coins");
+
+    showToast("Need 200 coins");
     return;
   }
 
   coins -= 200;
 
-  minePower *= 2;
+  minePower += 1;
 
   save();
   update();
 
-  showToast("Turbo Miner Activated");
+  showToast("Mining +1");
 }
 
 function buyEnergy(){
