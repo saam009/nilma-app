@@ -368,12 +368,35 @@ button{
   font-size:22px;
 }
 
-.n1{ top:15px; left:110px; }
-.n2{ top:55px; right:30px; }
-.n3{ bottom:55px; right:20px; }
-.n4{ bottom:15px; left:105px; }
-.n5{ bottom:55px; left:20px; }
-.n6{ top:55px; left:30px; }
+.n1{
+top:20px;
+left:112px;
+}
+
+.n2{
+top:65px;
+right:38px;
+}
+
+.n3{
+bottom:65px;
+right:38px;
+}
+
+.n4{
+bottom:20px;
+left:105px;
+}
+
+.n5{
+bottom:65px;
+left:35px;
+}
+
+.n6{
+top:65px;
+left:35px;
+}
 
 /* FLOAT COIN */
 .coin{
@@ -519,6 +542,14 @@ onclick="showScreen('homeScreen')">
 
 <div class="wheelArrow"></div>
 
+<div class="wheelContainer">
+
+<div class="wheelArrow"></div>
+
+<div class="wheelContainer">
+
+<div class="wheelArrow"></div>
+
 <div id="wheel">
 
 <div class="wheelNumber n1">5</div>
@@ -528,43 +559,61 @@ onclick="showScreen('homeScreen')">
 <div class="wheelNumber n5">100</div>
 <div class="wheelNumber n6">250</div>
 
-</div> 
+</div>
 
-    <!-- BUTTON -->
-    <button class="spinBtn" onclick="spinWheel()">
-      SPIN
-    </button>
+</div>
 
-  </div>
+<button class="spinBtn" onclick="spinWheel()">
+SPIN
+</button>
+
+</div>
 
 </div>
 
 <!-- TASK SCREEN -->
 <div id="taskScreen" class="screen">
- <button class="backBtn"
+
+<button class="backBtn"
 onclick="showScreen('homeScreen')">
 ⬅ Back
-</button> 
+</button>
 
-  <h2 style="text-align:center; margin-top:40px;">
-    📋 Tasks
-  </h2>
+<div class="heroCard">
 
-  <div style="text-align:center; margin-top:40px;">
+<h2>📋 Daily Tasks</h2>
 
-    <p>Follow our Instagram</p>
+<p style="margin-top:10px;">
+Complete tasks and earn rewards
+</p>
 
-    <button onclick="openInsta()">
-      Open Instagram
-    </button>
+</div>
 
-    <br><br>
+<div style="padding:18px;">
 
-    <button onclick="claimTask()">
-      Claim Reward
-    </button>
+<div class="card">
 
-  </div>
+<h3>📸 Follow Instagram</h3>
+
+<p style="margin:10px 0;">
+Reward: +30 Coins
+</p>
+
+<button class="playBtn"
+onclick="openInsta()">
+OPEN INSTAGRAM
+</button>
+
+<br><br>
+
+<button class="playBtn"
+onclick="claimTask()">
+CLAIM REWARD
+</button>
+
+</div>
+
+</div>
 
 </div>
 
@@ -622,9 +671,15 @@ onclick="showScreen('homeScreen')">
 ⬅ Back
 </button>
 
-  <h2 style="text-align:center; margin-top:40px;">
-    💎 Upgrades Shop
-  </h2>
+<div class="heroCard">
+
+<h2>💎 Upgrade Shop</h2>
+
+<p style="margin-top:10px;">
+Upgrade mining power and energy
+</p>
+
+</div>
 
   <div style="padding:20px;">
 
@@ -725,6 +780,8 @@ let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
 
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
+ let freeSpinUsed =
+localStorage.getItem("freeSpinUsed") || "no"; 
 
 let maxEnergy =
 parseInt(localStorage.getItem("maxEnergy")) || 100;
@@ -924,21 +981,62 @@ function spinWheel(){
 
   let now = Date.now();
 
-  if(now - lastSpin < 5000){
-    showToast("Wait 5 seconds");
-    return;
+  let today =
+  new Date().toDateString();
+
+  let savedDay =
+  localStorage.getItem("spinDay");
+
+  /* RESET DAILY SPIN */
+
+  if(savedDay !== today){
+
+    localStorage.setItem("spinDay", today);
+
+    freeSpinUsed = "no";
+
+    localStorage.setItem(
+      "freeSpinUsed",
+      "no"
+    );
   }
 
-  lastSpin = now;
+  /* AFTER FREE SPIN */
+
+  if(freeSpinUsed === "yes"){
+
+    if(coins < 20){
+      showToast("Need 20 coins");
+      return;
+    }
+
+    coins -= 20;
+  }
+
+  /* USE FREE SPIN */
+
+  if(freeSpinUsed === "no"){
+
+    freeSpinUsed = "yes";
+
+    localStorage.setItem(
+      "freeSpinUsed",
+      "yes"
+    );
+
+    showToast("Free Daily Spin");
+  }
 
   let rewards = [5,10,25,50,100,250];
 
   let randomIndex =
   Math.floor(Math.random()*rewards.length);
 
-  let reward = rewards[randomIndex];
+  let reward =
+  rewards[randomIndex];
 
-  let wheel = document.getElementById("wheel");
+  let wheel =
+  document.getElementById("wheel");
 
   let degree =
   3600 + (randomIndex * 60);
@@ -953,24 +1051,21 @@ function spinWheel(){
     save();
     update();
 
-    showToast("Won " + reward + " coins");
+    showToast(
+      "Won " + reward + " coins"
+    );
 
   },4000);
 }
 
 /* ENERGY REGEN */
-
-setInterval(() => {
-
-  if (energy < maxEnergy) {
-
-    energy += 1;
-
-    save();
-    update();
-  }
-
-}, 3000);
+ setInterval(() => { 
+   if (energy < maxEnergy) { 
+     energy += 1; 
+     save();
+     update();
+   } 
+ }, 3000); 
   /* PASSIVE MINING */
 
 setInterval(() => {
