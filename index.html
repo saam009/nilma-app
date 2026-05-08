@@ -153,6 +153,11 @@ body::before {
 }
 
 /* WHEEL */
+ .wheelContainer{
+  position:relative;
+  width:240px;
+  height:240px;
+} 
 #wheel {
   width: 220px;
   height: 220px;
@@ -392,8 +397,11 @@ onclick="showScreen('homeScreen')">
 
 
     <!-- WHEEL -->
-    <div id="wheel">
-    <div class="wheelArrow"></div>
+<div class="wheelContainer">
+
+<div class="wheelArrow"></div>
+
+<div id="wheel">
 
   <div class="wheelText t1">10</div>
   <div class="wheelText t2">20</div>
@@ -403,6 +411,8 @@ onclick="showScreen('homeScreen')">
   <div class="wheelText t6">0</div>
 
 </div>
+
+</div>  
 
     <!-- BUTTON -->
     <button class="spinBtn" onclick="spinWheel()">
@@ -475,9 +485,16 @@ onclick="showScreen('homeScreen')">
 
   <div class="card" style="margin-top:30px;">
 
-    <p>🥇 Player1 — 5000</p>
-    <p>🥈 Player2 — 3000</p>
-    <p>🥉 Player3 — 1000</p>
+  <p>🥇 CyberKing — 50000 💎 Reward: 5000</p>
+<p>🥈 ShadowX — 42000 💎 Reward: 3000</p>
+<p>🥉 NovaBot — 35000 💎 Reward: 2000</p>
+<p>4️⃣ Ghost — 30000</p>
+<p>5️⃣ Volt — 28000</p>
+<p>6️⃣ DarkAI — 24000</p>
+<p>7️⃣ Pixel — 20000</p>
+<p>8️⃣ Rex — 17000</p>
+<p>9️⃣ Zero — 15000</p>
+<p>🔟 Hyper — 12000</p>
 
   </div>
 
@@ -493,13 +510,33 @@ onclick="showScreen('homeScreen')">
     💎 Upgrades Shop
   </h2>
 
-  <div style="text-align:center; margin-top:40px;">
+  <div style="padding:20px;">
 
-    <button onclick="buyUpgrade()">
-      Upgrade Mining (+1)
-    </button>
+<div class="card">
+  <h3>⚡ Turbo Miner</h3>
+  <p>Mining power x2</p>
+  <button onclick="buyTurbo()">
+    Buy - 200 Coins
+  </button>
+</div>
 
-  </div>
+<div class="card">
+  <h3>🔋 Energy Core</h3>
+  <p>+100 Max Energy</p>
+  <button onclick="buyEnergy()">
+    Buy - 300 Coins
+  </button>
+</div>
+
+<div class="card">
+  <h3>💎 XP Booster</h3>
+  <p>Level faster</p>
+  <button onclick="buyXP()">
+    Buy - 400 Coins
+  </button>
+</div>
+
+</div>
 
 </div>
 <!-- AUDIO -->
@@ -572,6 +609,7 @@ let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
 let maxEnergy = 100;
 let taskDone = false;
 let minePower = 5;
+ let xpBoost = 1; 
 update();
 
 
@@ -621,7 +659,7 @@ function mine(event) {
   }
 
   coins += minePower;
-  xp += 10;
+  xp += 10 * xpBoost;
   energy -= 1;
 
   checkLevelUp();
@@ -832,6 +870,60 @@ function buyUpgrade(){
   update();
 
   showToast("Mining upgraded!");
+}
+  /* SHOP */
+
+function buyTurbo(){
+
+  if(coins < 200){
+    showToast("Not enough coins");
+    return;
+  }
+
+  coins -= 200;
+
+  minePower *= 2;
+
+  save();
+  update();
+
+  showToast("Turbo Miner Activated");
+}
+
+function buyEnergy(){
+
+  if(coins < 300){
+    showToast("Not enough coins");
+    return;
+  }
+
+  coins -= 300;
+
+  maxEnergy += 100;
+
+  energy = maxEnergy;
+
+  save();
+  update();
+
+  showToast("Energy Increased");
+}
+
+function buyXP(){
+
+  if(coins < 400){
+    showToast("Not enough coins");
+    return;
+  }
+
+  coins -= 400;
+
+  xpBoost += 1;
+
+  save();
+  update();
+
+  showToast("XP Booster Activated");
 }
 
 /* AUDIO */
