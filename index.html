@@ -397,44 +397,76 @@ text-shadow:0 0 10px black;
 }
 
 /* TOP */
+.label{
+position:absolute;
+top:50%;
+left:50%;
+
+font-weight:900;
+font-size:20px;
+color:white;
+
+text-shadow:0 0 10px black;
+
+transform-origin:center;
+}
+
+/* 5 */
 .l1{
-top:18px;
-left:145px;
+transform:
+translate(-50%,-50%)
+rotate(0deg)
+translateY(-120px)
+rotate(0deg);
 }
 
-/* TOP RIGHT */
+/* 10 */
 .l2{
-top:70px;
-right:45px;
+transform:
+translate(-50%,-50%)
+rotate(60deg)
+translateY(-120px)
+rotate(-60deg);
 }
 
-/* BOTTOM RIGHT */
+/* 25 */
 .l3{
-bottom:70px;
-right:45px;
+transform:
+translate(-50%,-50%)
+rotate(120deg)
+translateY(-120px)
+rotate(-120deg);
 }
 
-/* BOTTOM */
+/* 50 */
 .l4{
-bottom:18px;
-left:138px;
+transform:
+translate(-50%,-50%)
+rotate(180deg)
+translateY(-120px)
+rotate(-180deg);
 }
 
-/* BOTTOM LEFT */
+/* 100 */
 .l5{
-bottom:70px;
-left:38px;
+transform:
+translate(-50%,-50%)
+rotate(240deg)
+translateY(-120px)
+rotate(-240deg);
 }
 
-/* TOP LEFT */
+/* JACKPOT */
 .l6{
-top:70px;
-left:20px;
 font-size:14px;
 color:#ffe600;
-transform:rotate(-55deg);
-}
 
+transform:
+translate(-50%,-50%)
+rotate(300deg)
+translateY(-120px)
+rotate(-300deg);
+}
 /* POINTER */
 
 .pointer{
