@@ -339,7 +339,7 @@ margin-top:20px;
     opacity:0;
   }
 }
-  /* CYBER ROULETTE */
+ /* CYBER CHEST */
 
 .rouletteWrap{
 display:flex;
@@ -348,145 +348,100 @@ align-items:center;
 margin-top:30px;
 }
 
-#rouletteWheel{
-width:320px;
-height:320px;
-border-radius:50%;
+.cyberChest{
 position:relative;
+width:220px;
+height:220px;
 
-transform:rotate(-90deg);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+border-radius:30px;
 
 background:
-conic-gradient(
-#00e5ff 0deg 60deg,
-#ff00c8 60deg 120deg,
-#00ff88 120deg 180deg,
-#ff9800 180deg 240deg,
-#ffe600 240deg 300deg,
-#ff3d00 300deg 360deg
+linear-gradient(
+145deg,
+rgba(0,255,255,.12),
+rgba(255,0,200,.12)
 );
 
-border:10px solid rgba(255,255,255,.15);
+border:2px solid rgba(0,255,255,.4);
+
+backdrop-filter:blur(15px);
 
 box-shadow:
-0 0 30px #00e5ff,
-0 0 80px rgba(0,229,255,.5),
-0 0 120px rgba(255,0,200,.3);
+0 0 30px rgba(0,255,255,.4),
+0 0 80px rgba(255,0,200,.2);
 
-transition:
-transform 5s cubic-bezier(.15,.8,.2,1);
+cursor:pointer;
 
-} 
-.wheelCenter{
+overflow:hidden;
+
+transition:.25s;
+}
+
+.cyberChest:hover{
+transform:scale(1.05);
+}
+
+.cyberChest:active{
+transform:scale(.95);
+}
+
+.chestGlow{
 position:absolute;
-width:40px;
-height:40px;
-background:white;
-border-radius:50%;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-z-index:20;
-box-shadow:0 0 20px white;
+width:300px;
+height:300px;
+
+background:
+radial-gradient(
+circle,
+rgba(0,255,255,.35),
+transparent 70%
+);
+
+animation:chestPulse 2s infinite;
 }
 
-.label{
-position:absolute;
-font-weight:900;
-font-size:20px;
-color:white;
-text-shadow:0 0 10px black;
+@keyframes chestPulse{
+0%{
+transform:scale(.8);
+opacity:.5;
+}
+50%{
+transform:scale(1.1);
+opacity:1;
+}
+100%{
+transform:scale(.8);
+opacity:.5;
+}
 }
 
-/* TOP */
-.label{
-position:absolute;
-top:50%;
-left:50%;
-
-font-weight:900;
-font-size:22px;
-color:white;
-
-text-shadow:0 0 10px black;
-
-transform-origin:center;
-}
-
-/* TOP */
-.l1{
-transform:
-translate(-50%,-50%)
-rotate(0deg)
-translateY(-118px)
-rotate(90deg);
-}
-
-/* TOP RIGHT */
-.l2{
-transform:
-translate(-50%,-50%)
-rotate(60deg)
-translateY(-118px)
-rotate(30deg);
-}
-
-/* BOTTOM RIGHT */
-.l3{
-transform:
-translate(-50%,-50%)
-rotate(120deg)
-translateY(-118px)
-rotate(-30deg);
-}
-
-/* BOTTOM */
-.l4{
-transform:
-translate(-50%,-50%)
-rotate(180deg)
-translateY(-118px)
-rotate(-90deg);
-}
-
-/* BOTTOM LEFT */
-.l5{
-transform:
-translate(-50%,-50%)
-rotate(240deg)
-translateY(-118px)
-rotate(-150deg);
-}
-
-/* TOP LEFT */
-.l6{
-font-size:14px;
-color:#ffe600;
-
-transform:
-translate(-50%,-50%)
-rotate(300deg)
-translateY(-118px)
-rotate(-210deg);
-}
-/* POINTER */
-
-.pointer{
-position:relative;
-top:18px; 
-width:0;
-height:0;
-
-border-left:25px solid transparent;
-border-right:25px solid transparent;
-border-top:45px solid white;
-
-margin-bottom:-10px;
-z-index:10;
+.chestBody{
+font-size:90px;
+z-index:2;
 
 filter:
-drop-shadow(0 0 10px white);
+drop-shadow(0 0 15px cyan);
 }
+
+.chestText{
+margin-top:12px;
+
+font-size:22px;
+font-weight:900;
+letter-spacing:2px;
+
+z-index:2;
+
+color:#00ffff;
+
+text-shadow:
+0 0 10px cyan;
+} 
 
 /* SLICES */
 
@@ -599,34 +554,24 @@ onclick="showScreen('homeScreen')">
 
 <div class="rouletteWrap">
 
-<div class="pointer"></div>
+<div class="cyberChest" onclick="openChest()">
 
-<div id="rouletteWheel">
+<div class="chestGlow"></div>
 
-<div class="label l1">5</div>
+<div class="chestBody">📦</div>
 
-<div class="label l2">10</div>
-
-<div class="label l3">25</div>
-
-<div class="label l4">50</div>
-
-<div class="label l5">100</div>
-
-<div class="label l6">JACKPOT</div>
-
-<div class="wheelCenter"></div>
+<div class="chestText">
+CYBER CHEST
+</div>
 
 </div>
 
 <button
 class="spinBtn"
 id="spinBtn"
-onclick="spinWheel()">
-FREE SPIN
+onclick="openChest()">
+OPEN CHEST
 </button>
-
-</div>
 
 </div>
 
@@ -1055,7 +1000,7 @@ function claimTask() {
   showToast("+30 Coins");
   taskDone = false; 
 }
-  function spinWheel(){
+function openChest(){
 
 if(spinning) return;
 
@@ -1083,13 +1028,13 @@ localStorage.setItem(
 
 }
 
-/* PAID SPIN */
+/* PAID OPEN */
 
 if(freeSpinUsed === "yes"){
 
 if(coins < 20){
 
-showToast("Need 20 coins for spin");
+showToast("Need 20 coins");
 
 return;
 
@@ -1115,55 +1060,39 @@ localStorage.setItem(
 "yes"
 );
 
-showToast("FREE DAILY SPIN");
+showToast("FREE CHEST");
 
 }
 
 spinning = true;
+
 document.getElementById(
 "spinBtn"
-).disabled = true;    
+).disabled = true;
 
-let rewards = [
-5,     // TOP
-10,    // TOP RIGHT
-25,    // BOTTOM RIGHT
-50,    // BOTTOM
-100,   // BOTTOM LEFT
-500    // TOP LEFT
-];
-let randomIndex =
-Math.floor(
-Math.random() * rewards.length
+/* ANIMATION */
+
+let chest =
+document.querySelector(
+".cyberChest"
 );
 
-let reward =
-rewards[randomIndex];
+chest.style.transform =
+"scale(.9) rotate(5deg)";
 
-let wheel =
-document.getElementById(
-"rouletteWheel"
-);
+setTimeout(()=>{
 
-/* PERFECT POINTER ALIGNMENT */
+chest.style.transform =
+"scale(1.05) rotate(-5deg)";
 
-let sectorAngle = 60;
+},200);
 
-let targetAngle =
-(randomIndex * sectorAngle)
-+ (sectorAngle / 2);
+setTimeout(()=>{
 
-/* CONTINUOUS SPIN */
+chest.style.transform =
+"scale(1)";
 
-currentRotation =
-(currentRotation % 360)
-+ 3600
-+ (450 - targetAngle);
-
-/* ROTATE */
-
-wheel.style.transform =
-`rotate(${currentRotation}deg)`;
+},400);
 
 /* SOUND */
 
@@ -1172,7 +1101,25 @@ document
 .play()
 .catch(()=>{});
 
-/* REWARD */
+/* REWARDS */
+
+let rewards = [
+5,
+10,
+25,
+50,
+100,
+500
+];
+
+let reward =
+rewards[
+Math.floor(
+Math.random()*rewards.length
+)
+];
+
+/* RESULT */
 
 setTimeout(()=>{
 
@@ -1189,23 +1136,24 @@ document
 if(reward === 500){
 
 showToast(
-"🎉 JACKPOT +500"
+"🔥 JACKPOT +500"
 );
 
 }else{
 
 showToast(
-"Won " + reward + " coins"
+"🎁 +" + reward + " Coins"
 );
 
 }
 
 spinning = false;
- document.getElementById(
-"spinBtn"
-).disabled = false; 
 
-},5000);
+document.getElementById(
+"spinBtn"
+).disabled = false;
+
+},1800);
 
 }
 
