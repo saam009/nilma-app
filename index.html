@@ -5,6 +5,9 @@
 <title>Nilma Coin</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script> 
 
 <style>
 
@@ -783,6 +786,25 @@ TEXT
 </div>  
 
 <script>
+  const firebaseConfig = {
+
+apiKey: "AIzaSyCmIuzJc_FvRNr60JOZ6xwVsJMMUG7-_rc",
+
+authDomain: "nilma-coin.firebaseapp.com",
+
+projectId: "nilma-coin",
+
+storageBucket: "nilma-coin.firebasestorage.app",
+
+messagingSenderId: "225704570854",
+
+appId: "1:225704570854:web:c0389fb2e31a1adb643027"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
 
 /* DATA */
 
@@ -815,6 +837,21 @@ localStorage.getItem("paidChestPrice")
 ) || 20; 
 
 let currentRotation = 0;
+  let playerId =
+localStorage.getItem("playerId");
+
+if(!playerId){
+
+playerId =
+"player_" +
+Math.random().toString(36).substring(2,12);
+
+localStorage.setItem(
+"playerId",
+playerId
+);
+
+}
  let firstJoin =
 localStorage.getItem("firstJoin"); 
 update();
@@ -911,6 +948,19 @@ function save() {
   localStorage.setItem("maxEnergy", maxEnergy);
 localStorage.setItem("minePower", minePower);
 localStorage.setItem("xpBoost", xpBoost);
+  db.collection("players")
+.doc(playerId)
+.set({
+
+coins: coins,
+energy: energy,
+level: level,
+xp: xp,
+minePower: minePower,
+xpBoost: xpBoost,
+updated: Date.now()
+
+});
  
   localStorage.setItem(
 "paidChestPrice",
