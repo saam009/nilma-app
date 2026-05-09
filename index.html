@@ -785,42 +785,6 @@ box-shadow:0 0 20px rgba(0,255,255,0.4);
 TEXT
 </div>
  
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getFirestore,
-doc,
-setDoc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-/* FIREBASE CONFIG */
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCmIuzJc_FvRNr60JOZ6xwVsJMMUG7-_rc",
-  authDomain: "nilma-coin.firebaseapp.com",
-  projectId: "nilma-coin",
-  storageBucket: "nilma-coin.firebasestorage.app",
-  messagingSenderId: "225704570854",
-  appId: "1:225704570854:web:c0389fb2e31a1adb643027"
-};
-
-/* START FIREBASE */
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-/* MAKE GLOBAL */
-
-window.db = db;
-window.doc = doc;
-window.setDoc = setDoc;
-window.getDoc = getDoc;
-
-</script>
 <script>
   const firebaseConfig = {
 
