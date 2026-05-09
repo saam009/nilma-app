@@ -354,6 +354,8 @@ height:320px;
 border-radius:50%;
 position:relative;
 
+transform:rotate(-90deg);
+
 background:
 conic-gradient(
 #00e5ff 0deg 60deg,
@@ -403,7 +405,7 @@ top:50%;
 left:50%;
 
 font-weight:900;
-font-size:20px;
+font-size:22px;
 color:white;
 
 text-shadow:0 0 10px black;
@@ -411,52 +413,52 @@ text-shadow:0 0 10px black;
 transform-origin:center;
 }
 
-/* 5 */
+/* TOP */
 .l1{
 transform:
 translate(-50%,-50%)
 rotate(0deg)
-translateY(-120px)
-rotate(0deg);
+translateY(-118px)
+rotate(90deg);
 }
 
-/* 10 */
+/* TOP RIGHT */
 .l2{
 transform:
 translate(-50%,-50%)
 rotate(60deg)
-translateY(-120px)
-rotate(-60deg);
+translateY(-118px)
+rotate(30deg);
 }
 
-/* 25 */
+/* BOTTOM RIGHT */
 .l3{
 transform:
 translate(-50%,-50%)
 rotate(120deg)
-translateY(-120px)
-rotate(-120deg);
+translateY(-118px)
+rotate(-30deg);
 }
 
-/* 50 */
+/* BOTTOM */
 .l4{
 transform:
 translate(-50%,-50%)
 rotate(180deg)
-translateY(-120px)
-rotate(-180deg);
+translateY(-118px)
+rotate(-90deg);
 }
 
-/* 100 */
+/* BOTTOM LEFT */
 .l5{
 transform:
 translate(-50%,-50%)
 rotate(240deg)
-translateY(-120px)
-rotate(-240deg);
+translateY(-118px)
+rotate(-150deg);
 }
 
-/* JACKPOT */
+/* TOP LEFT */
 .l6{
 font-size:14px;
 color:#ffe600;
@@ -464,8 +466,8 @@ color:#ffe600;
 transform:
 translate(-50%,-50%)
 rotate(300deg)
-translateY(-120px)
-rotate(-300deg);
+translateY(-118px)
+rotate(-210deg);
 }
 /* POINTER */
 
@@ -1156,7 +1158,7 @@ let targetAngle =
 currentRotation =
 (currentRotation % 360)
 + 3600
-+ (360 - targetAngle);
++ (450 - targetAngle);
 
 /* ROTATE */
 
