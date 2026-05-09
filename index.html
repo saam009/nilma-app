@@ -233,7 +233,7 @@ button{
   cursor:pointer;
 }
   .spinBtn{
-  margin-top:30px;
+margin-top:20px;
   padding:14px 30px;
   border:none;
   border-radius:14px;
@@ -349,8 +349,8 @@ margin-top:30px;
 }
 
 #rouletteWheel{
-width:300px;
-height:300px;
+width:320px;
+height:320px;
 border-radius:50%;
 position:relative;
 
@@ -374,12 +374,13 @@ box-shadow:
 transition:
 transform 5s cubic-bezier(.15,.8,.2,1);
 
-overflow:hidden;
 }
 
 /* POINTER */
 
 .pointer{
+ position:relative;
+top:8px; 
 width:0;
 height:0;
 
@@ -395,9 +396,16 @@ drop-shadow(0 0 10px white);
 }
 
 /* SLICES */
-
 .slice{
 position:absolute;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+width:80px;
+height:80px;
+
 font-size:22px;
 font-weight:900;
 color:white;
@@ -439,10 +447,14 @@ left:28px;
 
 /* TOP LEFT */
 .s6{
-top:75px;
-left:5px;
-font-size:16px;
+top:65px;
+left:15px;
+
+font-size:14px;
+
 color:#ffe600;
+
+transform:rotate(-60deg);
 }
 
 </style>
@@ -1069,7 +1081,7 @@ document.getElementById(
 let sectorAngle = 60;
 
 let finalAngle =
-3600 - (randomIndex * sectorAngle);
+3600 + (randomIndex * 60);
 
 wheel.style.transform =
 "rotate(" + finalAngle + "deg)";
