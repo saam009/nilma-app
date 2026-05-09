@@ -900,6 +900,11 @@ function save() {
   localStorage.setItem("maxEnergy", maxEnergy);
 localStorage.setItem("minePower", minePower);
 localStorage.setItem("xpBoost", xpBoost);
+ 
+  localStorage.setItem(
+"paidChestPrice",
+paidChestPrice
+);
 }
 
 /* MINE */
@@ -1045,7 +1050,7 @@ localStorage.setItem(
 if(freeSpinUsed === "yes"){
 if(coins < paidChestPrice){
 
-showToast("Need 20 coins");
+showToast("Need " + paidChestPrice + " coins");
 
 return;
 
@@ -1123,19 +1128,36 @@ document
 
 /* REWARDS */
 
-let rewards = [
-[
-5,
-10,
-15,
-25,
-50,
-100
-];
-
 let reward;
 
 let random = Math.random();
+
+if(random < 0.45){
+
+reward = 5;
+
+}else if(random < 0.70){
+
+reward = 10;
+
+}else if(random < 0.85){
+
+reward = 15;
+
+}else if(random < 0.94){
+
+reward = 25;
+
+}else if(random < 0.99){
+
+reward = 50;
+
+}else{
+
+reward = 100;
+
+}
+
 
 if(random < 0.45){
 
@@ -1177,7 +1199,7 @@ document
 .play()
 .catch(()=>{});
 
-if(reward === 500){
+if(reward === 100){
 
 showToast(
 "🔥 JACKPOT +500"
