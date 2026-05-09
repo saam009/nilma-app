@@ -569,6 +569,18 @@ onclick="showScreen('homeScreen')">
 
 <div id="rouletteWheel">
 
+<div class="label l1">5</div>
+
+<div class="label l2">10</div>
+
+<div class="label l3">25</div>
+
+<div class="label l4">50</div>
+
+<div class="label l5">100</div>
+
+<div class="label l6">JACKPOT</div>
+
 <div class="wheelCenter"></div>
 
 </div>
@@ -805,7 +817,10 @@ let minePower =
 parseInt(localStorage.getItem("minePower")) || 1;
 
 let xpBoost =
-parseInt(localStorage.getItem("xpBoost")) || 1;  
+parseInt(localStorage.getItem("xpBoost")) || 1; 
+let spinning = false;
+
+let currentRotation = 0;  
 update();
 
 
@@ -864,8 +879,10 @@ function update() {
   document.getElementById("xpBar").style.width = xpPercent + "%";
   document.querySelector(".progressFill").style.width =
 xpPercent + "%";
-}
-  let spinBtn =
+
+/* SPIN BUTTON */
+
+let spinBtn =
 document.getElementById("spinBtn");
 
 if(spinBtn){
@@ -879,6 +896,8 @@ spinBtn.innerText =
 
 spinBtn.innerText =
 "FREE SPIN";
+
+}
 
 }
 
@@ -1044,6 +1063,9 @@ return;
 
 coins -= 20;
 
+save();
+update();
+
 showToast("-20 Coins");
 
 }
@@ -1064,16 +1086,18 @@ showToast("FREE DAILY SPIN");
 }
 
 spinning = true;
+document.getElementById(
+"spinBtn"
+).disabled = true;    
 
 let rewards = [
-5,
-10,
-25,
-50,
-100,
-500
+5,     // TOP
+10,    // TOP RIGHT
+25,    // BOTTOM RIGHT
+50,    // BOTTOM
+100,   // BOTTOM LEFT
+500    // TOP LEFT
 ];
-
 let randomIndex =
 Math.floor(
 Math.random() * rewards.length
@@ -1093,7 +1117,7 @@ let sectorAngle = 60;
 
 let targetAngle =
 (randomIndex * sectorAngle)
-+ 30;
++ (sectorAngle / 2);
 
 /* CONTINUOUS SPIN */
 
@@ -1141,6 +1165,9 @@ showToast(
 }
 
 spinning = false;
+ document.getElementById(
+"spinBtn"
+).disabled = false; 
 
 },5000);
 
