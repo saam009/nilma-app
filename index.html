@@ -64,6 +64,15 @@ body{
   padding:10px 14px;
   flex:1;
 }
+  .heroCard,
+.card,
+.gameCard,
+.balanceBox{
+
+box-shadow:
+0 0 20px rgba(255,215,0,.08);
+
+}
 
 .balanceTitle{
   font-size:13px;
@@ -805,7 +814,9 @@ parseInt(
 localStorage.getItem("paidChestPrice")
 ) || 20; 
 
-let currentRotation = 0;  
+let currentRotation = 0;
+ let firstJoin =
+localStorage.getItem("firstJoin"); 
 update();
 
 
@@ -915,11 +926,40 @@ function mine(event) {
     return;
   }
 
-  coins += minePower;
+  let crit = Math.random() < 0.1;
+
+let earned = crit
+? minePower * 5
+: minePower;
+
+coins += earned;
+
+if(crit){
+
+showToast(
+"🔥 CRITICAL HIT +" + earned
+);
+
+}
   xp += 2 * xpBoost;
   energy -= 1;
+  document.querySelector(".mineBtn")
+.style.transform = "scale(.9)";
+
+setTimeout(()=>{
+
+document.querySelector(".mineBtn")
+.style.transform = "scale(1)";
+
+},100);
 
   checkLevelUp();
+  if(window.Telegram?.WebApp){
+
+Telegram.WebApp.HapticFeedback
+.impactOccurred("light");
+
+}
 
   save();
   update();
@@ -938,9 +978,12 @@ function checkLevelUp() {
     xp -= xpMax;
 
     level += 1;
+    coins += level * 50;
 
     xpMax = Math.floor(xpMax * 1.5);
-showToast("LEVEL UP!");
+showToast(
+"LEVEL UP! +" + (level * 50) + " Coins"
+);
 
     save();
     update();
@@ -1127,37 +1170,37 @@ document
 .catch(()=>{});
 
 /* REWARDS */
-
-let reward;
-
 let random = Math.random();
 
-if(random < 0.45){
+let reward;
+let rarity;
+
+if(random < 0.50){
 
 reward = 5;
+rarity = "Common";
 
-}else if(random < 0.70){
-
-reward = 10;
-
-}else if(random < 0.85){
+}else if(random < 0.75){
 
 reward = 15;
+rarity = "Rare";
 
-}else if(random < 0.94){
+}else if(random < 0.92){
 
-reward = 25;
+reward = 40;
+rarity = "Epic";
 
 }else if(random < 0.99){
 
-reward = 50;
+reward = 100;
+rarity = "Legendary";
 
 }else{
 
-reward = 100;
+reward = 500;
+rarity = "MYTHIC";
 
 }
-
 
 if(random < 0.45){
 
@@ -1199,7 +1242,7 @@ document
 .play()
 .catch(()=>{});
 
-if(reward === 100){
+if(reward === 500){
 
 showToast(
 "🔥 JACKPOT +500"
@@ -1208,7 +1251,7 @@ showToast(
 }else{
 
 showToast(
-"🎁 +" + reward + " Coins"
+rarity + " Reward: +" + reward
 );
 
 }
@@ -1366,8 +1409,30 @@ function unlockAudio() {
 
   audioUnlocked = true;
 }
-  update();
-showScreen("homeScreen");
+ if(!firstJoin){
+
+coins += 500;
+
+localStorage.setItem(
+"firstJoin",
+"yes"
+);
+
+showToast(
+"🎉 Welcome Bonus +500"
+);
+
+save();
+
+}
+
+update();
+showScreen("homeScreen"); 
+  setInterval(()=>{
+
+save();
+
+},10000);
 
 </script>
 
