@@ -374,13 +374,72 @@ box-shadow:
 transition:
 transform 5s cubic-bezier(.15,.8,.2,1);
 
+} 
+.wheelCenter{
+position:absolute;
+width:40px;
+height:40px;
+background:white;
+border-radius:50%;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+z-index:20;
+box-shadow:0 0 20px white;
+}
+
+.label{
+position:absolute;
+font-weight:900;
+font-size:20px;
+color:white;
+text-shadow:0 0 10px black;
+}
+
+/* TOP */
+.l1{
+top:18px;
+left:145px;
+}
+
+/* TOP RIGHT */
+.l2{
+top:70px;
+right:45px;
+}
+
+/* BOTTOM RIGHT */
+.l3{
+bottom:70px;
+right:45px;
+}
+
+/* BOTTOM */
+.l4{
+bottom:18px;
+left:138px;
+}
+
+/* BOTTOM LEFT */
+.l5{
+bottom:70px;
+left:38px;
+}
+
+/* TOP LEFT */
+.l6{
+top:70px;
+left:20px;
+font-size:14px;
+color:#ffe600;
+transform:rotate(-55deg);
 }
 
 /* POINTER */
 
 .pointer{
- position:relative;
-top:8px; 
+position:relative;
+top:18px; 
 width:0;
 height:0;
 
@@ -396,66 +455,6 @@ drop-shadow(0 0 10px white);
 }
 
 /* SLICES */
-.slice{
-position:absolute;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-width:80px;
-height:80px;
-
-font-size:22px;
-font-weight:900;
-color:white;
-
-text-shadow:
-0 0 10px black,
-0 0 20px black;
-}
-
-/* TOP */
-.s1{
-top:25px;
-left:132px;
-}
-
-/* TOP RIGHT */
-.s2{
-top:75px;
-right:35px;
-}
-
-/* BOTTOM RIGHT */
-.s3{
-bottom:75px;
-right:35px;
-}
-
-/* BOTTOM */
-.s4{
-bottom:25px;
-left:125px;
-}
-
-/* BOTTOM LEFT */
-.s5{
-bottom:75px;
-left:28px;
-}
-
-/* TOP LEFT */
-.s6{
-top:65px;
-left:15px;
-
-font-size:14px;
-
-color:#ffe600;
-
-transform:rotate(-60deg);
-}
 
 </style>
 </head>
@@ -552,7 +551,6 @@ OPEN
 
 <!-- SPIN SCREEN -->
 <!-- SPIN SCREEN -->
-<!-- SPIN SCREEN -->
 <div id="spinScreen" class="screen">
 
 <button class="backBtn"
@@ -571,18 +569,15 @@ onclick="showScreen('homeScreen')">
 
 <div id="rouletteWheel">
 
-<div class="slice s1">5</div>
-<div class="slice s2">10</div>
-<div class="slice s3">25</div>
-<div class="slice s4">50</div>
-<div class="slice s5">100</div>
-<div class="slice s6">JACKPOT</div>
+<div class="wheelCenter"></div>
 
 </div>
 
-<button class="spinBtn"
+<button
+class="spinBtn"
+id="spinBtn"
 onclick="spinWheel()">
-SPIN
+FREE SPIN
 </button>
 
 </div>
@@ -870,6 +865,24 @@ function update() {
   document.querySelector(".progressFill").style.width =
 xpPercent + "%";
 }
+  let spinBtn =
+document.getElementById("spinBtn");
+
+if(spinBtn){
+
+if(freeSpinUsed === "yes"){
+
+spinBtn.innerText =
+"SPIN - 20 COINS";
+
+}else{
+
+spinBtn.innerText =
+"FREE SPIN";
+
+}
+
+}
 
 /* SAVE */
 
@@ -983,19 +996,15 @@ function claimTask() {
    showToast("Complete task first!");
     return;
   }
-
   coins += 30;
-
-  save();
-  update();
-
+  save(); 
+  update(); 
   showToast("+30 Coins");
-
-  taskDone = false;
+  taskDone = false; 
 }
+  function spinWheel(){
 
-/* SPIN */
-function spinWheel(){
+if(spinning) return;
 
 let today =
 new Date().toDateString();
@@ -1021,13 +1030,13 @@ localStorage.setItem(
 
 }
 
-/* PAID SPINS */
+/* PAID SPIN */
 
 if(freeSpinUsed === "yes"){
 
 if(coins < 20){
 
-showToast("Need 20 coins");
+showToast("Need 20 coins for spin");
 
 return;
 
@@ -1035,9 +1044,11 @@ return;
 
 coins -= 20;
 
+showToast("-20 Coins");
+
 }
 
-/* FREE SPIN */
+/* FREE DAILY */
 
 if(freeSpinUsed === "no"){
 
@@ -1052,7 +1063,7 @@ showToast("FREE DAILY SPIN");
 
 }
 
-/* REWARDS */
+spinning = true;
 
 let rewards = [
 5,
@@ -1076,15 +1087,23 @@ document.getElementById(
 "rouletteWheel"
 );
 
-/* REALISTIC SPIN */
+/* PERFECT POINTER ALIGNMENT */
 
 let sectorAngle = 60;
 
-let finalAngle =
-3600 + (randomIndex * 60);
+let targetAngle =
+(randomIndex * sectorAngle)
++ 30;
+
+/* CONTINUOUS SPIN */
+
+currentRotation +=
+3600 + (360 - targetAngle);
+
+/* ROTATE */
 
 wheel.style.transform =
-"rotate(" + finalAngle + "deg)";
+`rotate(${currentRotation}deg)`;
 
 /* SOUND */
 
@@ -1093,12 +1112,13 @@ document
 .play()
 .catch(()=>{});
 
+/* REWARD */
+
 setTimeout(()=>{
 
 coins += reward;
 
 save();
-
 update();
 
 document
@@ -1119,6 +1139,8 @@ showToast(
 );
 
 }
+
+spinning = false;
 
 },5000);
 
