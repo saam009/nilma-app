@@ -854,7 +854,50 @@ playerId
 }
  let firstJoin =
 localStorage.getItem("firstJoin"); 
+let firstJoin =
+localStorage.getItem("firstJoin");
+
+/* LOAD PLAYER DATA */
+
+async function loadPlayerData(){
+
+const playerRef =
+db.collection("players")
+.doc(playerId);
+
+const docSnap =
+await playerRef.get();
+
+if(docSnap.exists){
+
+const data = docSnap.data();
+
+coins = data.coins || 0;
+energy = data.energy || 100;
+level = data.level || 1;
+xp = data.xp || 0;
+
+minePower =
+data.minePower || 1;
+
+xpBoost =
+data.xpBoost || 1;
+
 update();
+
+showToast("☁️ Cloud Data Loaded");
+
+}else{
+
+save();
+
+}
+
+}
+
+/* START */
+
+loadPlayerData();
 
 
 /* SCREEN SYSTEM */
