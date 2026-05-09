@@ -853,8 +853,6 @@ playerId
 
 }
  let firstJoin =
-localStorage.getItem("firstJoin"); 
-let firstJoin =
 localStorage.getItem("firstJoin");
 
 /* LOAD PLAYER DATA */
@@ -897,8 +895,78 @@ save();
 
 /* START */
 
-loadPlayerData();
+async function loadPlayerData(){
 
+try{
+
+const playerRef =
+db.collection("players")
+.doc(playerId);
+
+const docSnap =
+await playerRef.get();
+
+if(docSnap.exists){
+
+const data = docSnap.data();
+
+/* ONLY overwrite if cloud has real data */
+
+if(data.coins != null){
+
+coins = data.coins;
+
+}
+
+if(data.energy != null){
+
+energy = data.energy;
+
+}
+
+if(data.level != null){
+
+level = data.level;
+
+}
+
+if(data.xp != null){
+
+xp = data.xp;
+
+}
+
+if(data.minePower != null){
+
+minePower = data.minePower;
+
+}
+
+if(data.xpBoost != null){
+
+xpBoost = data.xpBoost;
+
+}
+
+update();
+
+showToast("☁️ Cloud Data Loaded");
+
+}else{
+
+save();
+
+}
+
+}catch(err){
+
+console.log(err);
+
+showToast("Offline Mode");
+
+}
+
+}
 
 /* SCREEN SYSTEM */
 function showScreen(screenId){
@@ -991,7 +1059,7 @@ function save() {
   localStorage.setItem("maxEnergy", maxEnergy);
 localStorage.setItem("minePower", minePower);
 localStorage.setItem("xpBoost", xpBoost);
-  db.collection("players")
+ db.collection("players")
 .doc(playerId)
 .set({
 
@@ -1001,9 +1069,12 @@ level: level,
 xp: xp,
 minePower: minePower,
 xpBoost: xpBoost,
+xpMax: xpMax,
+maxEnergy: maxEnergy,
+paidChestPrice: paidChestPrice,
 updated: Date.now()
 
-});
+},{merge:true}); 
  
   localStorage.setItem(
 "paidChestPrice",
@@ -1518,7 +1589,7 @@ showToast(
 save();
 
 }
-
+loadPlayerData();
 update();
 showScreen("homeScreen"); 
   setInterval(()=>{
