@@ -890,7 +890,7 @@ if(spinBtn){
 if(freeSpinUsed === "yes"){
 
 spinBtn.innerText =
-"SPIN - 20 COINS";
+"PAID SPIN - 20";
 
 }else{
 
@@ -1121,8 +1121,10 @@ let targetAngle =
 
 /* CONTINUOUS SPIN */
 
-currentRotation +=
-3600 + (360 - targetAngle);
+currentRotation =
+(currentRotation % 360)
++ 3600
++ (360 - targetAngle);
 
 /* ROTATE */
 
