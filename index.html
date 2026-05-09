@@ -574,6 +574,8 @@ OPEN CHEST
 </button>
 
 </div>
+  </div>
+  <!-- CLOSE spinScreen -->
 
 <!-- TASK SCREEN -->
 <div id="taskScreen" class="screen">
@@ -798,6 +800,10 @@ parseInt(localStorage.getItem("minePower")) || 1;
 let xpBoost =
 parseInt(localStorage.getItem("xpBoost")) || 1; 
 let spinning = false;
+ let paidChestPrice =
+parseInt(
+localStorage.getItem("paidChestPrice")
+) || 20; 
 
 let currentRotation = 0;  
 update();
@@ -867,9 +873,9 @@ document.getElementById("spinBtn");
 if(spinBtn){
 
 if(freeSpinUsed === "yes"){
-
 spinBtn.innerText =
-"PAID SPIN - 20";
+"OPEN CHEST - " +
+paidChestPrice;
 
 }else{
 
@@ -1025,14 +1031,19 @@ localStorage.setItem(
 "freeSpinUsed",
 "no"
 );
+ paidChestPrice = 20;
+
+localStorage.setItem(
+"paidChestPrice",
+20
+); 
 
 }
 
 /* PAID OPEN */
 
 if(freeSpinUsed === "yes"){
-
-if(coins < 20){
+if(coins < paidChestPrice){
 
 showToast("Need 20 coins");
 
@@ -1040,12 +1051,21 @@ return;
 
 }
 
-coins -= 20;
+coins -= paidChestPrice;
 
 save();
 update();
 
-showToast("-20 Coins");
+showToast(
+"-" + paidChestPrice + " Coins"
+);
+
+paidChestPrice += 10;
+
+localStorage.setItem(
+"paidChestPrice",
+paidChestPrice
+);
 
 }
 
@@ -1186,7 +1206,7 @@ function showToast(text){
 
   setTimeout(()=>{
     toast.style.display = "none";
-  },2000);
+  },3500);
 }
   /* SHOP */
 
