@@ -852,41 +852,24 @@ playerId = telegramId.toString();
 
 }else{
 
-let savedGuestId =
-localStorage.getItem("guestId");
+document.body.innerHTML = `
+<div style="
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-size:24px;
+font-weight:bold;
+text-align:center;
+padding:30px;
+">
+❌ Open this game inside Telegram
+</div>
+`;
 
-if(!savedGuestId){
-
-savedGuestId =
-"guest_" +
-Math.random().toString(36).substring(2,12);
-
-localStorage.setItem(
-"guestId",
-savedGuestId
+throw new Error(
+"Telegram required"
 );
-
-}
-
-telegramId = savedGuestId;
-
-username =
-localStorage.getItem("guestUsername");
-
-if(!username){
-
-username =
-"Guest_" +
-Math.floor(Math.random()*9999);
-
-localStorage.setItem(
-"guestUsername",
-username
-);
-
-}
-
-playerId = telegramId.toString();
 
 }
 
