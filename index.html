@@ -828,8 +828,8 @@ localStorage.getItem("paidChestPrice")
 ) || 20; 
 
 let currentRotation = 0;
- let playerId = telegramId.toString(); 
- let tg = window.Telegram.WebApp;
+
+let tg = window.Telegram.WebApp;
 
 tg.expand();
 
@@ -837,6 +837,7 @@ let user = tg.initDataUnsafe?.user;
 
 let username;
 let telegramId;
+let playerId;
 
 if(user){
 
@@ -847,6 +848,8 @@ user.first_name ||
 
 telegramId = user.id;
 
+playerId = telegramId.toString();
+
 }else{
 
 username =
@@ -855,6 +858,8 @@ Math.floor(Math.random()*9999);
 
 telegramId =
 "guest_" + Date.now();
+
+playerId = telegramId.toString();
 
 }
 
