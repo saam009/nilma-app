@@ -1464,7 +1464,7 @@ update();
 
 },15000);
 
- async function loadLeaderboard(){
+ function loadLeaderboard(){
 
 const board =
 document.getElementById(
@@ -1473,13 +1473,10 @@ document.getElementById(
 
 board.innerHTML = "Loading...";
 
-try{
-
-const snapshot =
-await db.collection("players")
+db.collection("players")
 .orderBy("coins","desc")
 .limit(10)
-.get();
+.onSnapshot(snapshot=>{
 
 let html = "";
 
@@ -1496,10 +1493,22 @@ if(rank === 2) medal = "🥈";
 if(rank === 3) medal = "🥉";
 
 html += `
-<p style="margin-bottom:12px;">
-${medal} ${data.username || "Unknown"}
-— ${data.coins || 0} 💰
-</p>
+<div class="card" style="
+margin-bottom:12px;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+">
+<div>
+${medal}
+${data.username || "Unknown"}
+</div>
+
+<div>
+💰 ${data.coins || 0}
+</div>
+</div>
 `;
 
 rank++;
@@ -1508,14 +1517,14 @@ rank++;
 
 board.innerHTML = html;
 
-}catch(err){
+},err=>{
 
 console.log(err);
 
 board.innerHTML =
 "Failed to load leaderboard";
 
-}
+});
 
 }
   /* TOAST */
