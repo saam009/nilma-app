@@ -665,23 +665,14 @@ onclick="showScreen('homeScreen')">
   <h2 style="text-align:center; margin-top:40px;">
     🏆 Leaderboard
   </h2>
+<div class="card" style="margin-top:30px;">
 
-  <div class="card" style="margin-top:30px;">
+<div id="leaderboardList">
+Loading leaderboard...
+</div>
 
-  <p>🥇 CyberKing — 50000 💎 Reward: 5000</p>
-<p>🥈 ShadowX — 42000 💎 Reward: 3000</p>
-<p>🥉 NovaBot — 35000 💎 Reward: 2000</p>
-<p>4️⃣ Ghost — 30000</p>
-<p>5️⃣ Volt — 28000</p>
-<p>6️⃣ DarkAI — 24000</p>
-<p>7️⃣ Pixel — 20000</p>
-<p>8️⃣ Rex — 17000</p>
-<p>9️⃣ Zero — 15000</p>
-<p>🔟 Hyper — 12000</p>
-
-  </div>
-
-</div> 
+</div>
+  
 <!-- SHOP SCREEN -->
 <div id="shopScreen" class="screen">
   <button class="backBtn"
@@ -839,6 +830,21 @@ localStorage.getItem("paidChestPrice")
 let currentRotation = 0;
   let playerId =
 localStorage.getItem("playerId");
+ let username =
+localStorage.getItem("username");
+
+if(!username){
+
+username =
+"Player_" +
+Math.floor(Math.random()*9999);
+
+localStorage.setItem(
+"username",
+username
+);
+
+}
 
 if(!playerId){
 
@@ -1008,8 +1014,12 @@ function showScreen(screenId){
     document.querySelectorAll(".navItem")[4]
     .classList.add("active");
   }
+if(screenId === "leaderboardScreen"){
 
-}
+loadLeaderboard();
+
+} 
+
 
 /* UPDATE UI */
 
@@ -1062,7 +1072,8 @@ localStorage.setItem("xpBoost", xpBoost);
  db.collection("players")
 .doc(playerId)
 .set({
-
+ 
+username: username,
 coins: coins,
 energy: energy,
 level: level,
@@ -1451,6 +1462,61 @@ save();
 update();
 
 },15000);
+
+ async function loadLeaderboard(){
+
+const board =
+document.getElementById(
+"leaderboardList"
+);
+
+board.innerHTML = "Loading...";
+
+try{
+
+const snapshot =
+await db.collection("players")
+.orderBy("coins","desc")
+.limit(10)
+.get();
+
+let html = "";
+
+let rank = 1;
+
+snapshot.forEach(doc=>{
+
+const data = doc.data();
+
+let medal = rank;
+
+if(rank === 1) medal = "🥇";
+if(rank === 2) medal = "🥈";
+if(rank === 3) medal = "🥉";
+
+html += `
+<p style="margin-bottom:12px;">
+${medal} ${data.username || "Unknown"}
+— ${data.coins || 0} 💰
+</p>
+`;
+
+rank++;
+
+});
+
+board.innerHTML = html;
+
+}catch(err){
+
+console.log(err);
+
+board.innerHTML =
+"Failed to load leaderboard";
+
+}
+
+}
   /* TOAST */
 
 function showToast(text){
