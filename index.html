@@ -1102,6 +1102,34 @@ function save() {
   localStorage.setItem("maxEnergy", maxEnergy);
 localStorage.setItem("minePower", minePower);
 localStorage.setItem("xpBoost", xpBoost);
+/* ANTI CHEAT */
+
+let maxPossibleCoins =
+(level * 5000) + 50000;
+
+if(coins > maxPossibleCoins){
+
+coins = maxPossibleCoins;
+
+showToast("Cheat detected");
+
+}
+ if(coins < 0){
+coins = 0;
+}
+
+if(level < 1){
+level = 1;
+}
+
+if(energy < 0){
+energy = 0;
+}
+ if(xp > xpMax * 5){
+
+xp = xpMax;
+
+}
  db.collection("players")
 .doc(playerId)
 .set({
