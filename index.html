@@ -828,36 +828,36 @@ localStorage.getItem("paidChestPrice")
 ) || 20; 
 
 let currentRotation = 0;
-  let playerId =
-localStorage.getItem("playerId");
- let username =
-localStorage.getItem("username");
+ let playerId = telegramId.toString(); 
+ let tg = window.Telegram.WebApp;
 
-if(!username){
+tg.expand();
+
+let user = tg.initDataUnsafe?.user;
+
+let username;
+let telegramId;
+
+if(user){
 
 username =
-"Player_" +
+user.username ||
+user.first_name ||
+"TelegramUser";
+
+telegramId = user.id;
+
+}else{
+
+username =
+"Guest_" +
 Math.floor(Math.random()*9999);
 
-localStorage.setItem(
-"username",
-username
-);
+telegramId =
+"guest_" + Date.now();
 
 }
 
-if(!playerId){
-
-playerId =
-"player_" +
-Math.random().toString(36).substring(2,12);
-
-localStorage.setItem(
-"playerId",
-playerId
-);
-
-}
  let firstJoin =
 localStorage.getItem("firstJoin");
 
