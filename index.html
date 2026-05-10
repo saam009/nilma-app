@@ -648,9 +648,30 @@ onclick="showScreen('homeScreen')">
 
   <div style="text-align:center; margin-top:40px;">
 
-    <button onclick="daily()">
-      Claim Daily Reward
-    </button>
+  <button
+id="dailyBtn"
+onclick="daily()"
+style="
+padding:14px 28px;
+border:none;
+border-radius:14px;
+font-size:18px;
+font-weight:bold;
+background:linear-gradient(90deg,#ffd54a,#ff9800);
+color:black;
+">
+Claim Daily Reward
+</button>
+
+<div
+id="dailyTimer"
+style="
+margin-top:20px;
+font-size:18px;
+opacity:.85;
+">
+Ready to claim
+</div> 
 
   </div>
 
@@ -1243,6 +1264,7 @@ function daily() {
   coins += 50;
 
   lastDaily = now;
+ updateDailyTimer();
 
   localStorage.setItem("lastDaily", lastDaily);
 
@@ -1250,6 +1272,58 @@ function daily() {
   update();
 
   showToast("+50 Coins");
+}
+ function updateDailyTimer(){
+
+let btn =
+document.getElementById("dailyBtn");
+
+let timer =
+document.getElementById("dailyTimer");
+
+if(!btn || !timer) return;
+
+let now = Date.now();
+
+let remaining =
+86400000 - (now - lastDaily);
+
+if(remaining <= 0){
+
+btn.disabled = false;
+
+btn.style.opacity = "1";
+
+timer.innerText =
+"✅ Reward Ready";
+
+return;
+
+}
+
+btn.disabled = true;
+
+btn.style.opacity = ".6";
+
+let hours =
+Math.floor(remaining / 3600000);
+
+let minutes =
+Math.floor(
+(remaining % 3600000) / 60000
+);
+
+let seconds =
+Math.floor(
+(remaining % 60000) / 1000
+);
+
+timer.innerText =
+"⏳ " +
+hours + "h " +
+minutes + "m " +
+seconds + "s";
+
 }
 
 /* TASK */
@@ -1716,6 +1790,9 @@ showScreen("homeScreen");
 save();
 
 },10000);
+ setInterval(updateDailyTimer,1000);
+
+updateDailyTimer();
 
 </script>
 
