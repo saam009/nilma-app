@@ -852,12 +852,39 @@ playerId = telegramId.toString();
 
 }else{
 
+let savedGuestId =
+localStorage.getItem("guestId");
+
+if(!savedGuestId){
+
+savedGuestId =
+"guest_" +
+Math.random().toString(36).substring(2,12);
+
+localStorage.setItem(
+"guestId",
+savedGuestId
+);
+
+}
+
+telegramId = savedGuestId;
+
+username =
+localStorage.getItem("guestUsername");
+
+if(!username){
+
 username =
 "Guest_" +
 Math.floor(Math.random()*9999);
 
-telegramId =
-"guest_" + Date.now();
+localStorage.setItem(
+"guestUsername",
+username
+);
+
+}
 
 playerId = telegramId.toString();
 
