@@ -577,7 +577,74 @@ transition:.3s;
 </div>
 
 </div>
+ 
+<!-- PROFILE CARD -->
 
+<div class="heroCard"
+style="
+display:flex;
+align-items:center;
+gap:15px;
+">
+
+<img
+id="profilePhoto"
+src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+style="
+width:80px;
+height:80px;
+border-radius:50%;
+border:3px solid #ffd54a;
+object-fit:cover;
+box-shadow:
+0 0 20px rgba(255,215,0,.4);
+"
+>
+
+<div>
+
+<div
+id="profileName"
+style="
+font-size:24px;
+font-weight:800;
+">
+Player
+</div>
+
+<div style="
+margin-top:6px;
+opacity:.8;
+">
+⭐ Level
+<span id="profileLevel">
+1
+</span>
+</div>
+
+<div style="
+margin-top:6px;
+opacity:.8;
+">
+⛏ Power
+<span id="profilePower">
+1
+</span>
+</div>
+
+<div style="
+margin-top:6px;
+opacity:.8;
+">
+👥 Referrals
+<span id="profileRefs">
+0
+</span>
+</div>
+
+</div>
+
+</div>
 <div class="heroCard">
 
 <div class="heroTitle">
@@ -1269,6 +1336,9 @@ username =
 user.username ||
 user.first_name ||
 "TelegramUser";
+ let profilePhoto =
+user.photo_url ||
+"https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
 telegramId = user.id;
 
@@ -1520,6 +1590,67 @@ function update() {
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
   document.getElementById("level").innerText = level;
+ /* PROFILE */
+
+let profileName =
+document.getElementById(
+"profileName"
+);
+
+if(profileName){
+
+profileName.innerText =
+username;
+
+}
+
+let profileLevel =
+document.getElementById(
+"profileLevel"
+);
+
+if(profileLevel){
+
+profileLevel.innerText =
+level;
+
+}
+
+let profilePower =
+document.getElementById(
+"profilePower"
+);
+
+if(profilePower){
+
+profilePower.innerText =
+minePower;
+
+}
+
+let profileRefs =
+document.getElementById(
+"profileRefs"
+);
+
+if(profileRefs){
+
+profileRefs.innerText =
+referrals;
+
+}
+
+let profileImage =
+document.getElementById(
+"profilePhoto"
+);
+
+if(profileImage){
+
+profileImage.src =
+profilePhoto;
+
+}
 
   let xpPercent = (xp / xpMax) * 100;
   document.getElementById("xpBar").style.width = xpPercent + "%";
