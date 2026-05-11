@@ -2439,19 +2439,23 @@ reward,
 );
 
 }
- if(reward >= 100){
+/* EFFECTS */
 
-triggerRewardEffect(
-"legendary"
-);
+if(rewardType === "turbo"){
+
+triggerRewardEffect("mythic");
 
 }
 
-if(reward >= 40){
+else if(rewardType === "xp"){
 
-triggerRewardEffect(
-"epic"
-);
+triggerRewardEffect("legendary");
+
+}
+
+else if(rewardType === "crate"){
+
+triggerRewardEffect("epic");
 
 }
 
