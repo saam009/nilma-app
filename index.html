@@ -668,7 +668,35 @@ Level <span id="level">1</span>
 </div>
 
 </div>
+<div class="section">
 
+<div class="card">
+
+<h3 style="margin-bottom:15px;">
+🎒 Inventory
+</h3>
+
+<div style="
+display:flex;
+justify-content:space-between;
+gap:10px;
+">
+
+<div>
+🎟 Spins:
+<b id="freeSpinsText">0</b>
+</div>
+
+<div>
+📦 Rare Crates:
+<b id="rareCratesText">0</b>
+</div>
+
+</div>
+
+</div>
+
+</div>
 <div class="mineWrap">
 
 <button class="mineBtn" onclick="mine(event)">
@@ -1375,6 +1403,15 @@ tg.initDataUnsafe?.start_param;
 parseInt(
 localStorage.getItem("referrals")
 ) || 0;
+ let freeSpins =
+parseInt(
+localStorage.getItem("freeSpins")
+) || 0;
+
+let rareCrates =
+parseInt(
+localStorage.getItem("rareCrates")
+) || 0;
  /* MISSIONS */
 
 let mineMission =
@@ -1590,6 +1627,29 @@ function update() {
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
   document.getElementById("level").innerText = level;
+ let spinsText =
+document.getElementById(
+"freeSpinsText"
+);
+
+if(spinsText){
+
+spinsText.innerText =
+freeSpins;
+
+}
+
+let cratesText =
+document.getElementById(
+"rareCratesText"
+);
+
+if(cratesText){
+
+cratesText.innerText =
+rareCrates;
+
+}
  /* PROFILE */
 
 let profileName =
@@ -1711,6 +1771,15 @@ function save() {
   localStorage.setItem("maxEnergy", maxEnergy);
 localStorage.setItem("minePower", minePower);
 localStorage.setItem("xpBoost", xpBoost);
+ localStorage.setItem(
+"freeSpins",
+freeSpins
+);
+
+localStorage.setItem(
+"rareCrates",
+rareCrates
+);
 /* ANTI CHEAT */
 
 let maxPossibleCoins =
@@ -2154,30 +2223,37 @@ reward = 500;
 rarity = "MYTHIC";
 
 }
+let rewardType = "";
 
-if(random < 0.45){
-
-reward = 5;
-
-}else if(random < 0.7){
+if(random < 0.40){
 
 reward = 10;
+rewardType = "coins";
 
-}else if(random < 0.85){
-
-reward = 15;
-
-}else if(random < 0.94){
+}else if(random < 0.65){
 
 reward = 25;
+rewardType = "coins";
 
-}else if(random < 0.99){
+}else if(random < 0.80){
 
-reward = 50;
+reward = 1;
+rewardType = "spin";
+
+}else if(random < 0.92){
+
+reward = 1;
+rewardType = "crate";
+
+}else if(random < 0.98){
+
+reward = 2;
+rewardType = "xp";
 
 }else{
 
-reward = 100;
+reward = 1;
+rewardType = "turbo";
 
 }
 
@@ -2185,7 +2261,35 @@ reward = 100;
 
 setTimeout(()=>{
 
+if(rewardType === "coins"){
+
 coins += reward;
+
+}
+
+if(rewardType === "spin"){
+
+freeSpins += reward;
+
+}
+
+if(rewardType === "crate"){
+
+rareCrates += reward;
+
+}
+
+if(rewardType === "xp"){
+
+xpBoost += reward;
+
+}
+
+if(rewardType === "turbo"){
+
+minePower += reward;
+
+}
 
 save();
 update();
@@ -2195,28 +2299,52 @@ document
 .play()
 .catch(()=>{});
 
-if(reward >= 100){
+if(rewardType === "coins"){
 
 showRewardPopup(
-rarity,
+"COINS",
+reward,
+"💰"
+);
+
+}
+
+if(rewardType === "spin"){
+
+showRewardPopup(
+"FREE SPIN",
+1,
+"🎟"
+);
+
+}
+
+if(rewardType === "crate"){
+
+showRewardPopup(
+"RARE CRATE",
+1,
+"📦"
+);
+
+}
+
+if(rewardType === "xp"){
+
+showRewardPopup(
+"XP BOOST",
 reward,
 "🔥"
 );
 
-}else if(reward >= 40){
+}
+
+if(rewardType === "turbo"){
 
 showRewardPopup(
-rarity,
+"TURBO MINER",
 reward,
-"⚡"
-);
-
-}else{
-
-showRewardPopup(
-rarity,
-reward,
-"💰"
+"🚀"
 );
 
 }
