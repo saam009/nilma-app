@@ -732,6 +732,23 @@ OPEN
 </button>
 </div>
 </div>
+ <div class="gameCard">
+<img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=800">
+
+<div class="gameInfo">
+
+<div class="gameTitle">
+Rare Crates
+</div>
+
+<button
+class="playBtn"
+onclick="openRareCrate()">
+OPEN
+</button>
+
+</div>
+</div>
 <div class="gameCard">
 <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800">
 
@@ -2358,7 +2375,80 @@ document.getElementById(
 },1800);
 
 }
+function openRareCrate(){
 
+if(rareCrates <= 0){
+
+showToast(
+"No rare crates"
+);
+
+return;
+
+}
+
+rareCrates--;
+
+let random =
+Math.random();
+
+let reward;
+
+if(random < 0.50){
+
+reward = 100;
+
+coins += reward;
+
+showRewardPopup(
+"RARE COINS",
+reward,
+"💎"
+);
+
+}else if(random < 0.80){
+
+reward = 3;
+
+xpBoost += reward;
+
+showRewardPopup(
+"XP BOOST",
+reward,
+"🔥"
+);
+
+}else if(random < 0.95){
+
+reward = 2;
+
+minePower += reward;
+
+showRewardPopup(
+"TURBO POWER",
+reward,
+"🚀"
+);
+
+}else{
+
+reward = 1000;
+
+coins += reward;
+
+showRewardPopup(
+"LEGENDARY JACKPOT",
+reward,
+"👑"
+);
+
+}
+
+save();
+
+update();
+
+}
 /* ENERGY REGEN */
  setInterval(() => { 
    if (energy < maxEnergy) { 
