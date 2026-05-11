@@ -694,6 +694,69 @@ Loading leaderboard...
 
 </div>
  </div> 
+<!-- REFERRAL SCREEN -->
+<div id="referralScreen" class="screen">
+
+<button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
+
+<div class="heroCard">
+
+<h2>👥 Referral System</h2>
+
+<p style="margin-top:10px;">
+Invite friends and earn rewards
+</p>
+
+</div>
+
+<div style="padding:20px;">
+
+<div class="card">
+
+<h3>Your Referral Link</h3>
+
+<input
+id="refLink"
+readonly
+style="
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+margin-top:10px;
+font-size:16px;
+"
+>
+
+<button
+class="playBtn"
+style="margin-top:15px;"
+onclick="copyRefLink()">
+COPY LINK
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Total Referrals</h3>
+
+<p style="
+font-size:28px;
+margin-top:10px;
+font-weight:bold;
+">
+👥 <span id="refCount">0</span>
+</p>
+
+</div>
+
+</div>
+
+</div> 
 <!-- SHOP SCREEN -->
 <div id="shopScreen" class="screen">
   <button class="backBtn"
@@ -773,6 +836,10 @@ Shop
 <div class="navItem" onclick="showScreen('leaderboardScreen')">
 <div class="navIcon">🏆</div>
 Top
+</div>
+ <div class="navItem" onclick="showScreen('referralScreen')">
+<div class="navIcon">👥</div>
+Refer
 </div>
 
 </div>
@@ -896,6 +963,12 @@ throw new Error(
 
  let firstJoin =
 localStorage.getItem("firstJoin");
+ let startParam =
+tg.initDataUnsafe?.start_param;
+ let referrals =
+parseInt(
+localStorage.getItem("referrals")
+) || 0;
 
 /* LOAD PLAYER DATA */
 
@@ -989,6 +1062,11 @@ if(data.xpBoost != null){
 xpBoost = data.xpBoost;
 
 }
+ if(data.referrals != null){
+
+referrals = data.referrals;
+
+}
 
 update();
 
@@ -1050,6 +1128,10 @@ function showScreen(screenId){
     document.querySelectorAll(".navItem")[4]
     .classList.add("active");
   }
+ if(screenId === "referralScreen"){
+document.querySelectorAll(".navItem")[5]
+.classList.add("active");
+}
 if(screenId === "leaderboardScreen"){
 
 loadLeaderboard();
@@ -1075,6 +1157,25 @@ xpPercent + "%";
 
 let spinBtn =
 document.getElementById("spinBtn");
+let refCount =
+document.getElementById("refCount");
+
+if(refCount){
+
+refCount.innerText = referrals;
+
+}
+
+let refLink =
+document.getElementById("refLink");
+
+if(refLink){
+
+refLink.value =
+"https://t.me/NilmaCoinBot/app?startapp=" +
+playerId;
+
+} 
 
 if(spinBtn){
 
@@ -1148,6 +1249,7 @@ xpBoost: xpBoost,
 xpMax: xpMax,
 maxEnergy: maxEnergy,
 paidChestPrice: paidChestPrice,
+referrals: referrals,
 updated: Date.now()
 
 },{merge:true}); 
@@ -1732,6 +1834,20 @@ function buyXP(){
 
   showToast("XP Booster Activated");
 }
+ /* REFERRAL */
+
+function copyRefLink(){
+
+let refLink =
+document.getElementById("refLink");
+
+refLink.select();
+
+document.execCommand("copy");
+
+showToast("Referral link copied");
+
+}
 
 /* AUDIO */
 
@@ -1774,6 +1890,41 @@ localStorage.setItem(
 "firstJoin",
 "yes"
 );
+
+/* REFERRAL REWARD */
+
+if(startParam &&
+startParam !== playerId){
+
+db.collection("players")
+.doc(startParam)
+.get()
+.then(doc=>{
+
+if(doc.exists){
+
+let data = doc.data();
+
+let newRefs =
+(data.referrals || 0) + 1;
+
+let rewardCoins =
+(data.coins || 0) + 200;
+
+db.collection("players")
+.doc(startParam)
+.update({
+
+referrals: newRefs,
+coins: rewardCoins
+
+});
+
+}
+
+});
+
+}
 
 showToast(
 "🎉 Welcome Bonus +500"
