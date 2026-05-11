@@ -637,7 +637,39 @@ OPEN
 </button>
 </div>
 </div>
+<div class="gameCard">
+<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800">
 
+<div class="gameInfo">
+
+<div class="gameTitle">
+🎯 Missions
+</div>
+
+<button class="playBtn"
+onclick="showScreen('missionScreen')">
+OPEN
+</button>
+
+</div>
+</div>
+
+<div class="gameCard">
+<img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=800">
+
+<div class="gameInfo">
+
+<div class="gameTitle">
+🔥 Daily Streak
+</div>
+
+<button class="playBtn"
+onclick="showScreen('streakScreen')">
+OPEN
+</button>
+
+</div>
+</div>
 </div>
 
 </div>
@@ -971,6 +1003,80 @@ CLAIM
 </div>
 
 </div>
+ <!-- STREAK SCREEN -->
+<div id="streakScreen" class="screen">
+
+<button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
+
+<div class="heroCard">
+
+<h2>🔥 Daily Streak</h2>
+
+<p style="margin-top:10px;">
+Login daily to increase rewards
+</p>
+
+</div>
+
+<div style="
+padding:20px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+">
+
+<div class="card" id="day1">
+<h3>Day 1</h3>
+<p>💰 50 Coins</p>
+</div>
+
+<div class="card" id="day2">
+<h3>Day 2</h3>
+<p>💰 100 Coins</p>
+</div>
+
+<div class="card" id="day3">
+<h3>Day 3</h3>
+<p>🎰 Free Chest</p>
+</div>
+
+<div class="card" id="day4">
+<h3>Day 4</h3>
+<p>⚡ XP Boost</p>
+</div>
+
+<div class="card" id="day5">
+<h3>Day 5</h3>
+<p>💎 500 Coins</p>
+</div>
+
+<div class="card" id="day6">
+<h3>Day 6</h3>
+<p>🚀 Mine Power +2</p>
+</div>
+
+<div class="card" id="day7">
+<h3>Day 7</h3>
+<p>🔥 JACKPOT 1000</p>
+</div>
+
+</div>
+
+<div style="text-align:center;">
+
+<button
+id="streakBtn"
+class="spinBtn"
+onclick="claimStreak()">
+CLAIM STREAK
+</button>
+
+</div>
+
+</div>
 <!-- AUDIO -->
 <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
 
@@ -1008,6 +1114,10 @@ Missions
 <div class="navItem" onclick="showScreen('leaderboardScreen')">
 <div class="navIcon">🏆</div>
 Top
+</div>
+ <div class="navItem" onclick="showScreen('streakScreen')">
+<div class="navIcon">🔥</div>
+Streak
 </div>
  <div class="navItem" onclick="showScreen('referralScreen')">
 <div class="navIcon">👥</div>
@@ -1167,6 +1277,17 @@ let levelMissionClaimed =
 localStorage.getItem(
 "levelMissionClaimed"
 ) || "no";
+ /* STREAK */
+
+let streakDay =
+parseInt(
+localStorage.getItem("streakDay")
+) || 0;
+
+let lastStreakClaim =
+parseInt(
+localStorage.getItem("lastStreakClaim")
+) || 0;
 
 /* LOAD PLAYER DATA */
 
@@ -2193,6 +2314,152 @@ showToast(
 );
 
 }
+ /* STREAK SYSTEM */
+
+function claimStreak(){
+
+let now = Date.now();
+
+if(now - lastStreakClaim < 86400000){
+
+showToast(
+"Already claimed today"
+);
+
+return;
+
+}
+
+/* RESET IF MISSED 48h */
+
+if(
+now - lastStreakClaim >
+172800000
+){
+
+streakDay = 0;
+
+}
+
+streakDay++;
+
+if(streakDay > 7){
+
+streakDay = 1;
+
+}
+
+lastStreakClaim = now;
+
+localStorage.setItem(
+"streakDay",
+streakDay
+);
+
+localStorage.setItem(
+"lastStreakClaim",
+lastStreakClaim
+);
+
+/* REWARDS */
+
+if(streakDay === 1){
+
+coins += 50;
+
+}
+
+if(streakDay === 2){
+
+coins += 100;
+
+}
+
+if(streakDay === 3){
+
+freeSpinUsed = "no";
+
+localStorage.setItem(
+"freeSpinUsed",
+"no"
+);
+
+}
+
+if(streakDay === 4){
+
+xpBoost += 1;
+
+}
+
+if(streakDay === 5){
+
+coins += 500;
+
+}
+
+if(streakDay === 6){
+
+minePower += 2;
+
+}
+
+if(streakDay === 7){
+
+coins += 1000;
+
+showToast(
+"🔥 JACKPOT DAY!"
+);
+
+}
+
+save();
+update();
+updateStreak();
+
+showToast(
+"🔥 Day " +
+streakDay +
+" Claimed"
+);
+
+}
+
+function updateStreak(){
+
+for(let i=1;i<=7;i++){
+
+let card =
+document.getElementById(
+"day"+i
+);
+
+if(!card) continue;
+
+if(i < streakDay){
+
+card.style.border =
+"2px solid #00ff99";
+
+card.style.boxShadow =
+"0 0 20px rgba(0,255,153,.4)";
+
+}
+
+if(i === streakDay){
+
+card.style.border =
+"2px solid #ffd54a";
+
+card.style.boxShadow =
+"0 0 25px rgba(255,213,74,.5)";
+
+}
+
+}
+
+}
   /* TOAST */
 
 function showToast(text){
@@ -2392,6 +2659,7 @@ save();
 
 updateDailyTimer();
  updateMissions();
+ updateStreak();
 
 </script>
 
