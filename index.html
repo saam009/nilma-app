@@ -897,6 +897,80 @@ Upgrade mining power and energy
 </div>
 
 </div>
+ <!-- MISSION SCREEN -->
+<div id="missionScreen" class="screen">
+
+<button class="backBtn"
+onclick="showScreen('homeScreen')">
+⬅ Back
+</button>
+
+<div class="heroCard">
+
+<h2>🎯 Daily Missions</h2>
+
+<p style="margin-top:10px;">
+Complete missions and earn rewards
+</p>
+
+</div>
+
+<div style="padding:20px;">
+
+<div class="card">
+
+<h3>⛏ Mine 50 Times</h3>
+
+<p id="mineMissionText">
+0 / 50
+</p>
+
+<button
+class="playBtn"
+id="mineMissionBtn"
+onclick="claimMineMission()">
+CLAIM
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>🎰 Open 3 Chests</h3>
+
+<p id="chestMissionText">
+0 / 3
+</p>
+
+<button
+class="playBtn"
+id="chestMissionBtn"
+onclick="claimChestMission()">
+CLAIM
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>🏆 Reach Level 5</h3>
+
+<p id="levelMissionText">
+Level 1 / 5
+</p>
+
+<button
+class="playBtn"
+id="levelMissionBtn"
+onclick="claimLevelMission()">
+CLAIM
+</button>
+
+</div>
+
+</div>
+
+</div>
 <!-- AUDIO -->
 <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
 
@@ -925,6 +999,10 @@ Tasks
 <div class="navItem" onclick="showScreen('shopScreen')">
 <div class="navIcon">💎</div>
 Shop
+</div>
+ <div class="navItem" onclick="showScreen('missionScreen')">
+<div class="navIcon">🎯</div>
+Missions
 </div>
 
 <div class="navItem" onclick="showScreen('leaderboardScreen')">
