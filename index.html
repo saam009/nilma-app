@@ -1118,6 +1118,67 @@ Refer
 </div>
 
 </div>
+<!-- REWARD POPUP -->
+
+<div id="rewardPopup" style="
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(.7);
+width:320px;
+padding:30px;
+border-radius:28px;
+background:
+linear-gradient(145deg,
+rgba(20,20,20,.96),
+rgba(40,40,40,.96)
+);
+
+border:2px solid rgba(255,215,0,.4);
+
+text-align:center;
+
+z-index:999999;
+
+display:none;
+
+backdrop-filter:blur(20px);
+
+box-shadow:
+0 0 40px rgba(255,215,0,.25),
+0 0 120px rgba(255,140,0,.2);
+
+transition:.3s;
+">
+
+<div id="rewardEmoji"
+style="
+font-size:80px;
+margin-bottom:12px;
+">
+🔥
+</div>
+
+<div id="rewardTitle"
+style="
+font-size:32px;
+font-weight:900;
+color:#ffd54a;
+text-shadow:0 0 20px #ff9800;
+">
+LEGENDARY
+</div>
+
+<div id="rewardCoins"
+style="
+margin-top:14px;
+font-size:24px;
+font-weight:bold;
+">
++500 Coins
+</div>
+
+</div> 
 <!-- TOAST -->
 
 <div id="toast" style="
@@ -2003,16 +2064,28 @@ document
 .play()
 .catch(()=>{});
 
-if(reward === 500){
+if(reward >= 100){
 
-showToast(
-"🔥 JACKPOT +500"
+showRewardPopup(
+rarity,
+reward,
+"🔥"
+);
+
+}else if(reward >= 40){
+
+showRewardPopup(
+rarity,
+reward,
+"⚡"
 );
 
 }else{
 
-showToast(
-rarity + " Reward: +" + reward
+showRewardPopup(
+rarity,
+reward,
+"💰"
 );
 
 }
@@ -2451,6 +2524,57 @@ card.style.boxShadow =
 }
 
 }
+
+}
+ /* REWARD POPUP */
+
+function showRewardPopup(
+title,
+coinsReward,
+emoji
+){
+
+let popup =
+document.getElementById(
+"rewardPopup"
+);
+
+document.getElementById(
+"rewardTitle"
+).innerText = title;
+
+document.getElementById(
+"rewardCoins"
+).innerText =
+"+" + coinsReward + " Coins";
+
+document.getElementById(
+"rewardEmoji"
+).innerText = emoji;
+
+popup.style.display = "block";
+
+setTimeout(()=>{
+
+popup.style.transform =
+"translate(-50%,-50%) scale(1)";
+
+},50);
+
+/* AUTO CLOSE */
+
+setTimeout(()=>{
+
+popup.style.transform =
+"translate(-50%,-50%) scale(.7)";
+
+setTimeout(()=>{
+
+popup.style.display = "none";
+
+},250);
+
+},2200);
 
 }
   /* TOAST */
