@@ -1141,6 +1141,32 @@ tg.initDataUnsafe?.start_param;
 parseInt(
 localStorage.getItem("referrals")
 ) || 0;
+ /* MISSIONS */
+
+let mineMission =
+parseInt(
+localStorage.getItem("mineMission")
+) || 0;
+
+let chestMission =
+parseInt(
+localStorage.getItem("chestMission")
+) || 0;
+
+let mineMissionClaimed =
+localStorage.getItem(
+"mineMissionClaimed"
+) || "no";
+
+let chestMissionClaimed =
+localStorage.getItem(
+"chestMissionClaimed"
+) || "no";
+
+let levelMissionClaimed =
+localStorage.getItem(
+"levelMissionClaimed"
+) || "no";
 
 /* LOAD PLAYER DATA */
 
@@ -1447,6 +1473,12 @@ let earned = crit
 : minePower;
 
 coins += earned;
+ mineMission++;
+
+localStorage.setItem(
+"mineMission",
+mineMission
+);
 
 if(crit){
 
@@ -1740,7 +1772,13 @@ localStorage.setItem(
 showToast("FREE CHEST");
 
 }
+ 
+chestMission++;
 
+localStorage.setItem(
+"chestMission",
+chestMission
+);
 spinning = true;
 
 document.getElementById(
@@ -1960,6 +1998,201 @@ board.innerHTML =
 });
 
 }
+ /* MISSIONS */
+
+function updateMissions(){
+
+let mineText =
+document.getElementById(
+"mineMissionText"
+);
+
+let chestText =
+document.getElementById(
+"chestMissionText"
+);
+
+let levelText =
+document.getElementById(
+"levelMissionText"
+);
+
+if(mineText){
+
+mineText.innerText =
+mineMission + " / 50";
+
+}
+
+if(chestText){
+
+chestText.innerText =
+chestMission + " / 3";
+
+}
+
+if(levelText){
+
+levelText.innerText =
+"Level " + level + " / 5";
+
+}
+
+/* BUTTON STATES */
+
+let mineBtn =
+document.getElementById(
+"mineMissionBtn"
+);
+
+if(mineBtn){
+
+if(mineMissionClaimed === "yes"){
+
+mineBtn.innerText = "COMPLETED";
+mineBtn.disabled = true;
+
+}else if(mineMission >= 50){
+
+mineBtn.innerText = "CLAIM";
+
+}else{
+
+mineBtn.innerText = "IN PROGRESS";
+
+}
+
+}
+
+let chestBtn =
+document.getElementById(
+"chestMissionBtn"
+);
+
+if(chestBtn){
+
+if(chestMissionClaimed === "yes"){
+
+chestBtn.innerText = "COMPLETED";
+chestBtn.disabled = true;
+
+}else if(chestMission >= 3){
+
+chestBtn.innerText = "CLAIM";
+
+}else{
+
+chestBtn.innerText = "IN PROGRESS";
+
+}
+
+}
+
+let levelBtn =
+document.getElementById(
+"levelMissionBtn"
+);
+
+if(levelBtn){
+
+if(levelMissionClaimed === "yes"){
+
+levelBtn.innerText = "COMPLETED";
+levelBtn.disabled = true;
+
+}else if(level >= 5){
+
+levelBtn.innerText = "CLAIM";
+
+}else{
+
+levelBtn.innerText = "IN PROGRESS";
+
+}
+
+}
+
+}
+
+/* CLAIMS */
+
+function claimMineMission(){
+
+if(mineMission < 50) return;
+
+if(mineMissionClaimed === "yes")
+return;
+
+coins += 200;
+
+mineMissionClaimed = "yes";
+
+localStorage.setItem(
+"mineMissionClaimed",
+"yes"
+);
+
+save();
+update();
+updateMissions();
+
+showToast(
+"🎯 Mission Complete +200"
+);
+
+}
+
+function claimChestMission(){
+
+if(chestMission < 3) return;
+
+if(chestMissionClaimed === "yes")
+return;
+
+coins += 150;
+
+chestMissionClaimed = "yes";
+
+localStorage.setItem(
+"chestMissionClaimed",
+"yes"
+);
+
+save();
+update();
+updateMissions();
+
+showToast(
+"🎯 Chest Mission +150"
+);
+
+}
+
+function claimLevelMission(){
+
+if(level < 5) return;
+
+if(levelMissionClaimed === "yes")
+return;
+
+coins += 500;
+
+levelMissionClaimed = "yes";
+
+localStorage.setItem(
+"levelMissionClaimed",
+"yes"
+);
+
+save();
+update();
+updateMissions();
+
+showToast(
+"🏆 Level Mission +500"
+);
+
+}
   /* TOAST */
 
 function showToast(text){
@@ -2158,6 +2391,7 @@ save();
  setInterval(updateDailyTimer,1000);
 
 updateDailyTimer();
+ updateMissions();
 
 </script>
 
