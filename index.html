@@ -917,15 +917,60 @@ onclick="showScreen('homeScreen')">
 </div>
 
 <div class="rouletteWrap">
+ <div style="
+font-size:50px;
+margin-bottom:-10px;
+z-index:5;
+text-shadow:
+0 0 20px #ffd54a;
+">
+▼
+</div>
 
-<div class="cyberChest" onclick="openChest()">
+<div id="rouletteWheel" onclick="openChest()" style="
+width:260px;
+height:260px;
+border-radius:50%;
+position:relative;
+overflow:hidden;
+border:8px solid rgba(255,215,0,.5);
 
-<div class="chestGlow"></div>
+box-shadow:
+0 0 40px rgba(255,215,0,.4),
+0 0 120px rgba(255,140,0,.2);
 
-<div class="chestBody">📦</div>
+transition:4s cubic-bezier(.1,.7,.1,1);
 
-<div class="chestText">
-CYBER CHEST
+background:
+conic-gradient(
+#ff9800 0deg 60deg,
+#00e5ff 60deg 120deg,
+#ff00d4 120deg 180deg,
+#00ff99 180deg 240deg,
+#ffd54a 240deg 300deg,
+#ff4444 300deg 360deg
+);
+">
+
+<div style="
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:90px;
+height:90px;
+border-radius:50%;
+background:#111;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:40px;
+font-weight:bold;
+border:4px solid #ffd54a;
+box-shadow:0 0 20px rgba(255,215,0,.5);
+z-index:2;
+">
+🎰
 </div>
 
 </div>
@@ -2291,29 +2336,31 @@ document.getElementById(
 "spinBtn"
 ).disabled = true;
 
-/* ANIMATION */
+/* ROULETTE SPIN */
 
-let chest =
-document.querySelector(
-".cyberChest"
+let wheel =
+document.getElementById(
+"rouletteWheel"
 );
 
-chest.style.transform =
-"scale(.9) rotate(5deg)";
+let extraSpin =
+3600 + Math.floor(
+Math.random() * 720
+);
 
-setTimeout(()=>{
+currentRotation += extraSpin;
 
-chest.style.transform =
-"scale(1.05) rotate(-5deg)";
+wheel.style.transform =
+"rotate(" +
+currentRotation +
+"deg)";
+ wheel.style.boxShadow = `
+0 0 60px rgba(255,215,0,.9),
+0 0 140px rgba(255,140,0,.5)
+`;
 
-},200);
-
-setTimeout(()=>{
-
-chest.style.transform =
-"scale(1)";
-
-},400);
+wheel.style.filter =
+"brightness(1.3)";
 
 /* SOUND */
 
@@ -2498,7 +2545,13 @@ reward,
 );
 
 }
+wheel.style.boxShadow = `
+0 0 40px rgba(255,215,0,.4),
+0 0 120px rgba(255,140,0,.2)
+`;
 
+wheel.style.filter =
+"brightness(1)";
 spinning = false;
 
 document.getElementById(
