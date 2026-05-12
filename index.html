@@ -2395,10 +2395,9 @@ localStorage.setItem(
 chestMission
 );
 spinning = true;
-
-document.getElementById(
-"spinBtn"
-).disabled = true;
+setTimeout(() => {
+  spinning = false;
+}, 2500);
 
 /* ROULETTE SPIN */
 let chest =
@@ -2504,8 +2503,11 @@ rewardType = "turbo";
 }
 
 /* RESULT */
+setTimeout(() => {
 
-setTimeout(()=>{
+if(!document.getElementById("cyberChest")) return;
+
+try {
 
 if(rewardType === "coins"){
 
@@ -2622,11 +2624,14 @@ chest.style.filter =
 "brightness(1)";
 spinning = false;
 
-document.getElementById(
-"spinBtn"
-).disabled = false;
+update();
+save();
 
-},1800);
+} catch(e) {
+  console.log("Chest error:", e);
+}
+
+}, 1800);
 
 }
 function openRareCrate(){
