@@ -408,6 +408,7 @@ display:flex;
 flex-direction:column;
 align-items:center;
 margin-top:30px;
+position:relative;
 }
 
 .cyberChest{
@@ -963,96 +964,101 @@ onclick="showScreen('homeScreen')">
 </div>
 
 <div class="rouletteWrap">
- <div style="
-font-size:50px;
-margin-bottom:-10px;
-z-index:5;
-text-shadow:
-0 0 20px #ffd54a;
-">
-▼
-</div>
 
-<div id="cyberChest"
-onclick="openChest()"
-style="
-position:relative;
-width:240px;
-height:240px;
-border-radius:35px;
+  <div style="position:relative; width:240px; height:240px;">
 
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
+    <!-- ARROW -->
+    <div style="
+      font-size:50px;
+      margin-bottom:-10px;
+      z-index:5;
+      text-shadow:0 0 20px #ffd54a;
+      position:absolute;
+      top:-55px;
+      left:50%;
+      transform:translateX(-50%);
+    ">
+      ▼
+    </div>
 
-background:
-linear-gradient(
-145deg,
-rgba(0,255,255,.12),
-rgba(255,0,200,.12)
-);
+    <!-- CHEST -->
+    <div id="cyberChest" onclick="openChest()" style="
+      position:relative;
+      width:240px;
+      height:240px;
+      border-radius:35px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:linear-gradient(145deg,rgba(0,255,255,.12),rgba(255,0,200,.12));
+      border:2px solid rgba(0,255,255,.45);
+      backdrop-filter:blur(20px);
+      box-shadow:0 0 35px rgba(0,255,255,.4),0 0 100px rgba(255,0,200,.2);
+      overflow:hidden;
+      cursor:pointer;
+      transition:.25s;
+    ">
 
-border:2px solid rgba(0,255,255,.45);
+      <div id="chestGlow"
+      style="
+        position:absolute;
+        width:320px;
+        height:320px;
+        background:radial-gradient(circle,rgba(0,255,255,.35),transparent 70%);
+        animation:chestPulse 2s infinite;
+      "></div>
 
-backdrop-filter:blur(20px);
+      <div id="chestEmoji"
+      style="
+        font-size:95px;
+        z-index:2;
+        filter:drop-shadow(0 0 15px cyan);
+        animation:floatChest 2s infinite;
+      ">
+      📦
+      </div>
 
-box-shadow:
-0 0 35px rgba(0,255,255,.4),
-0 0 100px rgba(255,0,200,.2);
+      <div style="
+        margin-top:14px;
+        font-size:24px;
+        font-weight:900;
+        letter-spacing:2px;
+        z-index:2;
+        color:#00ffff;
+        text-shadow:0 0 12px cyan;
+      ">
+      OPEN CHEST
+      </div>
 
-overflow:hidden;
+    </div>
 
-cursor:pointer;
+    <!-- REWARDS (NOW INSIDE PROPER CONTAINER) -->
+    <div style="position:absolute; top:10px; left:50%; transform:translateX(-50%); font-size:18px; font-weight:bold;">
+      💰10
+    </div>
 
-transition:.25s;
-">
+    <div style="position:absolute; top:60px; right:-10px; font-size:18px; font-weight:bold;">
+      💰25
+    </div>
 
-<div id="chestGlow"
-style="
-position:absolute;
-width:320px;
-height:320px;
+    <div style="position:absolute; bottom:60px; right:-10px; font-size:18px; font-weight:bold;">
+      🎟
+    </div>
 
-background:
-radial-gradient(
-circle,
-rgba(0,255,255,.35),
-transparent 70%
-);
+    <div style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:18px; font-weight:bold;">
+      📦
+    </div>
 
-animation:chestPulse 2s infinite;
-">
-</div>
+    <div style="position:absolute; bottom:60px; left:-10px; font-size:18px; font-weight:bold;">
+      🔥XP
+    </div>
 
-<div id="chestEmoji"
-style="
-font-size:95px;
-z-index:2;
+    <div style="position:absolute; top:60px; left:-10px; font-size:18px; font-weight:bold;">
+      🚀
+    </div>
 
-filter:
-drop-shadow(0 0 15px cyan);
-
-animation:floatChest 2s infinite;
-">
-📦
-</div>
-
-<div style="
-margin-top:14px;
-font-size:24px;
-font-weight:900;
-letter-spacing:2px;
-
-z-index:2;
-
-color:#00ffff;
-
-text-shadow:
-0 0 12px cyan;
-">
-OPEN CHEST
-</div>
+  </div>
 
 </div>
 <!-- REWARD LABELS -->
@@ -1124,12 +1130,6 @@ transform:rotate(300deg);
 </div>
 </div>
 
-<button
-class="spinBtn"
-id="spinBtn"
-onclick="openChest()">
-OPEN CHEST
-</button>
 
 </div>
   </div>
