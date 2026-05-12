@@ -33,6 +33,52 @@ body{
   overflow-x:hidden;
   padding-bottom:90px;
 }
+ @keyframes chestPulse{
+
+0%{
+transform:scale(.8);
+opacity:.5;
+}
+
+50%{
+transform:scale(1.1);
+opacity:1;
+}
+
+100%{
+transform:scale(.8);
+opacity:.5;
+}
+
+}
+
+@keyframes floatChest{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-10px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
+
+#cyberChest:hover{
+
+transform:scale(1.05);
+
+}
+
+#cyberChest:active{
+
+transform:scale(.94);
+
+}
 
 /* SCREENS */
 
@@ -927,50 +973,87 @@ text-shadow:
 ▼
 </div>
 
-<div id="rouletteWheel" onclick="openChest()" style="
-width:260px;
-height:260px;
-border-radius:50%;
+<div id="cyberChest"
+onclick="openChest()"
+style="
 position:relative;
-overflow:hidden;
-border:8px solid rgba(255,215,0,.5);
+width:240px;
+height:240px;
+border-radius:35px;
 
-box-shadow:
-0 0 40px rgba(255,215,0,.4),
-0 0 120px rgba(255,140,0,.2);
-
-transition:4s cubic-bezier(.1,.7,.1,1);
-
-background:
-conic-gradient(
-#ff9800 0deg 60deg,
-#00e5ff 60deg 120deg,
-#ff00d4 120deg 180deg,
-#00ff99 180deg 240deg,
-#ffd54a 240deg 300deg,
-#ff4444 300deg 360deg
-);
-">
-
-<div style="
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:90px;
-height:90px;
-border-radius:50%;
-background:#111;
 display:flex;
+flex-direction:column;
 justify-content:center;
 align-items:center;
-font-size:40px;
-font-weight:bold;
-border:4px solid #ffd54a;
-box-shadow:0 0 20px rgba(255,215,0,.5);
-z-index:2;
+
+background:
+linear-gradient(
+145deg,
+rgba(0,255,255,.12),
+rgba(255,0,200,.12)
+);
+
+border:2px solid rgba(0,255,255,.45);
+
+backdrop-filter:blur(20px);
+
+box-shadow:
+0 0 35px rgba(0,255,255,.4),
+0 0 100px rgba(255,0,200,.2);
+
+overflow:hidden;
+
+cursor:pointer;
+
+transition:.25s;
 ">
-🎰
+
+<div id="chestGlow"
+style="
+position:absolute;
+width:320px;
+height:320px;
+
+background:
+radial-gradient(
+circle,
+rgba(0,255,255,.35),
+transparent 70%
+);
+
+animation:chestPulse 2s infinite;
+">
+</div>
+
+<div id="chestEmoji"
+style="
+font-size:95px;
+z-index:2;
+
+filter:
+drop-shadow(0 0 15px cyan);
+
+animation:floatChest 2s infinite;
+">
+📦
+</div>
+
+<div style="
+margin-top:14px;
+font-size:24px;
+font-weight:900;
+letter-spacing:2px;
+
+z-index:2;
+
+color:#00ffff;
+
+text-shadow:
+0 0 12px cyan;
+">
+OPEN CHEST
+</div>
+
 </div>
 <!-- REWARD LABELS -->
 
@@ -2403,30 +2486,34 @@ document.getElementById(
 ).disabled = true;
 
 /* ROULETTE SPIN */
-
-let wheel =
+let chest =
 document.getElementById(
-"rouletteWheel"
+"cyberChest"
 );
 
-let extraSpin =
-3600 + Math.floor(
-Math.random() * 720
-);
+chest.style.transform =
+"scale(.9) rotate(-6deg)";
 
-currentRotation += extraSpin;
+setTimeout(()=>{
 
-wheel.style.transform =
-"rotate(" +
-currentRotation +
-"deg)";
- wheel.style.boxShadow = `
-0 0 60px rgba(255,215,0,.9),
-0 0 140px rgba(255,140,0,.5)
+chest.style.transform =
+"scale(1.08) rotate(6deg)";
+
+},180);
+
+setTimeout(()=>{
+
+chest.style.transform =
+"scale(1) rotate(0deg)";
+
+},450);
+ chest.style.boxShadow = `
+0 0 60px rgba(0,255,255,.9),
+0 0 140px rgba(255,0,200,.5)
 `;
 
-wheel.style.filter =
-"brightness(1.3)";
+chest.style.filter =
+"brightness(1.4)";
 
 /* SOUND */
 
@@ -2611,12 +2698,12 @@ reward,
 );
 
 }
-wheel.style.boxShadow = `
-0 0 40px rgba(255,215,0,.4),
-0 0 120px rgba(255,140,0,.2)
+chest.style.boxShadow = `
+0 0 35px rgba(0,255,255,.4),
+0 0 100px rgba(255,0,200,.2)
 `;
 
-wheel.style.filter =
+chest.style.filter =
 "brightness(1)";
 spinning = false;
 
