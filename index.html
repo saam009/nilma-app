@@ -1467,6 +1467,7 @@ let user = tg.initDataUnsafe?.user;
 let username;
 let telegramId;
 let playerId;
+let profilePhoto;
 
 if(user){
 
@@ -1474,7 +1475,7 @@ username =
 user.username ||
 user.first_name ||
 "TelegramUser";
- let profilePhoto =
+ profilePhoto =
 user.photo_url ||
 "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
@@ -1672,7 +1673,9 @@ save();
 
 console.log(err);
 
-showToast("Offline Mode");
+console.error(err);
+
+showToast(err.message);
 
 }
 
