@@ -1739,7 +1739,14 @@ function update() {
 
   document.getElementById("balance").innerText = coins;
   document.getElementById("energy").innerText = energy;
-  document.getElementById("level").innerText = level;
+ let levelEl =
+document.getElementById("level");
+
+if(levelEl){
+
+levelEl.innerText = level;
+
+}
  let spinsText =
 document.getElementById(
 "freeSpinsText"
