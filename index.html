@@ -681,6 +681,15 @@ transition:.3s;
 </div>
 
 </div>
+ <div id="saveStatus" style="
+margin-top:10px;
+font-size:12px;
+opacity:.8;
+color:#00ff99;
+text-align:center;
+">
+☁️ Sync Ready
+</div>
 
 </div>
  
@@ -1886,7 +1895,7 @@ if(progressFill){
 /* SAVE */
 
 function save() {
-
+setSaveStatus("☁️ Saving...","#ffd54a");
   localStorage.setItem("coins", coins);
   localStorage.setItem("energy", energy);
   localStorage.setItem("level", level);
@@ -1932,10 +1941,10 @@ energy = 0;
 xp = xpMax;
 
 }
- db.collection("players")
+  db.collection("players")
 .doc(playerId)
 .set({
- 
+
 username: username || "Player",
 coins: coins,
 energy: energy,
@@ -1947,9 +1956,28 @@ xpMax: xpMax,
 maxEnergy: maxEnergy,
 paidChestPrice: paidChestPrice,
 referrals: referrals,
+freeSpins: freeSpins,
+rareCrates: rareCrates,
 updated: Date.now()
 
-},{merge:true}); 
+},{merge:true})
+
+.then(()=>{
+
+setSaveStatus("✅ Synced");
+
+})
+
+.catch((err)=>{
+
+console.log(err);
+
+setSaveStatus(
+"⚠️ Offline Mode",
+"#ff6666"
+);
+
+});
  
   localStorage.setItem(
 "paidChestPrice",
@@ -3153,6 +3181,17 @@ function showToast(text){
   setTimeout(()=>{
     toast.style.display = "none";
   },3500);
+}
+ function setSaveStatus(text,color="#00ff99"){
+
+let el = document.getElementById("saveStatus");
+
+if(!el) return;
+
+el.innerText = text;
+
+el.style.color = color;
+
 }
   /* SHOP */
 
