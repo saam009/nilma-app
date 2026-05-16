@@ -2443,15 +2443,6 @@ document
 .play()
 .catch(()=>{});
 
-if(rewardType === "coins"){
-
-showRewardPopup(
-"COINS",
-reward,
-"💰"
-);
-
-}
 /* EFFECTS */
 
 if(rewardType === "turbo"){
@@ -2472,45 +2463,7 @@ triggerRewardEffect("epic");
 
 }
 
-if(rewardType === "spin"){
 
-showRewardPopup(
-"FREE SPIN",
-1,
-"🎟"
-);
-
-}
-
-if(rewardType === "crate"){
-
-showRewardPopup(
-"RARE CRATE",
-1,
-"📦"
-);
-
-}
-
-if(rewardType === "xp"){
-
-showRewardPopup(
-"XP BOOST",
-reward,
-"🔥"
-);
-
-}
-
-if(rewardType === "turbo"){
-
-showRewardPopup(
-"TURBO MINER",
-reward,
-"🚀"
-);
-
-}
 chest.style.boxShadow = `
 0 0 35px rgba(0,255,255,.4),
 0 0 100px rgba(255,0,200,.2)
