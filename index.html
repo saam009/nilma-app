@@ -1972,11 +1972,25 @@ localStorage.setItem(
 mineMission
 );
 
-if(crit){
+ if(crit){
 
 showToast(
-"🔥 CRITICAL HIT +" + earned
+"💥 ULTRA STRIKE  +" + earned + " COINS"
 );
+
+document.querySelector(".mineBtn").style.boxShadow = `
+0 0 60px rgba(255,0,80,.9),
+0 0 140px rgba(255,120,0,.8)
+`;
+
+setTimeout(()=>{
+
+document.querySelector(".mineBtn").style.boxShadow = `
+0 0 40px rgba(255,170,0,.7),
+0 0 100px rgba(255,140,0,.5)
+`;
+
+},300);
 
 }
   xp += 2 * xpBoost;
