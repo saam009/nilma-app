@@ -681,15 +681,6 @@ transition:.3s;
 </div>
 
 </div>
- <div id="saveStatus" style="
-margin-top:10px;
-font-size:12px;
-opacity:.8;
-color:#00ff99;
-text-align:center;
-">
-☁️ Sync Ready
-</div>
 
 </div>
  
@@ -1964,18 +1955,11 @@ updated: Date.now()
 
 .then(()=>{
 
-setSaveStatus("✅ Synced");
-
 })
 
 .catch((err)=>{
 
 console.log(err);
-
-setSaveStatus(
-"⚠️ Offline Mode",
-"#ff6666"
-);
 
 });
  
@@ -3184,13 +3168,7 @@ function showToast(text){
 }
  function setSaveStatus(text,color="#00ff99"){
 
-let el = document.getElementById("saveStatus");
-
-if(!el) return;
-
-el.innerText = text;
-
-el.style.color = color;
+console.log("SAVE STATUS:", text);
 
 }
   /* SHOP */
