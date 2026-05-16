@@ -2391,35 +2391,49 @@ if(!document.getElementById("cyberChest")) return;
 
 try {
 
+let rewardText = "";
+
 if(rewardType === "coins"){
 
 coins += reward;
-chestPopEffect("+" + reward + " " + rewardType);
+
+rewardText = "💰 +" + reward + " COINS";
+
 }
 
 if(rewardType === "spin"){
 
 freeSpins += reward;
-chestPopEffect("+" + reward + " " + rewardType);
+
+rewardText = "🎟 FREE SPIN";
+
 }
 
 if(rewardType === "crate"){
 
 rareCrates += reward;
-chestPopEffect("+" + reward + " " + rewardType);
+
+rewardText = "📦 RARE CRATE";
+
 }
 
 if(rewardType === "xp"){
 
 xpBoost += reward;
-chestPopEffect("+" + reward + " " + rewardType);
+
+rewardText = "🔥 XP BOOST +" + reward;
+
 }
 
 if(rewardType === "turbo"){
 
 minePower += reward;
-chestPopEffect("+" + reward + " " + rewardType);
+
+rewardText = "🚀 TURBO +" + reward;
+
 }
+
+chestPopEffect(rewardText);
 
 save();
 update();
@@ -3125,29 +3139,56 @@ document.body.classList.remove(
 
 }
  function chestPopEffect(text){
-  let el = document.createElement("div");
 
-  el.innerText = text;
+let el = document.createElement("div");
 
-  el.style.position = "fixed";
-  el.style.left = "50%";
-  el.style.top = "45%";
-  el.style.transform = "translate(-50%,-50%) scale(0.5)";
-  el.style.fontSize = "40px";
-  el.style.fontWeight = "900";
-  el.style.color = "#00ffff";
-  el.style.textShadow = "0 0 20px cyan";
-  el.style.zIndex = "999999";
+el.innerText = text;
 
-  document.body.appendChild(el);
+el.style.position = "fixed";
+el.style.left = "50%";
+el.style.top = "50%";
+el.style.transform = "translate(-50%,-50%) scale(.4)";
+el.style.fontSize = "46px";
+el.style.fontWeight = "900";
+el.style.letterSpacing = "2px";
+el.style.color = "#ffffff";
+el.style.textShadow = `
+0 0 10px #00ffff,
+0 0 25px #00ffff,
+0 0 60px #ff00ff
+`;
 
-  setTimeout(()=>{
-    el.style.transition = "0.4s";
-    el.style.transform = "translate(-50%,-60%) scale(1.2)";
-    el.style.opacity = "0";
-  },50);
+el.style.zIndex = "999999";
+el.style.opacity = "0";
 
-  setTimeout(()=>el.remove(),600);
+document.body.appendChild(el);
+
+setTimeout(()=>{
+
+el.style.transition = ".45s";
+
+el.style.opacity = "1";
+
+el.style.transform =
+"translate(-50%,-58%) scale(1.15)";
+
+},50);
+
+setTimeout(()=>{
+
+el.style.opacity = "0";
+
+el.style.transform =
+"translate(-50%,-75%) scale(.9)";
+
+},900);
+
+setTimeout(()=>{
+
+el.remove();
+
+},1400);
+
 }
 function showToast(text){
 
