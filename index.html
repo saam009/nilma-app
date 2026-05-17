@@ -244,17 +244,55 @@ box-shadow:
 }
 
 .gameCard{
-  background:rgba(255,255,255,.06);
-  border-radius:18px;
+  position:relative;
+
+  background:
+  linear-gradient(
+  145deg,
+  rgba(10,10,25,.95),
+  rgba(0,0,0,.95)
+  );
+
+  border-radius:24px;
+
   overflow:hidden;
-  border:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(10px);
+
+  border:1px solid rgba(0,255,255,.25);
+
+  backdrop-filter:blur(16px);
+
+  box-shadow:
+  0 0 20px rgba(0,255,255,.08),
+  0 0 40px rgba(255,0,255,.05);
+
+  transition:.25s;
+}
+
+.gameCard:hover{
+
+  transform:translateY(-5px) scale(1.02);
+
+  box-shadow:
+  0 0 25px rgba(0,255,255,.25),
+  0 0 60px rgba(255,0,255,.15);
+
 }
 
 .gameCard img{
+
   width:100%;
-  height:120px;
+  height:170px;
+
   object-fit:cover;
+
+  filter:
+  saturate(1.2)
+  contrast(1.1)
+  brightness(.9);
+
+  border-bottom:
+  1px solid rgba(0,255,255,.15);
+
 }
 
 .gameInfo{
@@ -267,15 +305,44 @@ box-shadow:
 }
 
 .playBtn{
+
   width:100%;
-  padding:10px;
+
+  padding:12px;
+
   border:none;
-  border-radius:12px;
 
-  background:linear-gradient(90deg,#ffd54a,#ff9800);
+  border-radius:14px;
 
-  color:black;
-  font-weight:bold;
+  background:
+  linear-gradient(
+  90deg,
+  #00e5ff,
+  #8a2eff
+  );
+
+  color:white;
+
+  font-weight:800;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+
+  box-shadow:
+  0 0 15px rgba(0,229,255,.35);
+
+  transition:.2s;
+
+}
+
+.playBtn:hover{
+
+  transform:scale(1.03);
+
+  box-shadow:
+  0 0 25px rgba(138,46,255,.45);
+
 }
 
 /* CARDS */
@@ -792,7 +859,7 @@ Mini Games
 <div class="grid">
 
 <div class="gameCard">
-<img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800">
+<img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=1200">
 <div class="gameInfo">
 <div class="gameTitle">Spin Wheel</div>
 <button class="playBtn" onclick="showScreen('spinScreen')">
@@ -802,7 +869,7 @@ PLAY
 </div>
 
 <div class="gameCard">
-<img src="https://images.unsplash.com/photo-1511884642898-4c92249e20b6?q=80&w=800">
+<img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200">
 <div class="gameInfo">
 <div class="gameTitle">Tasks</div>
 <button class="playBtn" onclick="showScreen('taskScreen')">
@@ -811,7 +878,7 @@ OPEN
 </div>
 </div>
  <div class="gameCard">
-<img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=800">
+<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200">
 
 <div class="gameInfo">
 
@@ -828,7 +895,7 @@ OPEN
 </div>
 </div>
 <div class="gameCard">
-<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800">
+<img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200">
 
 <div class="gameInfo">
 
@@ -845,7 +912,7 @@ OPEN
 </div>
 
 <div class="gameCard">
-<img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=800">
+<img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200">
 
 <div class="gameInfo">
 
