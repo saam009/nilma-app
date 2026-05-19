@@ -1069,7 +1069,27 @@ CLAIM REWARD
 </button>
 
 </div>
+<div class="card">
 
+<h3>📘 Follow Facebook</h3>
+
+<p style="margin:10px 0;">
+Reward: +30 Coins
+</p>
+
+<button class="playBtn"
+onclick="openFacebook()">
+OPEN FACEBOOK
+</button>
+
+<br><br>
+
+<button class="playBtn"
+onclick="claimFacebookTask()">
+CLAIM REWARD
+</button>
+
+</div>
 </div>
 
 </div>
@@ -2291,7 +2311,37 @@ function openInsta() {
   window.open("https://instagram.com/");
   taskDone = true;
 }
+let facebookTaskDone = false;
 
+function openFacebook(){
+
+window.open(taskLinks.facebook);
+
+facebookTaskDone = true;
+
+}
+
+function claimFacebookTask(){
+
+if(!facebookTaskDone){
+
+showToast("Complete Facebook task first!");
+
+return;
+
+}
+
+coins += 30;
+
+save();
+
+update();
+
+showToast("+30 Coins");
+
+facebookTaskDone = false;
+
+}
 function claimTask() {
 
   if (!taskDone) {
