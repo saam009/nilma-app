@@ -692,6 +692,97 @@ transform:scale(1.6);
 }
 
 }
+ .shopCard{
+  position:relative;
+  padding:18px;
+  border-radius:22px;
+  background:rgba(15,15,25,.85);
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+  transition:.3s;
+}
+
+.shopCard:hover{
+  transform:translateY(-6px) scale(1.02);
+}
+
+.shopCard h3{
+  margin:8px 0;
+  font-size:20px;
+}
+
+.shopCard p{
+  opacity:.8;
+  font-size:14px;
+}
+
+.price{
+  margin-top:10px;
+  color:#ffd54a;
+  font-weight:bold;
+}
+
+/* RARITY COLORS */
+.rare{
+  border:1px solid rgba(0,200,255,.4);
+  box-shadow:0 0 20px rgba(0,200,255,.15);
+}
+
+.epic{
+  border:1px solid rgba(160,0,255,.4);
+  box-shadow:0 0 20px rgba(160,0,255,.15);
+}
+
+.legendary{
+  border:1px solid rgba(255,200,0,.4);
+  box-shadow:0 0 25px rgba(255,200,0,.2);
+}
+
+/* BADGE TOP RIGHT */
+.badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:20px;
+  background:rgba(255,255,255,.08);
+}
+
+/* OWNED TAG TOP LEFT */
+.ownedTag{
+  position:absolute;
+  top:10px;
+  left:10px;
+  font-size:10px;
+  padding:4px 8px;
+  border-radius:12px;
+  background:rgba(0,255,100,.15);
+  color:#00ff99;
+  border:1px solid rgba(0,255,100,.4);
+}
+
+/* SHOP BUTTON */
+.shopBtn{
+  margin-top:12px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:14px;
+  font-weight:900;
+  color:white;
+  background:linear-gradient(90deg,#00e5ff,#8a2eff);
+  box-shadow:0 0 20px rgba(0,229,255,.25);
+  transition:.2s;
+}
+
+.shopBtn:hover{
+  transform:scale(1.03);
+}
+
+.shopBtn:active{
+  transform:scale(.95);
+}
 </style>
 </head>
 
@@ -1218,47 +1309,67 @@ font-weight:bold;
 </div> 
 <!-- SHOP SCREEN -->
 <div id="shopScreen" class="screen">
-  <button class="backBtn"
+
+<button class="backBtn"
 onclick="showScreen('homeScreen')">
 ⬅ Back
 </button>
 
 <div class="heroCard">
-
-<h2>💎 Upgrade Shop</h2>
-
-<p style="margin-top:10px;">
-Upgrade mining power and energy
-</p>
-
+  <h2>💎 Cyber Upgrade Market</h2>
+  <p style="margin-top:10px;">
+    Neon-powered upgrades for elite miners
+  </p>
 </div>
 
-  <div style="padding:20px;">
+<div style="padding:20px; display:grid; gap:16px;">
 
-<div class="card">
+<!-- TURBO -->
+<div class="shopCard epic">
+  <div class="badge">EPIC</div>
+  <div class="ownedTag" id="turboOwned">NOT OWNED</div>
+
   <h3>⚡ Turbo Miner</h3>
-  <p>Mining power x2</p>
-  <button onclick="buyTurbo()">
-    Buy - 200 Coins
+  <p>Mining power x2 boost</p>
+
+  <div class="price">💰 200 Coins</div>
+
+  <button class="shopBtn" onclick="buyTurbo()">
+    UPGRADE
   </button>
 </div>
 
-<div class="card">
+<!-- ENERGY -->
+<div class="shopCard rare">
+  <div class="badge">RARE</div>
+  <div class="ownedTag" id="energyOwned">NOT OWNED</div>
+
   <h3>🔋 Energy Core</h3>
-  <p>+100 Max Energy</p>
-  <button onclick="buyEnergy()">
-    Buy - 300 Coins
+  <p>+100 Max Energy capacity</p>
+
+  <div class="price">💰 300 Coins</div>
+
+  <button class="shopBtn" onclick="buyEnergy()">
+    INSTALL
   </button>
 </div>
 
-<div class="card">
+<!-- XP -->
+<div class="shopCard legendary">
+  <div class="badge">LEGENDARY</div>
+  <div class="ownedTag" id="xpOwned">NOT OWNED</div>
+
   <h3>💎 XP Booster</h3>
-  <p>Level faster</p>
-  <button onclick="buyXP()">
-    Buy - 400 Coins
+  <p>Faster leveling system</p>
+
+  <div class="price">💰 400 Coins</div>
+
+  <button class="shopBtn" onclick="buyXP()">
+    ACTIVATE
   </button>
 </div>
 
+</div>
 </div>
 
 </div>
@@ -1874,6 +1985,7 @@ function update() {
  let balanceEl = document.getElementById("balance");
 if(balanceEl){
   balanceEl.innerText = coins;
+ updateShopUI();
 }
 
 let energyEl = document.getElementById("energy");
@@ -3389,6 +3501,17 @@ function buyXP(){
   update();
 
   showToast("XP Booster Activated");
+}
+ function updateShopUI(){
+
+  document.getElementById("turboOwned").innerText =
+    minePower > 1 ? "OWNED" : "NOT OWNED";
+
+  document.getElementById("energyOwned").innerText =
+    maxEnergy > 100 ? "OWNED" : "NOT OWNED";
+
+  document.getElementById("xpOwned").innerText =
+    xpBoost > 1 ? "OWNED" : "NOT OWNED";
 }
  /* REFERRAL */
 
