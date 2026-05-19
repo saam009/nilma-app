@@ -3,7 +3,7 @@
 <head>
  <link rel="preload"
 as="image"
-href="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200">
+href="https://images.unsplash.com/photo-f1511512578047-dfb367046420?q=80&w=1200">
 <meta charset="UTF-8">
 <title>Nilma Coin</title>
 
@@ -1332,7 +1332,7 @@ onclick="showScreen('homeScreen')">
   <h3>⚡ Turbo Miner</h3>
   <p>Mining power x2 boost</p>
 
-  <div class="price">💰 200 Coins</div>
+  <div class="price">💰 <span id="turboPriceText">200</span> Coins</div>
 
   <button class="shopBtn" onclick="buyTurbo()">
     UPGRADE
@@ -1345,9 +1345,9 @@ onclick="showScreen('homeScreen')">
   <div class="ownedTag" id="energyOwned">NOT OWNED</div>
 
   <h3>🔋 Energy Core</h3>
-  <p>+100 Max Energy capacity</p>
+  <p>2 Hours Faster Passive Mining capacity</p>
 
-  <div class="price">💰 300 Coins</div>
+  <div class="price">💰 <span id="autoMinerPriceText">300</span> Coins</div>
 
   <button class="shopBtn" onclick="buyEnergy()">
     INSTALL
@@ -1362,7 +1362,7 @@ onclick="showScreen('homeScreen')">
   <h3>💎 XP Booster</h3>
   <p>Faster leveling system</p>
 
-  <div class="price">💰 400 Coins</div>
+  <div class="price">💰 <span id="xpPriceText">400</span> Coins</div>
 
   <button class="shopBtn" onclick="buyXP()">
     ACTIVATE
@@ -1689,6 +1689,25 @@ parseInt(localStorage.getItem("minePower")) || 1;
 
 let xpBoost =
 parseInt(localStorage.getItem("xpBoost")) || 1; 
+ let turboPrice =
+parseInt(localStorage.getItem("turboPrice")) || 200;
+
+let autoMinerPrice =
+parseInt(localStorage.getItem("autoMinerPrice")) || 300;
+
+let xpPrice =
+parseInt(localStorage.getItem("xpPrice")) || 400;
+
+/* ACTIVE TIMERS */
+
+let turboEnd =
+parseInt(localStorage.getItem("turboEnd")) || 0;
+
+let autoMinerEnd =
+parseInt(localStorage.getItem("autoMinerEnd")) || 0;
+
+let xpEnd =
+parseInt(localStorage.getItem("xpEnd")) || 0;
 let spinning = false;
  let paidChestPrice =
 parseInt(
@@ -2843,6 +2862,12 @@ setInterval(() => {
 let passiveIncome =
 Math.floor(level / 3);
 
+if(Date.now() < autoMinerEnd){
+
+passiveIncome *= 3;
+
+}
+
 coins += passiveIncome;
 
 save();
@@ -3448,70 +3473,192 @@ function buyUpgrade(){
   showToast("Mining upgraded!");
 }
   /* SHOP */
-
 function buyTurbo(){
 
-  if(coins < 200){
+if(Date.now() < turboEnd){
 
-    showToast("Need 200 coins");
-    return;
-  }
+showToast("Turbo already active");
 
-  coins -= 200;
+return;
 
-  minePower += 1;
+}
 
-  save();
-  update();
+if(coins < turboPrice){
 
-  showToast("Mining +1");
+showToast("Need " + turboPrice + " coins");
+
+return;
+
+}
+
+coins -= turboPrice;
+
+minePower += 2;
+
+turboEnd = Date.now() + 7200000;
+
+turboPrice += 150;
+
+localStorage.setItem("turboPrice", turboPrice);
+localStorage.setItem("turboEnd", turboEnd);
+
+save();
+update();
+
+showToast("⚡ Turbo Activated");
+
 }
 
 function buyEnergy(){
 
-  if(coins < 300){
-    showToast("Not enough coins");
-    return;
-  }
+if(Date.now() < autoMinerEnd){
 
-  coins -= 300;
+showToast("Auto Miner already active");
 
-  maxEnergy += 100;
+return;
 
-  energy = maxEnergy;
+}
 
-  save();
-  update();
+if(coins < autoMinerPrice){
 
-  showToast("Energy Increased");
+showToast("Need " + autoMinerPrice);
+
+return;
+
+}
+
+coins -= autoMinerPrice;
+
+autoMinerEnd =
+Date.now() + 7200000;
+
+autoMinerPrice += 200;
+
+localStorage.setItem(
+"autoMinerPrice",
+autoMinerPrice
+);
+
+localStorage.setItem(
+"autoMinerEnd",
+autoMinerEnd
+);
+
+save();
+update();
+
+showToast("🤖 Auto Miner Activated");
+
 }
 
 function buyXP(){
 
-  if(coins < 400){
-    showToast("Not enough coins");
-    return;
-  }
+if(Date.now() < xpEnd){
 
-  coins -= 400;
+showToast("XP Boost already active");
 
-  xpBoost += 1;
+return;
 
-  save();
-  update();
+}
 
-  showToast("XP Booster Activated");
+if(coins < xpPrice){
+
+showToast("Need " + xpPrice);
+
+return;
+
+}
+
+coins -= xpPrice;
+
+xpBoost = 3;
+
+xpEnd = Date.now() + 14400000;
+
+xpPrice += 250;
+
+localStorage.setItem("xpPrice", xpPrice);
+localStorage.setItem("xpEnd", xpEnd);
+
+save();
+update();
+
+showToast("🔥 XP Boost Activated");
+
 }
  function updateShopUI(){
 
-  document.getElementById("turboOwned").innerText =
-    minePower > 1 ? "OWNED" : "NOT OWNED";
+let turboBtn =
+document.querySelectorAll(".shopBtn")[0];
 
-  document.getElementById("energyOwned").innerText =
-    maxEnergy > 100 ? "OWNED" : "NOT OWNED";
+let autoBtn =
+document.querySelectorAll(".shopBtn")[1];
 
-  document.getElementById("xpOwned").innerText =
-    xpBoost > 1 ? "OWNED" : "NOT OWNED";
+let xpBtn =
+document.querySelectorAll(".shopBtn")[2];
+
+/* PRICE */
+
+document.getElementById(
+"turboPriceText"
+).innerText = turboPrice;
+
+document.getElementById(
+"autoMinerPriceText"
+).innerText = autoMinerPrice;
+
+document.getElementById(
+"xpPriceText"
+).innerText = xpPrice;
+
+/* ACTIVE STATES */
+
+if(Date.now() < turboEnd){
+
+turboBtn.innerText = "ACTIVATED";
+
+turboBtn.style.opacity = ".6";
+
+}else{
+
+turboBtn.innerText = "UPGRADE";
+
+turboBtn.style.opacity = "1";
+
+minePower = 1;
+
+}
+
+if(Date.now() < autoMinerEnd){
+
+autoBtn.innerText = "ACTIVE";
+
+autoBtn.style.opacity = ".6";
+
+}else{
+
+autoBtn.innerText = "INSTALL";
+
+autoBtn.style.opacity = "1";
+
+}
+
+if(Date.now() < xpEnd){
+
+xpBtn.innerText = "BOOSTED";
+
+xpBtn.style.opacity = ".6";
+
+}else{
+
+xpBtn.innerText = "ACTIVATE";
+
+xpBtn.style.opacity = "1";
+
+xpBoost = 1;
+
+}
+
 }
  /* REFERRAL */
 
