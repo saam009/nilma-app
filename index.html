@@ -3,7 +3,7 @@
 <head>
  <link rel="preload"
 as="image"
-href="https://images.unsplash.com/photo-f1511512578047-dfb367046420?q=80&w=1200">
+href="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200">
 <meta charset="UTF-8">
 <title>Nilma Coin</title>
 
@@ -1840,15 +1840,20 @@ localStorage.getItem("paidChestPrice")
 
 let currentRotation = 0;
 
-let tg = window.Telegram?.WebApp;
+let tg = window.Telegram && window.Telegram.WebApp
+? window.Telegram.WebApp
+: null;
 
 if(tg){
   tg.expand();
+if("Notification" in window){
+
 if(Notification.permission !== "granted"){
 
 Notification.requestPermission();
 
-} 
+}
+
 }
 
 let user = tg?.initDataUnsafe?.user;
