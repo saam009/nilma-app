@@ -3936,6 +3936,12 @@ let maxTime =
 maxHours * 60 * 60 * 1000;
  /* WARNING NOTIFICATION */
 
+let notifyTime =
+Math.max(
+10000,
+maxTime - 1800000
+);
+
 setTimeout(()=>{
 
 if(Notification.permission === "granted"){
@@ -3948,7 +3954,7 @@ body:
 
 }
 
-}, maxTime - 1800000);
+}, notifyTime);
 
 /* LIMIT */
 
