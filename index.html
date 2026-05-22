@@ -1915,8 +1915,8 @@ console.log("Telegram Error:", err);
 
  let firstJoin =
 localStorage.getItem("firstJoin");
- let startParam =
-tg.initDataUnsafe?.start_param;
+let startParam =
+tg?.initDataUnsafe?.start_param; 
  let referrals =
 parseInt(
 localStorage.getItem("referrals")
@@ -3472,8 +3472,6 @@ xpTimer.innerText =
 
 }
 
-}
-
 /* ENERGY */
 
 if(autoMinerEnd > now){
@@ -3879,7 +3877,7 @@ document.getElementById(
 ).innerText = turboPrice;
 
 document.getElementById(
-"autoMinerPriceText"
+"energyPriceText"
 ).innerText = autoMinerPrice;
 
 document.getElementById(
