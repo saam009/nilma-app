@@ -1773,9 +1773,19 @@ appId: "1:225704570854:web:c0389fb2e31a1adb643027"
 
 };
 
+let db = null;
+
+try{
+
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
+db = firebase.firestore();
+
+}catch(err){
+
+console.log("Firebase Init Error:", err);
+
+}
 
 /* DATA */
 
@@ -1860,7 +1870,15 @@ if("Notification" in window){
 
 if(Notification.permission !== "granted"){
 
+try{
+
 Notification.requestPermission();
+
+}catch(e){
+
+console.log(e);
+
+}
 
 }
 
@@ -1954,41 +1972,6 @@ let taskLinks = {
 
 /* LOAD PLAYER DATA */
 
-async function loadPlayerData(){
-
-const playerRef =
-db.collection("players")
-.doc(playerId);
-
-const docSnap =
-await playerRef.get();
-
-if(docSnap.exists){
-
-const data = docSnap.data();
-
-coins = data.coins || 0;
-energy = data.energy || 100;
-level = data.level || 1;
-xp = data.xp || 0;
-
-minePower =
-data.minePower || 1;
-
-xpBoost =
-data.xpBoost || 1;
-
-update();
-
-showToast("☁️ Cloud Data Loaded");
-
-}else{
-
-save();
-
-}
-
-}
 
 /* START */
 
@@ -2295,7 +2278,9 @@ energy = 0;
 xp = xpMax;
 
 }
-  db.collection("players")
+  if(db){
+
+db.collection("players")
 .doc(playerId)
 .set({
 
@@ -2318,6 +2303,8 @@ updated: Date.now()
 
 .then(()=>{
 
+console.log("Cloud saved");
+
 })
 
 .catch((err)=>{
@@ -2325,6 +2312,8 @@ updated: Date.now()
 console.log(err);
 
 });
+
+}
  
   localStorage.setItem(
 "paidChestPrice",
@@ -2494,9 +2483,14 @@ document.getElementById(
 
 setTimeout(()=>{
 
-document.getElementById(
-"loadingScreen"
-).remove();
+let loader =
+document.getElementById("loadingScreen");
+
+if(loader){
+
+loader.remove();
+
+}
 
 },500);
 
@@ -4220,7 +4214,16 @@ showToast(
 };
 
 /* START GAME */
+ try{
+
 loadPlayerData();
+
+}catch(e){
+
+console.log("Load error", e);
+
+}
+
 update();
 showScreen("homeScreen");
  setInterval(()=>{
@@ -4238,7 +4241,11 @@ Date.now()
 updateDailyTimer();
  updateMissions();
  updateStreak();
- checkOfflineMining();
+ setTimeout(()=>{
+
+checkOfflineMining();
+
+},2000);
 
 </script>
 
