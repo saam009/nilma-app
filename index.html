@@ -1095,34 +1095,7 @@ onclick="showScreen('homeScreen')">
   <div class="chestContainer">
 
     <div id="cyberChest" class="chest">
-     <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  let chest = document.getElementById("cyberChest");
-
-  if(chest){
-    chest.addEventListener("click", openChest);
-  }
-
-});
-     document.addEventListener("DOMContentLoaded", ()=>{
-
-  let mineButton =
-  document.getElementById("mineButton");
-
-  if(mineButton){
-
-    mineButton.addEventListener("click",(e)=>{
-
-      mine(e);
-
-    });
-
-  }
-
-}); 
-</script>
-
+    
       <div class="chestGlow"></div>
 
       <div class="chestIcon">📦</div>
@@ -3874,8 +3847,7 @@ let xpBtn = buttons[2];
 document.getElementById(
 "turboPriceText"
 ).innerText = turboPrice;
-document.getElementById("autoMinerPriceText")
-).innerText = autoMinerPrice;
+document.getElementById("autoMinerPriceText").innerText = autoMinerPrice;
 
 document.getElementById(
 "xpPriceText"
@@ -4219,7 +4191,8 @@ checkOfflineMining();
 
 },2000);
  console.log("App Loaded Successfully");
-
+document.getElementById("cyberChest").addEventListener("click", openChest);
+document.getElementById("mineButton").addEventListener("click", (e) => mine(e));
 </script>
 
 </body>
