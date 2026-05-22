@@ -1840,12 +1840,22 @@ localStorage.getItem("paidChestPrice")
 
 let currentRotation = 0;
 
-let tg = window.Telegram && window.Telegram.WebApp
-? window.Telegram.WebApp
-: null;
+let tg = window.Telegram?.WebApp || null;
 
-if(tg){
-  tg.expand();
+let username = "Player";
+let telegramId = "guest_" + Date.now();
+let playerId = telegramId.toString();
+
+let profilePhoto =
+"https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+/* TELEGRAM SAFE LOAD */
+
+try{
+
+
+tg.expand();
+
 if("Notification" in window){
 
 if(Notification.permission !== "granted"){
@@ -1856,12 +1866,7 @@ Notification.requestPermission();
 
 }
 
-let user = tg?.initDataUnsafe?.user;
-
-let username;
-let telegramId;
-let playerId;
-let profilePhoto;
+let user = tg.initDataUnsafe?.user;
 
 if(user){
 
@@ -1869,34 +1874,22 @@ username =
 user.username ||
 user.first_name ||
 "TelegramUser";
- profilePhoto =
+
+profilePhoto =
 user.photo_url ||
-"https://cdn-icons-png.flaticon.com/512/149/149071.png";
+profilePhoto;
 
 telegramId = user.id;
 
 playerId = telegramId.toString();
 
-}else{
+}
 
-document.body.innerHTML = `
-<div style="
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-font-size:24px;
-font-weight:bold;
-text-align:center;
-padding:30px;
-">
-❌ Open this game inside Telegram
-</div>
-`;
+}
 
-throw new Error(
-"Telegram required"
-);
+}catch(err){
+
+console.log("Telegram Error:", err);
 
 }
 
@@ -4246,7 +4239,7 @@ updateDailyTimer();
  updateMissions();
  updateStreak();
  checkOfflineMining();
-}
+
 </script>
 
 </body>
