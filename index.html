@@ -1851,7 +1851,7 @@ Notification.requestPermission();
 } 
 }
 
-let user = tg.initDataUnsafe?.user;
+let user = tg?.initDataUnsafe?.user;
 
 let username;
 let telegramId;
@@ -2141,7 +2141,7 @@ if(energyEl){
   energyEl.innerText = energy;
 } 
  let levelEl =
-document.getElementById("level");
+document.getElementById("profileLevel");
 
 if(levelEl){
 
@@ -3455,6 +3455,88 @@ streakDay +
 );
 
 }
+setInterval(updateBoostTimers,1000);
+
+function updateBoostTimers(){
+
+let now = Date.now();
+
+let turboTimer =
+document.getElementById("turboTimer");
+
+let energyTimer =
+document.getElementById("energyTimer");
+
+let xpTimer =
+document.getElementById("xpTimer");
+
+/* TURBO */
+
+if(turboEnd > now){
+
+let left =
+Math.floor((turboEnd - now)/1000);
+
+let mins =
+Math.floor(left/60);
+
+let secs = left % 60;
+
+turboTimer.innerText =
+"⏳ " + mins + "m " + secs + "s";
+
+}else{
+
+turboTimer.innerText =
+"Ready to activate";
+
+}
+
+/* ENERGY */
+
+if(autoMinerEnd > now){
+
+let left =
+Math.floor((autoMinerEnd - now)/1000);
+
+let mins =
+Math.floor(left/60);
+
+let secs = left % 60;
+
+energyTimer.innerText =
+"⏳ " + mins + "m " + secs + "s";
+
+}else{
+
+energyTimer.innerText =
+"Ready to install";
+
+}
+
+/* XP */
+
+if(xpEnd > now){
+
+let left =
+Math.floor((xpEnd - now)/1000);
+
+let mins =
+Math.floor(left/60);
+
+let secs = left % 60;
+
+xpTimer.innerText =
+"⏳ " + mins + "m " + secs + "s";
+
+}else{
+
+xpTimer.innerText =
+"Ready to activate";
+
+}
+
+} 
 
 function updateStreak(){
 
@@ -3799,14 +3881,14 @@ showToast("🔥 XP Boost Activated");
 }
  function updateShopUI(){
 
-let turboBtn =
-document.querySelectorAll(".shopBtn")[0];
+let buttons =
+document.querySelectorAll(".shopBtn");
 
-let autoBtn =
-document.querySelectorAll(".shopBtn")[1];
+if(buttons.length < 3) return;
 
-let xpBtn =
-document.querySelectorAll(".shopBtn")[2];
+let turboBtn = buttons[0];
+let autoBtn = buttons[1];
+let xpBtn = buttons[2];
 
 /* PRICE */
 
