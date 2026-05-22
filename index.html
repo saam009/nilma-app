@@ -1765,7 +1765,7 @@ authDomain: "nilma-coin.firebaseapp.com",
 
 projectId: "nilma-coin",
 
-storageBucket: "nilma-coin.appspot.com",
+storageBucket: "nilma-coin.firebasestorage.app",
 
 messagingSenderId: "225704570854",
 
@@ -1864,7 +1864,9 @@ let profilePhoto =
 try{
 
 
-tg.expand();
+if(tg){
+  tg.expand();
+}
 
 if("Notification" in window){
 
@@ -2387,7 +2389,10 @@ Telegram.WebApp.HapticFeedback
   save();
   update();
 
-  showCoin(event.clientX, event.clientY);
+  let x = event?.clientX || window.innerWidth / 2;
+let y = event?.clientY || window.innerHeight / 2;
+
+showCoin(x, y);
 
   document.getElementById("clickSound").play().catch(()=>{});
 }
@@ -2996,12 +3001,18 @@ update();
 
 },15000);
 
- function loadLeaderboard(){
+function loadLeaderboard(){
 
 const board =
-document.getElementById(
-"leaderboardList"
-);
+document.getElementById("leaderboardList");
+
+if(!db){
+
+board.innerHTML = "Firebase not connected";
+
+return;
+
+}
 
 board.innerHTML = "Loading...";
 
@@ -3460,42 +3471,6 @@ xpTimer.innerText =
 }
 
 }
-
-}
-setInterval(updateBoostTimers,1000);
-
-function updateBoostTimers(){
-
-let now = Date.now();
-
-let turboTimer =
-document.getElementById("turboTimer");
-
-let energyTimer =
-document.getElementById("energyTimer");
-
-let xpTimer =
-document.getElementById("xpTimer");
-
-/* TURBO */
-
-if(turboEnd > now){
-
-let left =
-Math.floor((turboEnd - now)/1000);
-
-let mins =
-Math.floor(left/60);
-
-let secs = left % 60;
-
-turboTimer.innerText =
-"⏳ " + mins + "m " + secs + "s";
-
-}else{
-
-turboTimer.innerText =
-"Ready to activate";
 
 }
 
@@ -4216,7 +4191,9 @@ showToast(
 /* START GAME */
  try{
 
-loadPlayerData();
+if(db){
+  loadPlayerData();
+}
 
 }catch(e){
 
@@ -4246,6 +4223,7 @@ updateDailyTimer();
 checkOfflineMining();
 
 },2000);
+ console.log("App Loaded Successfully");
 
 </script>
 
