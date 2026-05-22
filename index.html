@@ -1666,6 +1666,75 @@ font-weight:bold;
 </div>
 
 </div> 
+ <!-- OFFLINE REWARD POPUP -->
+
+<div id="offlinePopup" style="
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(.8);
+width:340px;
+padding:28px;
+border-radius:28px;
+background:
+linear-gradient(145deg,
+rgba(10,10,20,.96),
+rgba(25,25,40,.96)
+);
+border:1px solid rgba(0,255,255,.3);
+backdrop-filter:blur(18px);
+box-shadow:
+0 0 40px rgba(0,255,255,.25),
+0 0 80px rgba(138,46,255,.2);
+z-index:999999;
+display:none;
+text-align:center;
+transition:.3s;
+">
+
+<div style="
+font-size:70px;
+margin-bottom:10px;
+filter:drop-shadow(0 0 20px cyan);
+">
+⚡
+</div>
+
+<div style="
+font-size:30px;
+font-weight:900;
+color:#00ffff;
+text-shadow:0 0 20px cyan;
+">
+OFFLINE REWARD
+</div>
+
+<div id="offlineCoins" style="
+margin-top:18px;
+font-size:26px;
+font-weight:bold;
+color:#ffd54a;
+">
++0 Coins
+</div>
+
+<div style="
+margin-top:10px;
+opacity:.8;
+font-size:14px;
+line-height:1.5;
+">
+Your miners worked while you were away
+</div>
+
+<button
+onclick="claimOfflineReward()"
+class="shopBtn"
+style="margin-top:22px;">
+CLAIM NOW
+</button>
+
+</div>
 <!-- TOAST -->
 
 <div id="toast" style="
@@ -1751,6 +1820,18 @@ parseInt(localStorage.getItem("autoMinerEnd")) || 0;
 
 let xpEnd =
 parseInt(localStorage.getItem("xpEnd")) || 0;
+ /* OFFLINE MINING */
+
+let lastOnline =
+parseInt(localStorage.getItem("lastOnline")) || Date.now();
+
+let vipOfflineHours = 1;
+
+let offlineClaimed =
+localStorage.getItem("offlineClaimed") || "yes";
+
+let offlineCooldown =
+parseInt(localStorage.getItem("offlineCooldown")) || 0;
 let spinning = false;
  let paidChestPrice =
 parseInt(
@@ -1763,6 +1844,11 @@ let tg = window.Telegram?.WebApp;
 
 if(tg){
   tg.expand();
+if(Notification.permission !== "granted"){
+
+Notification.requestPermission();
+
+} 
 }
 
 let user = tg.initDataUnsafe?.user;
@@ -3809,7 +3895,171 @@ document.execCommand("copy");
 showToast("Referral link copied");
 
 }
+/* OFFLINE MINING */
 
+function checkOfflineMining(){
+
+let now = Date.now();
+
+let offlineTime =
+now - lastOnline;
+
+/* 30 MIN COOLDOWN */
+
+if(now < offlineCooldown){
+
+showToast(
+"⏳ Offline mining cooldown active"
+);
+
+return;
+
+}
+
+/* VIP BOOSTS */
+
+let maxHours = 1;
+
+if(Date.now() < turboEnd){
+
+maxHours = 2;
+
+}
+
+if(Date.now() < autoMinerEnd){
+
+maxHours = 3;
+
+}
+
+let maxTime =
+maxHours * 60 * 60 * 1000;
+ /* WARNING NOTIFICATION */
+
+setTimeout(()=>{
+
+if(Notification.permission === "granted"){
+
+new Notification(
+"⚡ Nilma Coin",{
+body:
+"Hurry up! Claim your offline reward before it expires!"
+});
+
+}
+
+}, maxTime - 1800000);
+
+/* LIMIT */
+
+if(offlineTime > maxTime){
+
+offlineTime = maxTime;
+
+}
+
+/* TOO SMALL */
+
+if(offlineTime < 60000){
+
+return;
+
+}
+
+/* CALCULATE */
+
+let seconds =
+Math.floor(offlineTime / 1000);
+
+let reward =
+Math.floor(
+seconds * (minePower / 12)
+);
+
+if(reward <= 0){
+
+return;
+
+}
+
+/* SAVE TEMP */
+
+window.offlineReward = reward;
+
+let popup =
+document.getElementById(
+"offlinePopup"
+);
+
+document.getElementById(
+"offlineCoins"
+).innerText =
+"+" + reward + " Coins";
+
+popup.style.display = "block";
+
+setTimeout(()=>{
+
+popup.style.transform =
+"translate(-50%,-50%) scale(1)";
+
+},50);
+
+}
+
+function claimOfflineReward(){
+
+let reward =
+window.offlineReward || 0;
+
+coins += reward;
+
+save();
+update();
+
+let popup =
+document.getElementById(
+"offlinePopup"
+);
+
+popup.style.transform =
+"translate(-50%,-50%) scale(.8)";
+
+setTimeout(()=>{
+
+popup.style.display = "none";
+
+},250);
+
+showToast(
+"⚡ +" + reward + " Offline Coins"
+);
+
+/* START 30 MIN COOLDOWN */
+
+offlineCooldown =
+Date.now() + 1800000;
+
+localStorage.setItem(
+"offlineCooldown",
+offlineCooldown
+);
+
+}
+
+/* TRACK ONLINE */
+
+window.addEventListener(
+"beforeunload",
+()=>{
+
+localStorage.setItem(
+"lastOnline",
+Date.now()
+);
+
+}
+);
 /* AUDIO */
 
 let audioUnlocked = false;
@@ -3872,16 +4122,22 @@ showToast(
 loadPlayerData();
 update();
 showScreen("homeScreen");
-  setInterval(()=>{
+ setInterval(()=>{
 
 save();
 
-},10000);
+localStorage.setItem(
+"lastOnline",
+Date.now()
+);
+
+},15000);
  setInterval(updateDailyTimer,1000);
 
 updateDailyTimer();
  updateMissions();
  updateStreak();
+ checkOfflineMining();
 
 </script>
 
