@@ -3370,6 +3370,17 @@ showToast(
 save();
 update();
 updateStreak();
+
+showToast(
+"🔥 Day " +
+streakDay +
+" Claimed"
+);
+
+}
+
+/* BOOST TIMERS */
+
 setInterval(updateBoostTimers,1000);
 
 function updateBoostTimers(){
@@ -3386,6 +3397,8 @@ let xpTimer =
 document.getElementById("xpTimer");
 
 /* TURBO */
+
+if(turboTimer){
 
 if(turboEnd > now){
 
@@ -3407,7 +3420,11 @@ turboTimer.innerText =
 
 }
 
+}
+
 /* ENERGY */
+
+if(energyTimer){
 
 if(autoMinerEnd > now){
 
@@ -3429,7 +3446,11 @@ energyTimer.innerText =
 
 }
 
+}
+
 /* XP */
+
+if(xpTimer){
 
 if(xpEnd > now){
 
@@ -3451,13 +3472,7 @@ xpTimer.innerText =
 
 }
 
-} 
-
-showToast(
-"🔥 Day " +
-streakDay +
-" Claimed"
-);
+}
 
 }
 setInterval(updateBoostTimers,1000);
@@ -4231,7 +4246,7 @@ updateDailyTimer();
  updateMissions();
  updateStreak();
  checkOfflineMining();
-
+}
 </script>
 
 </body>
