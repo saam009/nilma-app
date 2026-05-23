@@ -1091,6 +1091,7 @@ OPEN
 
 <div class="gameTitle">
 🎯 Missions
+
 </div>
 
 <button class="playBtn"
@@ -2370,10 +2371,25 @@ showToast(
 "💥 ULTRA STRIKE  +" + earned + " COINS"
 );
 
-document.querySelector(".mineBtn").style.boxShadow = `
+const mineBtn = document.querySelector(".mineBtn");
+
+if(mineBtn){
+
+mineBtn.style.boxShadow = `
 0 0 60px rgba(255,0,80,.9),
 0 0 140px rgba(255,120,0,.8)
 `;
+
+setTimeout(()=>{
+
+mineBtn.style.boxShadow = `
+0 0 40px rgba(255,170,0,.7),
+0 0 100px rgba(255,140,0,.5)
+`;
+
+},300);
+
+}
 
 setTimeout(()=>{
 
