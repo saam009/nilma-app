@@ -2404,9 +2404,15 @@ document.querySelector(".mineBtn").style.boxShadow = `
   xp += 2 * xpBoost;
   energy -= 1;
   const reactor = document.getElementById("reactorWrap");
+
 if(reactor){
-  reactor.style.transform = "scale(.95)";
-  setTimeout(()=>{ reactor.style.transform = "scale(1)"; },100);
+
+reactor.style.transform = "scale(.95)";
+
+setTimeout(()=>{
+  reactor.style.transform = "scale(1)";
+},100);
+
 }
 
   checkLevelUp();
