@@ -1,995 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
- <link rel="preload"
-as="image"
-href="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200">
+<link rel="preload" as="image" href="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200">
 <meta charset="UTF-8">
 <title>Nilma Coin</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
- <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script> 
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;}
 body{
- background:#0b0b0b;
+  background:#0b0b0b;
   font-family:Segoe UI,sans-serif;
-  background:
-  linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.85)),
-  url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200');
-  background-size:cover;
-  background-position:center;
-  color:white;
-  min-height:100vh;
-  overflow-x:hidden;
-  padding-bottom:90px;
-}
- @keyframes chestPulse{
-
-0%{
-transform:scale(.8);
-opacity:.5;
-}
-
-50%{
-transform:scale(1.1);
-opacity:1;
-}
-
-100%{
-transform:scale(.8);
-opacity:.5;
-}
-
-}
-
- @keyframes spin{
-to{transform:rotate(360deg);}
-}
-@keyframes corePulse{
-0%,100%{transform:scale(1);filter:brightness(1);}
-50%{transform:scale(1.05);filter:brightness(1.3);}
-}
-@keyframes floatChest{
-
-0%{
-transform:translateY(0px);
-}
-
-50%{
-transform:translateY(-10px);
-}
-
-100%{
-transform:translateY(0px);
-}
-
-}
-
-#cyberChest:hover{
-
-transform:scale(1.05);
-
-}
-
-#cyberChest:active{
-
-transform:scale(.94);
-
-}
-
-/* SCREENS */
-
-.screen{
-  display:none;
-  padding-bottom:100px;
-  min-height:100vh;
-}
-
-.screen.active{
-  display:block !important;
-}
-
-/* TOP BAR */
-
-.topHeader{
-  padding:14px;
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(10px);
-}
-
-.balanceRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-
-.balanceBox{
-  background:rgba(255,215,0,.12);
-  border:1px solid rgba(255,215,0,.3);
-  border-radius:14px;
-  padding:10px 14px;
-  flex:1;
-}
-  .heroCard,
-.card,
-.gameCard,
-.balanceBox{
-
-box-shadow:
-0 0 20px rgba(255,215,0,.08);
-
-}
-
-.balanceTitle{
-  font-size:13px;
-  opacity:.8;
-}
-
-.balanceValue{
-  font-size:22px;
-  font-weight:bold;
-  color:#ffd54a;
-}
-
-/* HERO */
-
-.heroCard{
-  margin:15px;
-  padding:18px;
-  border-radius:22px;
-  background:
-  linear-gradient(135deg,
-  rgba(255,215,0,.16),
-  rgba(255,140,0,.08));
-
-  border:1px solid rgba(255,215,0,.25);
-
-  backdrop-filter:blur(12px);
-}
-
-.heroTitle{
-  font-size:24px;
-  font-weight:800;
-  margin-bottom:6px;
-}
-
-.heroSub{
-  opacity:.85;
-  line-height:1.5;
-}
-
-/* LEVEL */
-
-.levelBox{
-  margin-top:15px;
-}
-
-.progress{
-  height:12px;
-  background:rgba(255,255,255,.1);
-  border-radius:30px;
-  overflow:hidden;
-}
-
-.progressFill{
-  height:100%;
-  width:40%;
-  border-radius:30px;
-  background:linear-gradient(90deg,#ffd54a,#ff9800);
-}
-
-/* MAIN BUTTON */
-
-.mineWrap{
-  display:flex;
-  justify-content:center;
-  margin-top:35px;
-}
-
-.mineBtn{
-  width:190px;
-  height:190px;
-  border-radius:50%;
-  border:none;
-
-  background:
-  radial-gradient(circle at top,
-  #ffe082,
-  #ff9800,
-  #7a3e00);
-
-  color:white;
-  font-size:60px;
-  font-weight:bold;
-
-  box-shadow:
-  0 0 40px rgba(255,170,0,.7),
-  0 0 100px rgba(255,140,0,.5);
-
-  transition:.15s;
-}
-
-.mineBtn:active{
-  transform:scale(.92);
-}
- .mineBtn:hover{
-  transform:scale(1.03);
-} 
-
-/* SECTION */
-
-.section{
-  margin:18px;
-}
-
-.sectionTitle{
-  font-size:24px;
-  font-weight:700;
-  margin-bottom:14px;
-}
-
-/* GAME GRID */
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.gameCard{
-  position:relative;
-
-  background:
-  linear-gradient(
-  145deg,
-  rgba(10,10,25,.95),
-  rgba(0,0,0,.95)
-  );
-
-  border-radius:24px;
-
-  overflow:hidden;
-
-  border:1px solid rgba(0,255,255,.25);
-
-  backdrop-filter:blur(16px);
-
-  box-shadow:
-  0 0 20px rgba(0,255,255,.08),
-  0 0 40px rgba(255,0,255,.05);
-
-  transition:.25s;
-}
-
-.gameCard:hover{
-
-  transform:translateY(-5px) scale(1.02);
-
-  box-shadow:
-  0 0 25px rgba(0,255,255,.25),
-  0 0 60px rgba(255,0,255,.15);
-
-}
-
-.gameCard img{
-
-width:100%;
-height:210px;
-
-object-fit:cover;
-
-filter:
-brightness(.95)
-contrast(1.15)
-saturate(1.25);
-
-transition:.35s;
-
-}
- .gameCard:hover img{
-
-transform:scale(1.05);
-
-filter:
-brightness(1.05)
-contrast(1.2)
-saturate(1.35);
-
-}
-
-.gameInfo{
-
-padding:16px;
-
-background:
-linear-gradient(
-180deg,
-rgba(0,0,0,.0),
-rgba(0,0,0,.75)
-);
-
-backdrop-filter:blur(10px);
-
-}
-
-.gameTitle{
-
-font-size:24px;
-font-weight:900;
-
-margin-bottom:10px;
-
-letter-spacing:1px;
-
-text-transform:uppercase;
-
-color:white;
-
-text-shadow:
-0 0 10px rgba(0,255,255,.5);
-
-}
-
-.playBtn{
-
-  width:100%;
-
-  padding:12px;
-
-  border:none;
-
-  border-radius:14px;
-
-  background:
-  linear-gradient(
-  90deg,
-  #00e5ff,
-  #8a2eff
-  );
-
-  color:white;
-
-  font-weight:800;
-
-  letter-spacing:1px;
-
-  text-transform:uppercase;
-
-  box-shadow:
-  0 0 15px rgba(0,229,255,.35);
-
-  transition:.2s;
-
-}
-
-.playBtn:hover{
-
-  transform:scale(1.03);
-
-  box-shadow:
-  0 0 25px rgba(138,46,255,.45);
-
-}
-
-/* CARDS */
-
-.card{
-  background:rgba(255,255,255,.06);
-  border-radius:20px;
-  padding:18px;
-  margin-bottom:15px;
-  border:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(12px);
-}
-
-/* BUTTON */
-
-button{
-  cursor:pointer;
-  outline:none;
-  -webkit-tap-highlight-color:transparent;
-}
-
-button:focus{
-  outline:none;
-}
-
-.mineBtn{
-  -webkit-tap-highlight-color:transparent;
-}
-  .spinBtn{
-margin-top:20px;
-  padding:14px 30px;
-  border:none;
-  border-radius:14px;
-
-  background:
-  linear-gradient(90deg,#ffd54a,#ff9800);
-
-  color:black;
-  font-size:18px;
-  font-weight:bold;
-
-  box-shadow:
-  0 0 20px rgba(255,152,0,.5);
-}
-  .backBtn{
-  margin:15px;
-  padding:10px 18px;
-  border:none;
-  border-radius:12px;
-
-  background:rgba(255,255,255,.08);
-
-  color:white;
-
-  backdrop-filter:blur(10px);
-}
-
-/* BOTTOM NAV */
-
-.bottomNav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:80px;
-
-  background:rgba(0,0,0,.85);
-
-  border-top:1px solid rgba(255,255,255,.08);
-
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-
-  backdrop-filter:blur(20px);
-
-  z-index:999;
-}
-
-.navItem{
-  text-align:center;
-  font-size:12px;
-  color:#bbb;
-  flex:1;
-}
-
-.navItem.active{
-  color:#ffd54a;
-}
-
-.navIcon{
-  font-size:24px;
-  margin-bottom:4px;
-}
-
-/* TOAST */
-
-#toast{
-  position:fixed;
-  top:30px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#111;
-  border:1px solid #ff9800;
-  padding:14px 22px;
-  border-radius:14px;
-  color:#ffd54a;
-  display:none;
-  z-index:99999;
-}
-
-/* SPIN WHEEL */
-
-/* FLOAT COIN */
-.coin{
-  position:fixed;
-  color:#ffd54a;
-  font-size:28px;
-  font-weight:900;
-  pointer-events:none;
-  z-index:99999;
-
-  text-shadow:
-  0 0 10px #ff9800,
-  0 0 20px #ff9800;
-
-  animation:floatCoin 1s forwards;
-}
-
-@keyframes floatCoin{
-  to{
-    transform:translateY(-80px);
-    opacity:0;
-  }
-}
-
-/* SLICES */
-.chestContainer{
-  position:relative;
-  width:240px;
-  height:240px;
-}
-
-.chest{
-  width:240px;
-  height:240px;
-  border-radius:28px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-
-  background:linear-gradient(145deg,#0ff2,#f0f2);
-  border:2px solid rgba(0,255,255,.35);
-
-  box-shadow:
-    0 0 25px rgba(0,255,255,.25),
-    0 0 60px rgba(255,0,200,.15);
-
-  cursor:pointer;
-  transition:.25s;
-  position:relative;
-  overflow:hidden;
-}
-
-.chest:hover{ transform:scale(1.05); }
-.chest:active{ transform:scale(.95); }
-
-.chestGlow{
-  position:absolute;
-  width:320px;
-  height:320px;
-  background:radial-gradient(circle,rgba(0,255,255,.25),transparent 70%);
-  animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-  0%{transform:scale(.8);opacity:.5;}
-  50%{transform:scale(1.1);opacity:1;}
-  100%{transform:scale(.8);opacity:.5;}
-}
-
-.chestIcon{
-  font-size:90px;
-  z-index:2;
-  filter:drop-shadow(0 0 12px cyan);
-  animation:float 2s infinite;
-}
-
-@keyframes float{
-  0%{transform:translateY(0);}
-  50%{transform:translateY(-8px);}
-  100%{transform:translateY(0);}
-}
-
-.chestText{
-  margin-top:10px;
-  font-size:20px;
-  font-weight:900;
-  color:#00ffff;
-  text-shadow:0 0 10px cyan;
-  z-index:2;
-}
- .rouletteWrap{
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-width:100%;
-min-height:70vh;
-
-position:relative;
-
-margin:0 auto;
-
-}
- #spinScreen.active{
-
-display:flex !important;
-flex-direction:column;
-
-}
- /* REAL CHEST OPENING */
-
-.chest.opening{
-
-animation:
-chestShake .5s,
-chestBoom .9s .5s forwards;
-
-}
-
-@keyframes chestShake{
-
-0%{transform:rotate(0);}
-20%{transform:rotate(-6deg);}
-40%{transform:rotate(6deg);}
-60%{transform:rotate(-6deg);}
-80%{transform:rotate(6deg);}
-100%{transform:rotate(0);}
-
-}
-
-@keyframes chestBoom{
-
-0%{
-
-transform:scale(1);
-filter:brightness(1);
-
-}
-
-50%{
-
-transform:scale(1.15);
-filter:brightness(2);
-
-}
-
-100%{
-
-transform:scale(1);
-
-filter:brightness(1.1);
-
-}
-
-}
-
-/* CHEST LIGHT BURST */
-
-.chest.opening::after{
-
-content:"";
-
-position:absolute;
-
-inset:-40px;
-
-background:
-radial-gradient(
-circle,
-rgba(255,255,255,.9),
-transparent 70%
-);
-
-animation:burst .8s forwards;
-
-pointer-events:none;
-
-}
-
-@keyframes burst{
-
-0%{
-
-opacity:0;
-transform:scale(.2);
-
-}
-
-30%{
-
-opacity:1;
-
-}
-
-100%{
-
-opacity:0;
-transform:scale(1.6);
-
-}
-
-}
- .shopCard{
-  position:relative;
-  padding:18px;
-  border-radius:22px;
-  background:rgba(15,15,25,.85);
-  border:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(14px);
-  transition:.3s;
-}
-
-.shopCard:hover{
-
-transform:
-translateY(-8px)
-scale(1.03)
-rotateX(3deg);
-
-box-shadow:
-0 0 35px rgba(0,255,255,.18),
-0 0 80px rgba(255,0,255,.12);
-
-}
-
-.shopCard h3{
-  margin:8px 0;
-  font-size:20px;
-}
-
-.shopCard p{
-  opacity:.8;
-  font-size:14px;
-}
-
-.price{
-  margin-top:10px;
-  color:#ffd54a;
-  font-weight:bold;
-}
-
-/* RARITY COLORS */
-.rare{
-  border:1px solid rgba(0,200,255,.4);
-  box-shadow:0 0 20px rgba(0,200,255,.15);
-}
-
-.epic{
-  border:1px solid rgba(160,0,255,.4);
-  box-shadow:0 0 20px rgba(160,0,255,.15);
-}
-
-.legendary{
-  border:1px solid rgba(255,200,0,.4);
-  box-shadow:0 0 25px rgba(255,200,0,.2);
-}
-
-/* BADGE TOP RIGHT */
-.badge{
-  position:absolute;
-  top:10px;
-  right:10px;
-  font-size:11px;
-  padding:4px 10px;
-  border-radius:20px;
-  background:rgba(255,255,255,.08);
-}
-
-/* OWNED TAG TOP LEFT */
-.ownedTag{
-  position:absolute;
-  top:10px;
-  left:10px;
-  font-size:10px;
-  padding:4px 8px;
-  border-radius:12px;
-  background:rgba(0,255,100,.15);
-  color:#00ff99;
-  border:1px solid rgba(0,255,100,.4);
-}
-
-/* SHOP BUTTON */
-.shopBtn{
-  margin-top:12px;
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:14px;
-  font-weight:900;
-  color:white;
-  background:linear-gradient(90deg,#00e5ff,#8a2eff);
-  box-shadow:0 0 20px rgba(0,229,255,.25);
-  transition:.2s;
-}
-
-.shopBtn:hover{
-  transform:scale(1.03);
-}
-
-.shopBtn:active{
-  transform:scale(.95);
-}
- .shopBtn.activeBoost{
-
-background:linear-gradient(90deg,#00ff99,#00c853);
-
-box-shadow:
-0 0 25px rgba(0,255,153,.45);
-
-color:white;
-
-}
+  background:linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.85)),url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200');
+  background-size:cover;background-position:center;
+  color:white;min-height:100vh;overflow-x:hidden;padding-bottom:90px;
+}
+@keyframes chestPulse{0%{transform:scale(.8);opacity:.5;}50%{transform:scale(1.1);opacity:1;}100%{transform:scale(.8);opacity:.5;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes corePulse{0%,100%{transform:scale(1);filter:brightness(1);}50%{transform:scale(1.05);filter:brightness(1.3);}}
+@keyframes floatChest{0%{transform:translateY(0px);}50%{transform:translateY(-10px);}100%{transform:translateY(0px);}}
+#cyberChest:hover{transform:scale(1.05);}
+#cyberChest:active{transform:scale(.94);}
+.screen{display:none;padding-bottom:100px;min-height:100vh;}
+.screen.active{display:block !important;}
+.topHeader{padding:14px;position:sticky;top:0;z-index:100;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);}
+.balanceRow{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.balanceBox{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);border-radius:14px;padding:10px 14px;flex:1;}
+.heroCard,.card,.gameCard,.balanceBox{box-shadow:0 0 20px rgba(255,215,0,.08);}
+.balanceTitle{font-size:13px;opacity:.8;}
+.balanceValue{font-size:22px;font-weight:bold;color:#ffd54a;}
+.heroCard{margin:15px;padding:18px;border-radius:22px;background:linear-gradient(135deg,rgba(255,215,0,.16),rgba(255,140,0,.08));border:1px solid rgba(255,215,0,.25);backdrop-filter:blur(12px);}
+.heroTitle{font-size:24px;font-weight:800;margin-bottom:6px;}
+.heroSub{opacity:.85;line-height:1.5;}
+.levelBox{margin-top:15px;}
+.progress{height:12px;background:rgba(255,255,255,.1);border-radius:30px;overflow:hidden;}
+.progressFill{height:100%;width:0%;border-radius:30px;background:linear-gradient(90deg,#ffd54a,#ff9800);}
+.mineWrap{display:flex;justify-content:center;margin-top:35px;}
+.mineBtn{width:190px;height:190px;border-radius:50%;border:none;background:radial-gradient(circle at top,#ffe082,#ff9800,#7a3e00);color:white;font-size:60px;font-weight:bold;box-shadow:0 0 40px rgba(255,170,0,.7),0 0 100px rgba(255,140,0,.5);transition:.15s;}
+.mineBtn:active{transform:scale(.92);}
+.mineBtn:hover{transform:scale(1.03);}
+.section{margin:18px;}
+.sectionTitle{font-size:24px;font-weight:700;margin-bottom:14px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.gameCard{position:relative;background:linear-gradient(145deg,rgba(10,10,25,.95),rgba(0,0,0,.95));border-radius:24px;overflow:hidden;border:1px solid rgba(0,255,255,.25);backdrop-filter:blur(16px);box-shadow:0 0 20px rgba(0,255,255,.08),0 0 40px rgba(255,0,255,.05);transition:.25s;}
+.gameCard:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 0 25px rgba(0,255,255,.25),0 0 60px rgba(255,0,255,.15);}
+.gameCard img{width:100%;height:210px;object-fit:cover;filter:brightness(.95) contrast(1.15) saturate(1.25);transition:.35s;}
+.gameCard:hover img{transform:scale(1.05);filter:brightness(1.05) contrast(1.2) saturate(1.35);}
+.gameInfo{padding:16px;background:linear-gradient(180deg,rgba(0,0,0,.0),rgba(0,0,0,.75));backdrop-filter:blur(10px);}
+.gameTitle{font-size:24px;font-weight:900;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;color:white;text-shadow:0 0 10px rgba(0,255,255,.5);}
+.playBtn{width:100%;padding:12px;border:none;border-radius:14px;background:linear-gradient(90deg,#00e5ff,#8a2eff);color:white;font-weight:800;letter-spacing:1px;text-transform:uppercase;box-shadow:0 0 15px rgba(0,229,255,.35);transition:.2s;}
+.playBtn:hover{transform:scale(1.03);box-shadow:0 0 25px rgba(138,46,255,.45);}
+.card{background:rgba(255,255,255,.06);border-radius:20px;padding:18px;margin-bottom:15px;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px);}
+button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
+button:focus{outline:none;}
+.mineBtn{-webkit-tap-highlight-color:transparent;}
+.spinBtn{margin-top:20px;padding:14px 30px;border:none;border-radius:14px;background:linear-gradient(90deg,#ffd54a,#ff9800);color:black;font-size:18px;font-weight:bold;box-shadow:0 0 20px rgba(255,152,0,.5);}
+.backBtn{margin:15px;padding:10px 18px;border:none;border-radius:12px;background:rgba(255,255,255,.08);color:white;backdrop-filter:blur(10px);}
+.bottomNav{position:fixed;bottom:0;left:0;width:100%;height:80px;background:rgba(0,0,0,.85);border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-around;align-items:center;backdrop-filter:blur(20px);z-index:999;}
+.navItem{text-align:center;font-size:12px;color:#bbb;flex:1;}
+.navItem.active{color:#ffd54a;}
+.navIcon{font-size:24px;margin-bottom:4px;}
+#toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #ff9800;padding:14px 22px;border-radius:14px;color:#ffd54a;display:none;z-index:99999;}
+.coin{position:fixed;color:#ffd54a;font-size:28px;font-weight:900;pointer-events:none;z-index:99999;text-shadow:0 0 10px #ff9800,0 0 20px #ff9800;animation:floatCoin 1s forwards;}
+@keyframes floatCoin{to{transform:translateY(-80px);opacity:0;}}
+.chestContainer{position:relative;width:240px;height:240px;}
+.chest{width:240px;height:240px;border-radius:28px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(145deg,#0ff2,#f0f2);border:2px solid rgba(0,255,255,.35);box-shadow:0 0 25px rgba(0,255,255,.25),0 0 60px rgba(255,0,200,.15);cursor:pointer;transition:.25s;position:relative;overflow:hidden;}
+.chest:hover{transform:scale(1.05);}
+.chest:active{transform:scale(.95);}
+.chestGlow{position:absolute;width:320px;height:320px;background:radial-gradient(circle,rgba(0,255,255,.25),transparent 70%);animation:pulse 2s infinite;}
+@keyframes pulse{0%{transform:scale(.8);opacity:.5;}50%{transform:scale(1.1);opacity:1;}100%{transform:scale(.8);opacity:.5;}}
+.chestIcon{font-size:90px;z-index:2;filter:drop-shadow(0 0 12px cyan);animation:float 2s infinite;}
+@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-8px);}100%{transform:translateY(0);}}
+.chestText{margin-top:10px;font-size:20px;font-weight:900;color:#00ffff;text-shadow:0 0 10px cyan;z-index:2;}
+.rouletteWrap{display:flex;justify-content:center;align-items:center;width:100%;min-height:70vh;position:relative;margin:0 auto;}
+#spinScreen.active{display:flex !important;flex-direction:column;}
+.chest.opening{animation:chestShake .5s,chestBoom .9s .5s forwards;}
+@keyframes chestShake{0%{transform:rotate(0);}20%{transform:rotate(-6deg);}40%{transform:rotate(6deg);}60%{transform:rotate(-6deg);}80%{transform:rotate(6deg);}100%{transform:rotate(0);}}
+@keyframes chestBoom{0%{transform:scale(1);filter:brightness(1);}50%{transform:scale(1.15);filter:brightness(2);}100%{transform:scale(1);filter:brightness(1.1);}}
+.chest.opening::after{content:"";position:absolute;inset:-40px;background:radial-gradient(circle,rgba(255,255,255,.9),transparent 70%);animation:burst .8s forwards;pointer-events:none;}
+@keyframes burst{0%{opacity:0;transform:scale(.2);}30%{opacity:1;}100%{opacity:0;transform:scale(1.6);}}
+.shopCard{position:relative;padding:18px;border-radius:22px;background:rgba(15,15,25,.85);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px);transition:.3s;}
+.shopCard:hover{transform:translateY(-8px) scale(1.03) rotateX(3deg);box-shadow:0 0 35px rgba(0,255,255,.18),0 0 80px rgba(255,0,255,.12);}
+.shopCard h3{margin:8px 0;font-size:20px;}
+.shopCard p{opacity:.8;font-size:14px;}
+.price{margin-top:10px;color:#ffd54a;font-weight:bold;}
+.rare{border:1px solid rgba(0,200,255,.4);box-shadow:0 0 20px rgba(0,200,255,.15);}
+.epic{border:1px solid rgba(160,0,255,.4);box-shadow:0 0 20px rgba(160,0,255,.15);}
+.legendary{border:1px solid rgba(255,200,0,.4);box-shadow:0 0 25px rgba(255,200,0,.2);}
+.badge{position:absolute;top:10px;right:10px;font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.08);}
+.ownedTag{position:absolute;top:10px;left:10px;font-size:10px;padding:4px 8px;border-radius:12px;background:rgba(0,255,100,.15);color:#00ff99;border:1px solid rgba(0,255,100,.4);}
+.shopBtn{margin-top:12px;width:100%;padding:12px;border:none;border-radius:14px;font-weight:900;color:white;background:linear-gradient(90deg,#00e5ff,#8a2eff);box-shadow:0 0 20px rgba(0,229,255,.25);transition:.2s;}
+.shopBtn:hover{transform:scale(1.03);}
+.shopBtn:active{transform:scale(.95);}
+.shopBtn.activeBoost{background:linear-gradient(90deg,#00ff99,#00c853);box-shadow:0 0 25px rgba(0,255,153,.45);color:white;}
 </style>
 </head>
+<body style="background:#050505;" onclick="unlockAudio()">
 
-<body
-style="background:#050505;"
-onclick="unlockAudio()">
- <div id="loadingScreen" style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100vh;
-background:
-linear-gradient(180deg,#050505,#111,#000);
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:999999;
-overflow:hidden;
-">
-
-<img
-src="https://cdn-icons-png.flaticon.com/512/825/825508.png"
-style="
-width:140px;
-height:140px;
-border-radius:30px;
-box-shadow:
-0 0 30px rgba(255,215,0,.5),
-0 0 80px rgba(255,140,0,.35);
-animation:pulseLogo 2s infinite;
-"
->
-
-<div style="
-margin-top:25px;
-font-size:34px;
-font-weight:900;
-color:#ffd54a;
-letter-spacing:3px;
-text-shadow:0 0 20px #ff9800;
-">
-NILMA COIN
+<div id="loadingScreen" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:linear-gradient(180deg,#050505,#111,#000);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;overflow:hidden;">
+<img src="https://cdn-icons-png.flaticon.com/512/825/825508.png" style="width:140px;height:140px;border-radius:30px;box-shadow:0 0 30px rgba(255,215,0,.5),0 0 80px rgba(255,140,0,.35);">
+<div style="margin-top:25px;font-size:34px;font-weight:900;color:#ffd54a;letter-spacing:3px;text-shadow:0 0 20px #ff9800;">NILMA COIN</div>
+<div style="margin-top:12px;font-size:15px;opacity:.8;color:white;">Loading Mining Systems...</div>
+<div style="width:240px;height:14px;background:rgba(255,255,255,.08);border-radius:30px;overflow:hidden;margin-top:35px;">
+<div id="loadingBar" style="width:0%;height:100%;border-radius:30px;background:linear-gradient(90deg,#ffd54a,#ff9800);box-shadow:0 0 20px rgba(255,152,0,.7);transition:.3s;"></div>
 </div>
-
-<div style="
-margin-top:12px;
-font-size:15px;
-opacity:.8;
-color:white;
-">
-Loading Mining Systems...
 </div>
-
-<div style="
-width:240px;
-height:14px;
-background:rgba(255,255,255,.08);
-border-radius:30px;
-overflow:hidden;
-margin-top:35px;
-">
-
-<div id="loadingBar" style="
-width:0%;
-height:100%;
-border-radius:30px;
-background:
-linear-gradient(90deg,#ffd54a,#ff9800);
-box-shadow:
-0 0 20px rgba(255,152,0,.7);
-transition:.3s;
-">
-</div>
-
-</div>
-
-</div>
- <div class="cyberBg"></div> 
 
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
-
 <div class="topHeader">
-
 <div class="balanceRow">
-
-<div class="balanceBox">
-<div class="balanceTitle">Coins</div>
-<div class="balanceValue">💰 <span id="balance">0</span></div>
+<div class="balanceBox"><div class="balanceTitle">Coins</div><div class="balanceValue">💰 <span id="balance">0</span></div></div>
+<div class="balanceBox"><div class="balanceTitle">Energy</div><div class="balanceValue">⚡ <span id="energy">100</span></div></div>
+</div>
 </div>
 
-<div class="balanceBox">
-<div class="balanceTitle">Energy</div>
-<div class="balanceValue">⚡ <span id="energy">100</span></div>
-</div>
-
-</div>
-
-</div>
- 
-<!-- PROFILE CARD -->
-
-<div class="heroCard"
-style="
-display:flex;
-align-items:center;
-gap:15px;
-">
-
-<img
-id="profilePhoto"
-src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-style="
-width:80px;
-height:80px;
-border-radius:50%;
-border:3px solid #ffd54a;
-object-fit:cover;
-box-shadow:
-0 0 20px rgba(255,215,0,.4);
-"
->
-
+<div class="heroCard" style="display:flex;align-items:center;gap:15px;">
+<img id="profilePhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width:80px;height:80px;border-radius:50%;border:3px solid #ffd54a;object-fit:cover;box-shadow:0 0 20px rgba(255,215,0,.4);">
 <div style="flex:1;">
-
-<div
-id="profileName"
-style="
-font-size:24px;
-font-weight:800;
-">
-Player
+<div id="profileName" style="font-size:24px;font-weight:800;">Player</div>
+<div style="margin-top:6px;color:#ffd54a;font-weight:700;font-size:15px;">🔥 Ready To Get RICH?</div>
+<div style="margin-top:10px;opacity:.8;">⭐ Level: <span id="profileLevel">1</span></div>
+<div style="margin-top:4px;opacity:.8;">⛏ Power: <span id="profilePower">1</span></div>
+<div style="margin-top:4px;opacity:.8;">👥 Referrals: <span id="profileRefs">0</span></div>
+<div class="levelBox" style="margin-top:12px;"><div class="progress"><div class="progressFill" id="xpBar"></div></div></div>
 </div>
-
-<div style="
-margin-top:6px;
-color:#ffd54a;
-font-weight:700;
-font-size:15px;
-">
-🔥 Ready To Get RICH?
-</div>
-
-<div style="
-margin-top:10px;
-opacity:.8;
-">
-⭐ Level:
-<span id="profileLevel">1</span>
-</div>
-
-<div style="
-margin-top:4px;
-opacity:.8;
-">
-⛏ Power:
-<span id="profilePower">1</span>
-</div>
-
-<div style="
-margin-top:4px;
-opacity:.8;
-">
-👥 Referrals:
-<span id="profileRefs">0</span>
-</div>
-
-<!-- XP BAR -->
-
-<div class="levelBox" style="margin-top:12px;">
-
-<div class="progress">
-<div class="progressFill" id="xpBar"></div>
-</div>
-
-</div>
-
-</div>
-
 </div>
 
 <div style="margin:15px;">
@@ -1041,3293 +177,859 @@ opacity:.8;
 </div>
 
 <div class="section">
-
-<div class="sectionTitle">
-Mini Games
-</div>
-
+<div class="sectionTitle">Mini Games</div>
 <div class="grid">
-
-<div class="gameCard">
-<img src="https://raw.githubusercontent.com/saam009/nilma-app/eec9d4ed81305c91deb9b6de3b9380e4041fef6a/00.jpeg">
-<div class="gameInfo">
-<div class="gameTitle">Spin Wheel</div>
-<button class="playBtn" onclick="showScreen('spinScreen')">
-PLAY
-</button>
-</div>
-</div>
-
-<div class="gameCard">
-<img src="https://raw.githubusercontent.com/saam009/nilma-app/main/99.jpeg">
-<div class="gameInfo">
-<div class="gameTitle">Tasks</div>
-<button class="playBtn" onclick="showScreen('taskScreen')">
-OPEN
-</button>
-</div>
-</div>
- <div class="gameCard">
- <img src="https://raw.githubusercontent.com/saam009/nilma-app/main/88.jpeg"> 
-
-<div class="gameInfo">
-
-<div class="gameTitle">
-Rare Crates
-</div>
-
-<button
-class="playBtn"
-onclick="openRareCrate()">
-OPEN
-</button>
-
-</div>
-</div>
-<div class="gameCard">
-<img src="https://raw.githubusercontent.com/saam009/nilma-app/main/77.jpeg">
-
-<div class="gameInfo">
-
-<div class="gameTitle">
-🎯 Missions
-
-</div>
-
-<button class="playBtn"
-onclick="showScreen('missionScreen')">
-OPEN
-</button>
-
-</div>
-</div>
-
-<div class="gameCard">
-<img src="https://raw.githubusercontent.com/saam009/nilma-app/main/66.jpeg">
-
-<div class="gameInfo">
-
-<div class="gameTitle">
-🔥 Daily Streak
-</div>
-
-<button class="playBtn"
-onclick="showScreen('streakScreen')">
-OPEN
-</button>
-
+<div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/eec9d4ed81305c91deb9b6de3b9380e4041fef6a/00.jpeg"><div class="gameInfo"><div class="gameTitle">Spin Wheel</div><button class="playBtn" onclick="showScreen('spinScreen')">PLAY</button></div></div>
+<div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/99.jpeg"><div class="gameInfo"><div class="gameTitle">Tasks</div><button class="playBtn" onclick="showScreen('taskScreen')">OPEN</button></div></div>
+<div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/88.jpeg"><div class="gameInfo"><div class="gameTitle">Rare Crates</div><button class="playBtn" onclick="openRareCrate()">OPEN</button></div></div>
+<div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/77.jpeg"><div class="gameInfo"><div class="gameTitle">🎯 Missions</div><button class="playBtn" onclick="showScreen('missionScreen')">OPEN</button></div></div>
+<div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/66.jpeg"><div class="gameInfo"><div class="gameTitle">🔥 Daily Streak</div><button class="playBtn" onclick="showScreen('streakScreen')">OPEN</button></div></div>
 </div>
 </div>
 </div>
 
-</div>
-
-</div>
-
-<!-- SPIN SCREEN -->
 <!-- SPIN SCREEN -->
 <div id="spinScreen" class="screen">
-
-<button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-<div class="heroCard" style="text-align:center;">
-<h2>🎰 Cyber Roulette</h2>
-<p>Spin for massive rewards</p>
-</div>
-
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard" style="text-align:center;"><h2>🎰 Cyber Roulette</h2><p>Spin for massive rewards</p></div>
 <div class="rouletteWrap">
-
-  <div class="chestContainer">
-
-    <div id="cyberChest" class="chest">
-    
-      <div class="chestGlow"></div>
-
-      <div class="chestIcon">📦</div>
-
-      <div class="chestText">OPEN CHEST</div>
-
-    </div>
-
-  </div>
-
+<div class="chestContainer">
+<div id="cyberChest" class="chest">
+<div class="chestGlow"></div>
+<div class="chestIcon">📦</div>
+<div class="chestText">OPEN CHEST</div>
 </div>
-
-  </div>
-  <!-- CLOSE spinScreen -->
+</div>
+</div>
+</div>
 
 <!-- TASK SCREEN -->
 <div id="taskScreen" class="screen">
-
-<button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-<div class="heroCard">
-
-<h2>📋 Daily Tasks</h2>
-
-<p style="margin-top:10px;">
-Complete tasks and earn rewards
-</p>
-
-</div>
-
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard"><h2>📋 Daily Tasks</h2><p style="margin-top:10px;">Complete tasks and earn rewards</p></div>
 <div style="padding:18px;">
-
 <div class="card">
-
-<h3>📸 Follow Instagram</h3>
-
-<p style="margin:10px 0;">
-Reward: +30 Coins
-</p>
-
-<button class="playBtn"
-onclick="openInsta()">
-OPEN INSTAGRAM
-</button>
-
-<br><br>
-
-<button class="playBtn"
-onclick="claimTask()">
-CLAIM REWARD
-</button>
-
+<h3>📸 Follow Instagram</h3><p style="margin:10px 0;">Reward: +30 Coins</p>
+<button class="playBtn" onclick="openInsta()">OPEN INSTAGRAM</button><br><br>
+<button class="playBtn" onclick="claimTask()">CLAIM REWARD</button>
 </div>
 <div class="card">
-
-<h3>📘 Follow Facebook</h3>
-
-<p style="margin:10px 0;">
-Reward: +30 Coins
-</p>
-
-<button class="playBtn"
-onclick="openFacebook()">
-OPEN FACEBOOK
-</button>
-
-<br><br>
-
-<button class="playBtn"
-onclick="claimFacebookTask()">
-CLAIM REWARD
-</button>
-
+<h3>📘 Follow Facebook</h3><p style="margin:10px 0;">Reward: +30 Coins</p>
+<button class="playBtn" onclick="openFacebook()">OPEN FACEBOOK</button><br><br>
+<button class="playBtn" onclick="claimFacebookTask()">CLAIM REWARD</button>
 </div>
 </div>
-
 </div>
 
 <!-- DAILY SCREEN -->
 <div id="dailyScreen" class="screen">
-  <button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-  <h2 style="text-align:center; margin-top:40px;">
-    🎁 Daily Reward
-  </h2>
-
-  <div style="text-align:center; margin-top:40px;">
-
-  <button
-id="dailyBtn"
-onclick="daily()"
-style="
-padding:14px 28px;
-border:none;
-border-radius:14px;
-font-size:18px;
-font-weight:bold;
-background:linear-gradient(90deg,#ffd54a,#ff9800);
-color:black;
-">
-Claim Daily Reward
-</button>
-
-<div
-id="dailyTimer"
-style="
-margin-top:20px;
-font-size:18px;
-opacity:.85;
-">
-Ready to claim
-</div> 
-
-  </div>
-
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<h2 style="text-align:center;margin-top:40px;">🎁 Daily Reward</h2>
+<div style="text-align:center;margin-top:40px;">
+<button id="dailyBtn" onclick="daily()" style="padding:14px 28px;border:none;border-radius:14px;font-size:18px;font-weight:bold;background:linear-gradient(90deg,#ffd54a,#ff9800);color:black;">Claim Daily Reward</button>
+<div id="dailyTimer" style="margin-top:20px;font-size:18px;opacity:.85;">Ready to claim</div>
 </div>
- <!-- LEADERBOARD SCREEN -->
+</div>
+
+<!-- LEADERBOARD SCREEN -->
 <div id="leaderboardScreen" class="screen">
-  <button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-  <h2 style="text-align:center; margin-top:40px;">
-    🏆 Leaderboard
-  </h2>
-<div class="card" style="margin-top:30px;">
-
-<div id="leaderboardList">
-Loading leaderboard...
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<h2 style="text-align:center;margin-top:40px;">🏆 Leaderboard</h2>
+<div class="card" style="margin-top:30px;"><div id="leaderboardList">Loading leaderboard...</div></div>
 </div>
 
-</div>
- </div> 
 <!-- REFERRAL SCREEN -->
 <div id="referralScreen" class="screen">
-
-<button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-<div class="heroCard">
-
-<h2>👥 Referral System</h2>
-
-<p style="margin-top:10px;">
-Invite friends and earn rewards
-</p>
-
-</div>
-
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard"><h2>👥 Referral System</h2><p style="margin-top:10px;">Invite friends and earn rewards</p></div>
 <div style="padding:20px;">
-
-<div class="card">
-
-<h3>Your Referral Link</h3>
-
-<input
-id="refLink"
-readonly
-style="
-width:100%;
-padding:14px;
-border:none;
-border-radius:12px;
-margin-top:10px;
-font-size:16px;
-"
->
-
-<button
-class="playBtn"
-style="margin-top:15px;"
-onclick="copyRefLink()">
-COPY LINK
-</button>
-
+<div class="card"><h3>Your Referral Link</h3><input id="refLink" readonly style="width:100%;padding:14px;border:none;border-radius:12px;margin-top:10px;font-size:16px;"><button class="playBtn" style="margin-top:15px;" onclick="copyRefLink()">COPY LINK</button></div>
+<div class="card"><h3>Total Referrals</h3><p style="font-size:28px;margin-top:10px;font-weight:bold;">👥 <span id="refCount">0</span></p></div>
+</div>
 </div>
 
-<div class="card">
-
-<h3>Total Referrals</h3>
-
-<p style="
-font-size:28px;
-margin-top:10px;
-font-weight:bold;
-">
-👥 <span id="refCount">0</span>
-</p>
-
-</div>
-
-</div>
-
-</div> 
 <!-- SHOP SCREEN -->
 <div id="shopScreen" class="screen">
-
-<button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-<div class="heroCard">
-  <h2>💎 Cyber Upgrade Market</h2>
-  <p style="margin-top:10px;">
-    Neon-powered upgrades for elite miners
-  </p>
-</div>
-
-<div style="padding:20px; display:grid; gap:16px;">
-
-<!-- TURBO -->
-<div class="shopCard epic">
-  <div class="badge">EPIC</div>
-  <div class="ownedTag" id="turboOwned">NOT OWNED</div>
-
-  <h3>⚡ Turbo Miner</h3>
-  <p>Mining power x2 boost</p>
-
-  <div class="price">💰 <span id="turboPriceText">200</span> Coins</div>
-
-  <button class="shopBtn" onclick="buyTurbo()">
-UPGRADE
-</button>
-
-<div id="turboTimer"
-style="
-margin-top:10px;
-font-size:13px;
-opacity:.8;
-">
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard"><h2>💎 Cyber Upgrade Market</h2><p style="margin-top:10px;">Neon-powered upgrades for elite miners</p></div>
+<div style="padding:20px;display:grid;gap:16px;">
+<div class="shopCard epic"><div class="badge">EPIC</div><div class="ownedTag" id="turboOwned">NOT OWNED</div><h3>⚡ Turbo Miner</h3><p>Mining power x2 boost</p><div class="price">💰 <span id="turboPriceText">200</span> Coins</div><button class="shopBtn" onclick="buyTurbo()">UPGRADE</button><div id="turboTimer" style="margin-top:10px;font-size:13px;opacity:.8;"></div></div>
+<div class="shopCard rare"><div class="badge">RARE</div><div class="ownedTag" id="energyOwned">NOT OWNED</div><h3>🔋 Energy Core</h3><p>Auto mines coins every 15 seconds for 2 hours</p><div class="price">💰 <span id="autoMinerPriceText">300</span> Coins</div><button class="shopBtn" onclick="buyEnergy()">INSTALL</button><div id="energyTimer" style="margin-top:10px;font-size:13px;opacity:.8;"></div></div>
+<div class="shopCard legendary"><div class="badge">LEGENDARY</div><div class="ownedTag" id="xpOwned">NOT OWNED</div><h3>💎 XP Booster</h3><p>Faster leveling system</p><div class="price">💰 <span id="xpPriceText">400</span> Coins</div><button class="shopBtn" onclick="buyXP()">ACTIVATE</button><div id="xpTimer" style="margin-top:10px;font-size:13px;opacity:.8;"></div></div>
 </div>
 </div>
 
-<!-- ENERGY -->
-<div class="shopCard rare">
-  <div class="badge">RARE</div>
-  <div class="ownedTag" id="energyOwned">NOT OWNED</div>
-
-  <h3>🔋 Energy Core</h3>
- <p>Auto mines coins every 15 seconds for 2 hours</p> 
-
-  <div class="price">💰 <span id="autoMinerPriceText">300</span> Coins</div>
-
-  <button class="shopBtn" onclick="buyEnergy()">
-INSTALL
-</button>
-
-<div id="energyTimer"
-style="
-margin-top:10px;
-font-size:13px;
-opacity:.8;
-">
-</div>
-</div>
-
-<!-- XP -->
-<div class="shopCard legendary">
-  <div class="badge">LEGENDARY</div>
-  <div class="ownedTag" id="xpOwned">NOT OWNED</div>
-
-  <h3>💎 XP Booster</h3>
-  <p>Faster leveling system</p>
-
-  <div class="price">💰 <span id="xpPriceText">400</span> Coins</div>
-
-  <button class="shopBtn" onclick="buyXP()">
-ACTIVATE
-</button>
-
-<div id="xpTimer"
-style="
-margin-top:10px;
-font-size:13px;
-opacity:.8;
-">
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
- <!-- MISSION SCREEN -->
+<!-- MISSION SCREEN -->
 <div id="missionScreen" class="screen">
-
-<button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-<div class="heroCard">
-
-<h2>🎯 Daily Missions</h2>
-
-<p style="margin-top:10px;">
-Complete missions and earn rewards
-</p>
-
-</div>
-
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard"><h2>🎯 Daily Missions</h2><p style="margin-top:10px;">Complete missions and earn rewards</p></div>
 <div style="padding:20px;">
-
-<div class="card">
-
-<h3>⛏ Mine 50 Times</h3>
-
-<p id="mineMissionText">
-0 / 50
-</p>
-
-<button
-class="playBtn"
-id="mineMissionBtn"
-onclick="claimMineMission()">
-CLAIM
-</button>
-
+<div class="card"><h3>⛏ Mine 50 Times</h3><p id="mineMissionText">0 / 50</p><button class="playBtn" id="mineMissionBtn" onclick="claimMineMission()">CLAIM</button></div>
+<div class="card"><h3>🎰 Open 3 Chests</h3><p id="chestMissionText">0 / 3</p><button class="playBtn" id="chestMissionBtn" onclick="claimChestMission()">CLAIM</button></div>
+<div class="card"><h3>🏆 Reach Level 5</h3><p id="levelMissionText">Level 1 / 5</p><button class="playBtn" id="levelMissionBtn" onclick="claimLevelMission()">CLAIM</button></div>
+</div>
 </div>
 
-<div class="card">
-
-<h3>🎰 Open 3 Chests</h3>
-
-<p id="chestMissionText">
-0 / 3
-</p>
-
-<button
-class="playBtn"
-id="chestMissionBtn"
-onclick="claimChestMission()">
-CLAIM
-</button>
-
-</div>
-
-<div class="card">
-
-<h3>🏆 Reach Level 5</h3>
-
-<p id="levelMissionText">
-Level 1 / 5
-</p>
-
-<button
-class="playBtn"
-id="levelMissionBtn"
-onclick="claimLevelMission()">
-CLAIM
-</button>
-
-</div>
-
-</div>
-
-</div>
- <!-- STREAK SCREEN -->
+<!-- STREAK SCREEN -->
 <div id="streakScreen" class="screen">
-
-<button class="backBtn"
-onclick="showScreen('homeScreen')">
-⬅ Back
-</button>
-
-<div class="heroCard">
-
-<h2>🔥 Daily Streak</h2>
-
-<p style="margin-top:10px;">
-Login daily to increase rewards
-</p>
-
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard"><h2>🔥 Daily Streak</h2><p style="margin-top:10px;">Login daily to increase rewards</p></div>
+<div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+<div class="card" id="day1"><h3>Day 1</h3><p>💰 50 Coins</p></div>
+<div class="card" id="day2"><h3>Day 2</h3><p>💰 100 Coins</p></div>
+<div class="card" id="day3"><h3>Day 3</h3><p>🎰 Free Chest</p></div>
+<div class="card" id="day4"><h3>Day 4</h3><p>⚡ XP Boost</p></div>
+<div class="card" id="day5"><h3>Day 5</h3><p>💎 500 Coins</p></div>
+<div class="card" id="day6"><h3>Day 6</h3><p>🚀 Mine Power +2</p></div>
+<div class="card" id="day7"><h3>Day 7</h3><p>🔥 JACKPOT 1000</p></div>
+</div>
+<div style="text-align:center;"><button id="streakBtn" class="spinBtn" onclick="claimStreak()">CLAIM STREAK</button></div>
 </div>
 
-<div style="
-padding:20px;
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-">
-
-<div class="card" id="day1">
-<h3>Day 1</h3>
-<p>💰 50 Coins</p>
-</div>
-
-<div class="card" id="day2">
-<h3>Day 2</h3>
-<p>💰 100 Coins</p>
-</div>
-
-<div class="card" id="day3">
-<h3>Day 3</h3>
-<p>🎰 Free Chest</p>
-</div>
-
-<div class="card" id="day4">
-<h3>Day 4</h3>
-<p>⚡ XP Boost</p>
-</div>
-
-<div class="card" id="day5">
-<h3>Day 5</h3>
-<p>💎 500 Coins</p>
-</div>
-
-<div class="card" id="day6">
-<h3>Day 6</h3>
-<p>🚀 Mine Power +2</p>
-</div>
-
-<div class="card" id="day7">
-<h3>Day 7</h3>
-<p>🔥 JACKPOT 1000</p>
-</div>
-
-</div>
-
-<div style="text-align:center;">
-
-<button
-id="streakBtn"
-class="spinBtn"
-onclick="claimStreak()">
-CLAIM STREAK
-</button>
-
-</div>
-
-</div>
-<!-- AUDIO -->
 <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
-
 <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
-
 <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>
 
 <!-- NAV -->
 <div class="bottomNav">
-
-<div class="navItem active" onclick="showScreen('homeScreen')">
-<div class="navIcon">🏠</div>
-Home
+<div class="navItem active" onclick="showScreen('homeScreen')"><div class="navIcon">🏠</div>Home</div>
+<div class="navItem" onclick="showScreen('spinScreen')"><div class="navIcon">🎰</div>Spin</div>
+<div class="navItem" onclick="showScreen('taskScreen')"><div class="navIcon">📋</div>Tasks</div>
+<div class="navItem" onclick="showScreen('shopScreen')"><div class="navIcon">💎</div>Shop</div>
+<div class="navItem" onclick="showScreen('leaderboardScreen')"><div class="navIcon">🏆</div>Top</div>
+<div class="navItem" onclick="showScreen('referralScreen')"><div class="navIcon">👥</div>Refer</div>
 </div>
 
-<div class="navItem" onclick="showScreen('spinScreen')">
-<div class="navIcon">🎰</div>
-Spin
-</div>
-
-<div class="navItem" onclick="showScreen('taskScreen')">
-<div class="navIcon">📋</div>
-Tasks
-</div>
-
-<div class="navItem" onclick="showScreen('shopScreen')">
-<div class="navIcon">💎</div>
-Shop
-</div>
-
-<div class="navItem" onclick="showScreen('leaderboardScreen')">
-<div class="navIcon">🏆</div>
-Top
-</div>
-
- <div class="navItem" onclick="showScreen('referralScreen')">
-<div class="navIcon">👥</div>
-Refer
-</div>
-
-</div>
 <!-- REWARD POPUP -->
-
-<div id="rewardPopup" style="
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%) scale(.7);
-width:320px;
-padding:30px;
-border-radius:28px;
-background:
-linear-gradient(145deg,
-rgba(20,20,20,.96),
-rgba(40,40,40,.96)
-);
-
-border:2px solid rgba(255,215,0,.4);
-
-text-align:center;
-
-z-index:999999;
-
-display:none;
-
-backdrop-filter:blur(20px);
-
-box-shadow:
-0 0 40px rgba(255,215,0,.25),
-0 0 120px rgba(255,140,0,.2);
-
-transition:.3s;
-">
-
-<div id="rewardEmoji"
-style="
-font-size:80px;
-margin-bottom:12px;
-">
-🔥
+<div id="rewardPopup" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.7);width:320px;padding:30px;border-radius:28px;background:linear-gradient(145deg,rgba(20,20,20,.96),rgba(40,40,40,.96));border:2px solid rgba(255,215,0,.4);text-align:center;z-index:999999;display:none;backdrop-filter:blur(20px);box-shadow:0 0 40px rgba(255,215,0,.25),0 0 120px rgba(255,140,0,.2);transition:.3s;">
+<div id="rewardEmoji" style="font-size:80px;margin-bottom:12px;">🔥</div>
+<div id="rewardTitle" style="font-size:32px;font-weight:900;color:#ffd54a;text-shadow:0 0 20px #ff9800;">LEGENDARY</div>
+<div id="rewardCoins" style="margin-top:14px;font-size:24px;font-weight:bold;">+500 Coins</div>
 </div>
 
-<div id="rewardTitle"
-style="
-font-size:32px;
-font-weight:900;
-color:#ffd54a;
-text-shadow:0 0 20px #ff9800;
-">
-LEGENDARY
+<!-- OFFLINE REWARD POPUP -->
+<div id="offlinePopup" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);width:340px;padding:28px;border-radius:28px;background:linear-gradient(145deg,rgba(10,10,20,.96),rgba(25,25,40,.96));border:1px solid rgba(0,255,255,.3);backdrop-filter:blur(18px);box-shadow:0 0 40px rgba(0,255,255,.25),0 0 80px rgba(138,46,255,.2);z-index:999999;display:none;text-align:center;transition:.3s;">
+<div style="font-size:70px;margin-bottom:10px;filter:drop-shadow(0 0 20px cyan);">⚡</div>
+<div style="font-size:30px;font-weight:900;color:#00ffff;text-shadow:0 0 20px cyan;">OFFLINE REWARD</div>
+<div id="offlineCoins" style="margin-top:18px;font-size:26px;font-weight:bold;color:#ffd54a;">+0 Coins</div>
+<div style="margin-top:10px;opacity:.8;font-size:14px;line-height:1.5;">Your miners worked while you were away</div>
+<button onclick="claimOfflineReward()" class="shopBtn" style="margin-top:22px;">CLAIM NOW</button>
 </div>
 
-<div id="rewardCoins"
-style="
-margin-top:14px;
-font-size:24px;
-font-weight:bold;
-">
-+500 Coins
-</div>
+<div id="toast" style="position:fixed;top:30px;left:50%;transform:translateX(-50%);background:rgba(0,255,255,0.15);border:1px solid #00ffff;padding:14px 24px;border-radius:15px;backdrop-filter:blur(15px);color:#00ffff;font-weight:bold;display:none;z-index:99999;box-shadow:0 0 20px rgba(0,255,255,0.4);">TEXT</div>
 
-</div> 
- <!-- OFFLINE REWARD POPUP -->
-
-<div id="offlinePopup" style="
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%) scale(.8);
-width:340px;
-padding:28px;
-border-radius:28px;
-background:
-linear-gradient(145deg,
-rgba(10,10,20,.96),
-rgba(25,25,40,.96)
-);
-border:1px solid rgba(0,255,255,.3);
-backdrop-filter:blur(18px);
-box-shadow:
-0 0 40px rgba(0,255,255,.25),
-0 0 80px rgba(138,46,255,.2);
-z-index:999999;
-display:none;
-text-align:center;
-transition:.3s;
-">
-
-<div style="
-font-size:70px;
-margin-bottom:10px;
-filter:drop-shadow(0 0 20px cyan);
-">
-⚡
-</div>
-
-<div style="
-font-size:30px;
-font-weight:900;
-color:#00ffff;
-text-shadow:0 0 20px cyan;
-">
-OFFLINE REWARD
-</div>
-
-<div id="offlineCoins" style="
-margin-top:18px;
-font-size:26px;
-font-weight:bold;
-color:#ffd54a;
-">
-+0 Coins
-</div>
-
-<div style="
-margin-top:10px;
-opacity:.8;
-font-size:14px;
-line-height:1.5;
-">
-Your miners worked while you were away
-</div>
-
-<button
-onclick="claimOfflineReward()"
-class="shopBtn"
-style="margin-top:22px;">
-CLAIM NOW
-</button>
-
-</div>
-<!-- TOAST -->
-
-<div id="toast" style="
-position:fixed;
-top:30px;
-left:50%;
-transform:translateX(-50%);
-background:rgba(0,255,255,0.15);
-border:1px solid #00ffff;
-padding:14px 24px;
-border-radius:15px;
-backdrop-filter:blur(15px);
-color:#00ffff;
-font-weight:bold;
-display:none;
-z-index:99999;
-box-shadow:0 0 20px rgba(0,255,255,0.4);
-">
-TEXT
-</div>
- 
 <script>
-  const firebaseConfig = {
-
-apiKey: "AIzaSyCmIuzJc_FvRNr60JOZ6xwVsJMMUG7-_rc",
-
-authDomain: "nilma-coin.firebaseapp.com",
-
-projectId: "nilma-coin",
-
-storageBucket: "nilma-coin.firebasestorage.app",
-
-messagingSenderId: "225704570854",
-
-appId: "1:225704570854:web:c0389fb2e31a1adb643027"
-
+// ===================== FIREBASE =====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCmIuzJc_FvRNr60JOZ6xwVsJMMUG7-_rc",
+  authDomain: "nilma-coin.firebaseapp.com",
+  projectId: "nilma-coin",
+  storageBucket: "nilma-coin.firebasestorage.app",
+  messagingSenderId: "225704570854",
+  appId: "1:225704570854:web:c0389fb2e31a1adb643027"
 };
-
 let db = null;
-
-try{
-
-firebase.initializeApp(firebaseConfig);
-
-db = firebase.firestore();
-
-}catch(err){
-
-console.log("Firebase Init Error:", err);
-
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch(err) {
+  console.log("Firebase Init Error:", err);
 }
 
-/* DATA */
-
+// ===================== DATA =====================
 let coins = parseInt(localStorage.getItem("coins")) || 0;
 let energy = parseInt(localStorage.getItem("energy")) || 100;
 let level = parseInt(localStorage.getItem("level")) || 1;
 let xp = parseInt(localStorage.getItem("xp")) || 0;
-
 let xpMax = parseInt(localStorage.getItem("xpMax")) || 100;
-
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
-let lastSpin = parseInt(localStorage.getItem("lastSpin")) || 0;
- let freeSpinUsed =
-localStorage.getItem("freeSpinUsed") || "no"; 
-
-let maxEnergy =
-parseInt(localStorage.getItem("maxEnergy")) || 100;
-
+let maxEnergy = parseInt(localStorage.getItem("maxEnergy")) || 100;
 let taskDone = false;
-
-let minePower =
-parseInt(localStorage.getItem("minePower")) || 1;
-
-let xpBoost =
-parseInt(localStorage.getItem("xpBoost")) || 1; 
- let turboPrice =
-parseInt(localStorage.getItem("turboPrice")) || 200;
-
-let autoMinerPrice =
-parseInt(localStorage.getItem("autoMinerPrice")) || 300;
-
-let xpPrice =
-parseInt(localStorage.getItem("xpPrice")) || 400;
-
-/* ACTIVE TIMERS */
-
-let turboEnd =
-parseInt(localStorage.getItem("turboEnd")) || 0;
-
-let autoMinerEnd =
-parseInt(localStorage.getItem("autoMinerEnd")) || 0;
-
-let xpEnd =
-parseInt(localStorage.getItem("xpEnd")) || 0;
- /* OFFLINE MINING */
-
-let lastOnline =
-parseInt(localStorage.getItem("lastOnline")) || Date.now();
-
-let vipOfflineHours = 1;
-
-let offlineClaimed =
-localStorage.getItem("offlineClaimed") || "yes";
-
-let offlineCooldown =
-parseInt(localStorage.getItem("offlineCooldown")) || 0;
+let facebookTaskDone = false;
+let minePower = parseInt(localStorage.getItem("minePower")) || 1;
+let xpBoost = parseInt(localStorage.getItem("xpBoost")) || 1;
+let turboPrice = parseInt(localStorage.getItem("turboPrice")) || 200;
+let autoMinerPrice = parseInt(localStorage.getItem("autoMinerPrice")) || 300;
+let xpPrice = parseInt(localStorage.getItem("xpPrice")) || 400;
+let turboEnd = parseInt(localStorage.getItem("turboEnd")) || 0;
+let autoMinerEnd = parseInt(localStorage.getItem("autoMinerEnd")) || 0;
+let xpEnd = parseInt(localStorage.getItem("xpEnd")) || 0;
+let lastOnline = parseInt(localStorage.getItem("lastOnline")) || Date.now();
+let offlineCooldown = parseInt(localStorage.getItem("offlineCooldown")) || 0;
 let spinning = false;
- let paidChestPrice =
-parseInt(
-localStorage.getItem("paidChestPrice")
-) || 20; 
+let paidChestPrice = parseInt(localStorage.getItem("paidChestPrice")) || 20;
+let freeSpinUsed = localStorage.getItem("freeSpinUsed") || "no";
+let referrals = parseInt(localStorage.getItem("referrals")) || 0;
+let freeSpins = parseInt(localStorage.getItem("freeSpins")) || 0;
+let rareCrates = parseInt(localStorage.getItem("rareCrates")) || 0;
+let mineMission = parseInt(localStorage.getItem("mineMission")) || 0;
+let chestMission = parseInt(localStorage.getItem("chestMission")) || 0;
+let mineMissionClaimed = localStorage.getItem("mineMissionClaimed") || "no";
+let chestMissionClaimed = localStorage.getItem("chestMissionClaimed") || "no";
+let levelMissionClaimed = localStorage.getItem("levelMissionClaimed") || "no";
+let streakDay = parseInt(localStorage.getItem("streakDay")) || 0;
+let lastStreakClaim = parseInt(localStorage.getItem("lastStreakClaim")) || 0;
 
-let currentRotation = 0;
-
+// ===================== TELEGRAM =====================
 let tg = window.Telegram?.WebApp || null;
-
 let username = "Player";
 let telegramId = "guest_" + Date.now();
 let playerId = telegramId.toString();
-
-let profilePhoto =
-"https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
-/* TELEGRAM SAFE LOAD */
-
-try{
-
-
-if(tg){
-  tg.expand();
-}
-
-if("Notification" in window){
-
-if(Notification.permission !== "granted"){
-
-try{
-
-Notification.requestPermission();
-
-}catch(e){
-
-console.log(e);
-
-}
-
-}
-
-}
-
-let user = tg.initDataUnsafe?.user;
-
-if(user){
-
-username =
-user.username ||
-user.first_name ||
-"TelegramUser";
-
-profilePhoto =
-user.photo_url ||
-profilePhoto;
-
-telegramId = user.id;
-
-playerId = telegramId.toString();
-
-}
-
-
-}catch(err){
-
-console.log("Telegram Error:", err);
-
-}
-
- let firstJoin =
-localStorage.getItem("firstJoin");
-let startParam =
-tg?.initDataUnsafe?.start_param; 
- let referrals =
-parseInt(
-localStorage.getItem("referrals")
-) || 0;
- let freeSpins =
-parseInt(
-localStorage.getItem("freeSpins")
-) || 0;
-
-let rareCrates =
-parseInt(
-localStorage.getItem("rareCrates")
-) || 0;
- /* MISSIONS */
-
-let mineMission =
-parseInt(
-localStorage.getItem("mineMission")
-) || 0;
-
-let chestMission =
-parseInt(
-localStorage.getItem("chestMission")
-) || 0;
-
-let mineMissionClaimed =
-localStorage.getItem(
-"mineMissionClaimed"
-) || "no";
-
-let chestMissionClaimed =
-localStorage.getItem(
-"chestMissionClaimed"
-) || "no";
-
-let levelMissionClaimed =
-localStorage.getItem(
-"levelMissionClaimed"
-) || "no";
- /* STREAK */
-
-let streakDay =
-parseInt(
-localStorage.getItem("streakDay")
-) || 0;
-
-let lastStreakClaim =
-parseInt(
-localStorage.getItem("lastStreakClaim")
-) || 0;
-let taskLinks = {
-  facebook: "https://www.facebook.com/share/1Luby3B6ys/",
-  instagram: "https://www.instagram.com/nilmacoin?igsh=bWJ5dzJ0ZXVucmU1"
-}; 
-
-/* LOAD PLAYER DATA */
-
-
-/* START */
-
-async function loadPlayerData(){
-
-try{
-
-const playerRef =
-db.collection("players")
-.doc(playerId);
-
-const docSnap =
-await playerRef.get();
-
-if(docSnap.exists){
-
-const data = docSnap.data();
-
-/* ONLY overwrite if cloud has real data */
-
-if(data.coins != null){
-
-coins = data.coins;
-
-}
-
-if(data.energy != null){
-
-energy = data.energy;
-
-}
-
-if(data.level != null){
-
-level = data.level;
-
-}
-
-if(data.xp != null){
-
-xp = data.xp;
-
-}
-
-if(data.minePower != null){
-
-minePower = data.minePower;
-
-}
-
-if(data.xpBoost != null){
-
-xpBoost = data.xpBoost;
-
-}
- if(data.referrals != null){
-
-referrals = data.referrals;
-
-}
-
-update();
-
-showToast("☁️ Cloud Data Loaded");
-
-}else{
-
-save();
-
-}
-
-}catch(err){
-
-console.log(err);
-
-console.error(err);
-
-showToast(err.message);
-
-}
-
-}
-
-/* SCREEN SYSTEM */
-function showScreen(screenId){
-
-  document.querySelectorAll(".screen")
-  .forEach(screen=>{
-    screen.classList.remove("active");
-  });
-
-  document.getElementById(screenId)
-  .classList.add("active");
-
-  document.querySelectorAll(".navItem")
-  .forEach(item=>{
-    item.classList.remove("active");
-  });
-
-  if(screenId === "homeScreen"){
-    document.querySelectorAll(".navItem")[0]
-    .classList.add("active");
+let profilePhoto = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+try {
+  if (tg) tg.expand();
+  let user = tg?.initDataUnsafe?.user;
+  if (user) {
+    username = user.username || user.first_name || "TelegramUser";
+    profilePhoto = user.photo_url || profilePhoto;
+    telegramId = user.id;
+    playerId = telegramId.toString();
   }
-
-  if(screenId === "spinScreen"){
-    document.querySelectorAll(".navItem")[1]
-    .classList.add("active");
-  }
-
-  if(screenId === "taskScreen"){
-    document.querySelectorAll(".navItem")[2]
-    .classList.add("active");
-  }
-
-  if(screenId === "shopScreen"){
-    document.querySelectorAll(".navItem")[3]
-    .classList.add("active");
-  }
-
-  if(screenId === "leaderboardScreen"){
-    document.querySelectorAll(".navItem")[4]
-    .classList.add("active");
-  }
- if(screenId === "referralScreen"){
-document.querySelectorAll(".navItem")[5]
-.classList.add("active");
-}
-if(screenId === "leaderboardScreen"){
-
-loadLeaderboard();
-
-} 
+} catch(err) {
+  console.log("Telegram Error:", err);
 }
 
+// First join bonus
+let firstJoin = localStorage.getItem("firstJoin");
+if (!firstJoin) {
+  coins += 500;
+  localStorage.setItem("firstJoin", "yes");
+}
 
-/* UPDATE UI */
+// ===================== FIREBASE LOAD =====================
+async function loadPlayerData() {
+  try {
+    const playerRef = db.collection("players").doc(playerId);
+    const docSnap = await playerRef.get();
+    if (docSnap.exists) {
+      const data = docSnap.data();
+      if (data.coins != null) coins = data.coins;
+      if (data.energy != null) energy = data.energy;
+      if (data.level != null) level = data.level;
+      if (data.xp != null) xp = data.xp;
+      if (data.minePower != null) minePower = data.minePower;
+      if (data.xpBoost != null) xpBoost = data.xpBoost;
+      if (data.referrals != null) referrals = data.referrals;
+      update();
+      showToast("☁️ Cloud Data Loaded");
+    } else {
+      save();
+    }
+  } catch(err) {
+    console.log(err);
+  }
+}
 
+// ===================== SCREEN =====================
+function showScreen(screenId) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(screenId).classList.add("active");
+  document.querySelectorAll(".navItem").forEach(i => i.classList.remove("active"));
+  const map = {homeScreen:0,spinScreen:1,taskScreen:2,shopScreen:3,leaderboardScreen:4,referralScreen:5};
+  const idx = map[screenId];
+  if (idx !== undefined) {
+    const items = document.querySelectorAll(".navItem");
+    if (items[idx]) items[idx].classList.add("active");
+  }
+  if (screenId === "leaderboardScreen") loadLeaderboard();
+}
+
+// ===================== UPDATE UI =====================
 function update() {
-
- let balanceEl = document.getElementById("balance");
-if(balanceEl){
-  balanceEl.innerText = coins;
- updateShopUI();
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+  set("balance", coins);
+  set("energy", energy);
+  set("profileLevel", level);
+  set("profilePower", minePower);
+  set("profileRefs", referrals);
+  set("profileName", username);
+  set("freeSpinsText", freeSpins);
+  set("rareCratesText", rareCrates);
+  const profileImage = document.getElementById("profilePhoto");
+  if (profileImage) profileImage.src = profilePhoto;
+  let xpPercent = Math.min((xp / xpMax) * 100, 100);
+  const xpBar = document.getElementById("xpBar");
+  if (xpBar) xpBar.style.width = xpPercent + "%";
+  updateShopUI();
 }
 
-let energyEl = document.getElementById("energy");
-if(energyEl){
-  energyEl.innerText = energy;
-} 
- let levelEl =
-document.getElementById("profileLevel");
-
-if(levelEl){
-
-levelEl.innerText = level;
-
-}
- let spinsText =
-document.getElementById(
-"freeSpinsText"
-);
-
-if(spinsText){
-
-spinsText.innerText =
-freeSpins;
-
-}
-
-let cratesText =
-document.getElementById(
-"rareCratesText"
-);
-
-if(cratesText){
-
-cratesText.innerText =
-rareCrates;
-
-}
- /* PROFILE */
-
-let profileName =
-document.getElementById(
-"profileName"
-);
-
-if(profileName){
-
-profileName.innerText =
-username;
-
-}
-
-let profileLevel =
-document.getElementById(
-"profileLevel"
-);
-
-if(profileLevel){
-
-profileLevel.innerText =
-level;
-
-}
-
-let profilePower =
-document.getElementById(
-"profilePower"
-);
-
-if(profilePower){
-
-profilePower.innerText =
-minePower;
-
-}
-
-let profileRefs =
-document.getElementById(
-"profileRefs"
-);
-
-if(profileRefs){
-
-profileRefs.innerText =
-referrals;
-
-}
-
-let profileImage =
-document.getElementById(
-"profilePhoto"
-);
-
-if(profileImage){
-
-profileImage.src =
-profilePhoto;
-
-}
-
-  let xpPercent = (xp / xpMax) * 100;
-  let xpBar = document.getElementById("xpBar");
-
-if(xpBar){
-  xpBar.style.width = xpPercent + "%";
-}
-
-let progressFill = document.querySelector(".progressFill");
-
-if(progressFill){
-  progressFill.style.width = xpPercent + "%";
-}
-
-}
-
-/* SAVE */
-
+// ===================== SAVE =====================
 function save() {
-setSaveStatus("☁️ Saving...","#ffd54a");
   localStorage.setItem("coins", coins);
   localStorage.setItem("energy", energy);
   localStorage.setItem("level", level);
   localStorage.setItem("xp", xp);
   localStorage.setItem("xpMax", xpMax);
   localStorage.setItem("maxEnergy", maxEnergy);
-localStorage.setItem("minePower", minePower);
-localStorage.setItem("xpBoost", xpBoost);
- localStorage.setItem(
-"freeSpins",
-freeSpins
-);
-
-localStorage.setItem(
-"rareCrates",
-rareCrates
-);
-/* ANTI CHEAT */
-
-let maxPossibleCoins =
-(level * 5000) + 50000;
-
-if(coins > maxPossibleCoins){
-
-coins = maxPossibleCoins;
-
-showToast("Cheat detected");
-
-}
- if(coins < 0){
-coins = 0;
-}
-
-if(level < 1){
-level = 1;
-}
-
-if(energy < 0){
-energy = 0;
-}
- if(xp > xpMax * 5){
-
-xp = xpMax;
-
-}
-  if(db){
-
-db.collection("players")
-.doc(playerId)
-.set({
-
-username: username || "Player",
-coins: coins,
-energy: energy,
-level: level,
-xp: xp,
-minePower: minePower,
-xpBoost: xpBoost,
-xpMax: xpMax,
-maxEnergy: maxEnergy,
-paidChestPrice: paidChestPrice,
-referrals: referrals,
-freeSpins: freeSpins,
-rareCrates: rareCrates,
-updated: Date.now()
-
-},{merge:true})
-
-.then(()=>{
-
-console.log("Cloud saved");
-
-})
-
-.catch((err)=>{
-
-console.log(err);
-
-});
-
-}
- 
-  localStorage.setItem(
-"paidChestPrice",
-paidChestPrice
-);
-}
-
-/* MINE */
-function mine(event) {
-
-  if (energy <= 0) {
-    showToast("No energy!");
-    return;
+  localStorage.setItem("minePower", minePower);
+  localStorage.setItem("xpBoost", xpBoost);
+  localStorage.setItem("freeSpins", freeSpins);
+  localStorage.setItem("rareCrates", rareCrates);
+  localStorage.setItem("paidChestPrice", paidChestPrice);
+  // Anti-cheat
+  let maxPossibleCoins = (level * 5000) + 50000;
+  if (coins > maxPossibleCoins) { coins = maxPossibleCoins; }
+  if (coins < 0) coins = 0;
+  if (level < 1) level = 1;
+  if (energy < 0) energy = 0;
+  if (xp > xpMax * 5) xp = xpMax;
+  if (db) {
+    db.collection("players").doc(playerId).set({
+      username: username || "Player",
+      coins, energy, level, xp,
+      minePower, xpBoost, xpMax, maxEnergy,
+      paidChestPrice, referrals, freeSpins, rareCrates,
+      updated: Date.now()
+    }, {merge:true}).catch(err => console.log(err));
   }
+}
 
+// ===================== MINE =====================
+function mine(event) {
+  if (energy <= 0) { showToast("No energy!"); return; }
   let crit = Math.random() < 0.1;
-
-let earned = crit
-? minePower * 5
-: minePower;
-
-coins += earned;
- mineMission++;
-
-localStorage.setItem(
-"mineMission",
-mineMission
-);
-
- if(crit){
-
-showToast(
-"💥 ULTRA STRIKE  +" + earned + " COINS"
-);
-
-const mineBtn = document.querySelector(".mineBtn");
-
-if(mineBtn){
-
-mineBtn.style.boxShadow = `
-0 0 60px rgba(255,0,80,.9),
-0 0 140px rgba(255,120,0,.8)
-`;
-
-setTimeout(()=>{
-
-mineBtn.style.boxShadow = `
-0 0 40px rgba(255,170,0,.7),
-0 0 100px rgba(255,140,0,.5)
-`;
-
-},300);
-
-}
-  
-setTimeout(()=>{
-
-xp += 2 * xpBoost;
+  let earned = crit ? minePower * 5 : minePower;
+  coins += earned;
+  xp += 2 * xpBoost;   // FIX: was broken syntax
   energy -= 1;
+  mineMission++;
+  localStorage.setItem("mineMission", mineMission);
+  if (crit) {
+    showToast("💥 ULTRA STRIKE +" + earned + " COINS");
+    const reactor = document.getElementById("reactorWrap");
+    if (reactor) {
+      reactor.style.boxShadow = "0 0 60px rgba(255,0,80,.9)";
+      setTimeout(() => { reactor.style.boxShadow = ""; }, 300);
+    }
+  }
   const reactor = document.getElementById("reactorWrap");
-
-if(reactor){
-
-reactor.style.transform = "scale(.95)";
-
-setTimeout(()=>{
-  reactor.style.transform = "scale(1)";
-},100);
-
-}
-
+  if (reactor) {
+    reactor.style.transform = "scale(.95)";
+    setTimeout(() => { reactor.style.transform = "scale(1)"; }, 100);
+  }
   checkLevelUp();
-  if(window.Telegram?.WebApp){
-
-Telegram.WebApp.HapticFeedback
-.impactOccurred("light");
-
-}
-
+  if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred("light");
   save();
   update();
-
   let x = event?.clientX || window.innerWidth / 2;
-let y = event?.clientY || window.innerHeight / 2;
-
-showCoin(x, y);
-
-  document.getElementById("clickSound").play().catch(()=>{});
+  let y = event?.clientY || window.innerHeight / 2;
+  showCoin(x, y, earned);
+  document.getElementById("clickSound").play().catch(() => {});
 }
 
-/* LEVEL */
-
+// ===================== LEVEL =====================
 function checkLevelUp() {
-
   if (xp >= xpMax) {
-
     xp -= xpMax;
-
     level += 1;
     coins += level * 50;
-
     xpMax = Math.floor(xpMax * 1.5);
-showToast(
-"LEVEL UP! +" + (level * 50) + " Coins"
-);
-
+    showToast("LEVEL UP! +" + (level * 50) + " Coins");
     save();
     update();
   }
 }
 
-/* FLOAT COIN */
-function showCoin(x,y){
-
+// ===================== FLOAT COIN =====================
+function showCoin(x, y, amount) {
   let coin = document.createElement("div");
-
   coin.className = "coin";
-
-  coin.innerHTML = "+" + minePower;
-
+  coin.innerHTML = "+" + amount;
   coin.style.left = x + "px";
   coin.style.top = y + "px";
-
   document.body.appendChild(coin);
-
-  setTimeout(()=>{
-    coin.remove();
-  },1000);
+  setTimeout(() => coin.remove(), 1000);
 }
 
-/* DAILY */
-
+// ===================== DAILY =====================
 function daily() {
-
   let now = Date.now();
-
-  if (now - lastDaily < 86400000) {
-
-   showToast("Come back tomorrow!");
-    return;
-  }
-
+  if (now - lastDaily < 86400000) { showToast("Come back tomorrow!"); return; }
   coins += 50;
-
   lastDaily = now;
- updateDailyTimer();
- 
   localStorage.setItem("lastDaily", lastDaily);
-
   save();
   update();
-
+  updateDailyTimer();
   showToast("+50 Coins");
 }
-/* LOADING SCREEN */
 
-let load = 0;
-
-let loadingInterval =
-setInterval(()=>{
-
-load += Math.random() * 20;
-
-if(load >= 100){
-
-load = 100;
-
-clearInterval(loadingInterval);
-
-setTimeout(()=>{
-
-document.getElementById(
-"loadingScreen"
-).style.opacity = "0";
-
-document.getElementById(
-"loadingScreen"
-).style.transition = "0.5s";
-
-setTimeout(()=>{
-
-let loader =
-document.getElementById("loadingScreen");
-
-if(loader){
-
-loader.remove();
-
+function updateDailyTimer() {
+  let btn = document.getElementById("dailyBtn");
+  let timer = document.getElementById("dailyTimer");
+  if (!btn || !timer) return;
+  let now = Date.now();
+  let remaining = 86400000 - (now - lastDaily);
+  if (remaining <= 0) {
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    timer.innerText = "✅ Reward Ready";
+    return;
+  }
+  btn.disabled = true;
+  btn.style.opacity = ".6";
+  let hours = Math.floor(remaining / 3600000);
+  let minutes = Math.floor((remaining % 3600000) / 60000);
+  let seconds = Math.floor((remaining % 60000) / 1000);
+  timer.innerText = "⏳ " + hours + "h " + minutes + "m " + seconds + "s";
 }
 
-},500);
-
-},400);
-
-}
-
-document.getElementById(
-"loadingBar"
-).style.width = load + "%";
-
-},250); 
- function updateDailyTimer(){
-
-let btn =
-document.getElementById("dailyBtn");
-
-let timer =
-document.getElementById("dailyTimer");
-
-if(!btn || !timer) return;
-
-let now = Date.now();
-
-let remaining =
-86400000 - (now - lastDaily);
-
-if(remaining <= 0){
-
-btn.disabled = false;
-
-btn.style.opacity = "1";
-
-timer.innerText =
-"✅ Reward Ready";
-
-return;
-
-}
-
-btn.disabled = true;
-
-btn.style.opacity = ".6";
-
-let hours =
-Math.floor(remaining / 3600000);
-
-let minutes =
-Math.floor(
-(remaining % 3600000) / 60000
-);
-
-let seconds =
-Math.floor(
-(remaining % 60000) / 1000
-);
-
-timer.innerText =
-"⏳ " +
-hours + "h " +
-minutes + "m " +
-seconds + "s";
-
-}
-
-/* TASK */
-
+// ===================== TASKS =====================
 function openInsta() {
-
-window.open("https://www.instagram.com/nilmacoin?igsh=bWJ5dzJ0ZXVucmU1");
-
-taskDone = true;
-
-}
-let facebookTaskDone = false;
-
-function openFacebook(){
-
-window.open("https://www.facebook.com/share/14eXqwaWvzK/");
-
-facebookTaskDone = true;
-
-}
-
-function claimFacebookTask(){
-
-if(!facebookTaskDone){
-
-showToast("Complete Facebook task first!");
-
-return;
-
-}
-
-coins += 30;
-
-save();
-
-update();
-
-showToast("+30 Coins");
-
-facebookTaskDone = false;
-
+  window.open("https://www.instagram.com/nilmacoin?igsh=bWJ5dzJ0ZXVucmU1");
+  taskDone = true;
 }
 function claimTask() {
-
-  if (!taskDone) {
-
-   showToast("Complete task first!");
-    return;
-  }
+  if (!taskDone) { showToast("Complete task first!"); return; }
   coins += 30;
-  save(); 
-  update(); 
-  showToast("+30 Coins");
-  taskDone = false; 
-}
-function openChest(){
-
-if(spinning) return;
-
-let today =
-new Date().toDateString();
-
-let savedDay =
-localStorage.getItem("spinDay");
-
-/* RESET DAILY */
-
-if(savedDay !== today){
-
-localStorage.setItem(
-"spinDay",
-today
-);
-
-freeSpinUsed = "no";
-
-localStorage.setItem(
-"freeSpinUsed",
-"no"
-);
- paidChestPrice = 20;
-
-localStorage.setItem(
-"paidChestPrice",
-20
-); 
-
-}
-
-/* PAID OPEN */
-
-if(freeSpinUsed === "yes"){
-if(coins < paidChestPrice){
-
-showToast("Need " + paidChestPrice + " coins");
-
-return;
-
-}
-
-coins -= paidChestPrice;
-
-save();
-update();
-
-showToast(
-"-" + paidChestPrice + " Coins"
-);
-
-paidChestPrice += 10;
-
-localStorage.setItem(
-"paidChestPrice",
-paidChestPrice
-);
-
-}
-
-/* FREE DAILY */
-
-if(freeSpinUsed === "no"){
-
-freeSpinUsed = "yes";
-
-localStorage.setItem(
-"freeSpinUsed",
-"yes"
-);
-
-showToast("FREE CHEST");
-
-}
- 
-chestMission++;
-
-localStorage.setItem(
-"chestMission",
-chestMission
-);
-spinning = true;
-setTimeout(() => {
-  spinning = false;
-}, 2500);
-
-/* ROULETTE SPIN */
-let chest =
-document.getElementById(
-"cyberChest"
-);
-
- chest.classList.add("opening");
-
-setTimeout(()=>{
-
-chest.classList.remove("opening");
-
-},1800);
- chest.style.boxShadow = `
-0 0 60px rgba(0,255,255,.9),
-0 0 140px rgba(255,0,200,.5)
-`;
-
-chest.style.filter =
-"brightness(1.4)";
-
-/* SOUND */
-
-document
-.getElementById("spinSound")
-.play()
-.catch(()=>{});
-
-/* REWARDS */
-let random = Math.random();
-
-let reward;
-let rarity;
-
-if(random < 0.50){
-
-reward = 5;
-rarity = "Common";
-
-}else if(random < 0.75){
-
-reward = 15;
-rarity = "Rare";
-
-}else if(random < 0.92){
-
-reward = 40;
-rarity = "Epic";
-
-}else if(random < 0.99){
-
-reward = 100;
-rarity = "Legendary";
-
-}else{
-
-reward = 500;
-rarity = "MYTHIC";
-
-}
-let rewardType = "";
-
-if(random < 0.40){
-
-reward = 10;
-rewardType = "coins";
-
-}else if(random < 0.65){
-
-reward = 25;
-rewardType = "coins";
-
-}else if(random < 0.80){
-
-reward = 1;
-rewardType = "spin";
-
-}else if(random < 0.92){
-
-reward = 1;
-rewardType = "crate";
-
-}else if(random < 0.98){
-
-reward = 2;
-rewardType = "xp";
-
-}else{
-
-reward = 1;
-rewardType = "turbo";
-
-}
-
-/* RESULT */
-setTimeout(() => {
-
-if(!document.getElementById("cyberChest")) return;
-
-try {
-
-let rewardText = "";
-
-if(rewardType === "coins"){
-
-coins += reward;
-
-rewardText = "💰 +" + reward + " COINS";
-
-}
-
-if(rewardType === "spin"){
-
-freeSpins += reward;
-
-rewardText = "🎟 FREE SPIN";
-
-}
-
-if(rewardType === "crate"){
-
-rareCrates += reward;
-
-rewardText = "📦 RARE CRATE";
-
-}
-
-if(rewardType === "xp"){
-
-xpBoost += reward;
-
-rewardText = "🔥 XP BOOST +" + reward;
-
-}
-
-if(rewardType === "turbo"){
-
-minePower += reward;
-
-rewardText = "🚀 TURBO +" + reward;
-
-}
-
-chestPopEffect(rewardText);
-
-save();
-update();
-
-document
-.getElementById("winSound")
-.play()
-.catch(()=>{});
-
-/* EFFECTS */
-
-if(rewardType === "turbo"){
-
-triggerRewardEffect("mythic");
-
-}
-
-else if(rewardType === "xp"){
-
-triggerRewardEffect("legendary");
-
-}
-
-else if(rewardType === "crate"){
-
-triggerRewardEffect("epic");
-
-}
-
-
-chest.style.boxShadow = `
-0 0 35px rgba(0,255,255,.4),
-0 0 100px rgba(255,0,200,.2)
-`;
-
-chest.style.filter =
-"brightness(1)";
-spinning = false;
-
-update();
-save();
-
-} catch(e) {
-  console.log("Chest error:", e);
-}
-
-}, 1800);
-
-}
-function openRareCrate(){
-
-if(rareCrates <= 0){
-
-showToast(
-"No rare crates"
-);
-
-return;
-
-}
-
-rareCrates--;
-
-let random =
-Math.random();
-
-let reward;
-
-if(random < 0.50){
-
-reward = 100;
-
-coins += reward;
-
-showRewardPopup(
-"RARE COINS",
-reward,
-"💎"
-);
-
-}else if(random < 0.80){
-
-reward = 3;
-
-xpBoost += reward;
-
-showRewardPopup(
-"XP BOOST",
-reward,
-"🔥"
-);
-
-}else if(random < 0.95){
-
-reward = 2;
-
-minePower += reward;
-
-showRewardPopup(
-"TURBO POWER",
-reward,
-"🚀"
-);
-
-}else{
-
-reward = 1000;
-
-coins += reward;
-
-showRewardPopup(
-"LEGENDARY JACKPOT",
-reward,
-"👑"
-);
- triggerRewardEffect(
-"mythic"
-);
-
-}
-
-save();
-
-update();
-
-}
-/* ENERGY REGEN */
- setInterval(() => { 
-   if (energy < maxEnergy) { 
-     energy += 1; 
-     save();
-     update();
-   } 
- }, 3000); 
-  /* PASSIVE MINING */
-
-setInterval(() => {
-
-let passiveIncome =
-Math.floor(level / 3);
-
-if(Date.now() < autoMinerEnd){
-
-passiveIncome *= 3;
-
-}
-
-coins += passiveIncome;
-
-save();
-update();
-
-},15000);
-
-function loadLeaderboard(){
-
-const board =
-document.getElementById("leaderboardList");
-
-if(!db){
-
-board.innerHTML = "Firebase not connected";
-
-return;
-
-}
-
-board.innerHTML = "Loading...";
-
-db.collection("players")
-.orderBy("coins","desc")
-.limit(10)
-.onSnapshot(snapshot=>{
-
-let html = "";
-
-let rank = 1;
-
-snapshot.forEach(doc=>{
-
-const data = doc.data();
-
-let medal = rank;
-
-if(rank === 1) medal = "🥇";
-if(rank === 2) medal = "🥈";
-if(rank === 3) medal = "🥉";
-
-html += `
-<div class="card" style="
-margin-bottom:12px;
-padding:14px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-">
-<div>
-${medal}
-${data.username || "Unknown"}
-</div>
-
-<div>
-💰 ${data.coins || 0}
-</div>
-</div>
-`;
-
-rank++;
-
-});
-
-board.innerHTML = html;
-
-},err=>{
-
-console.log(err);
-
-board.innerHTML =
-"Failed to load leaderboard";
-
-});
-
-}
- /* MISSIONS */
-
-function updateMissions(){
-
-let mineText =
-document.getElementById(
-"mineMissionText"
-);
-
-let chestText =
-document.getElementById(
-"chestMissionText"
-);
-
-let levelText =
-document.getElementById(
-"levelMissionText"
-);
-
-if(mineText){
-
-mineText.innerText =
-mineMission + " / 50";
-
-}
-
-if(chestText){
-
-chestText.innerText =
-chestMission + " / 3";
-
-}
-
-if(levelText){
-
-levelText.innerText =
-"Level " + level + " / 5";
-
-}
-
-/* BUTTON STATES */
-
-let mineBtn =
-document.getElementById(
-"mineMissionBtn"
-);
-
-if(mineBtn){
-
-if(mineMissionClaimed === "yes"){
-
-mineBtn.innerText = "COMPLETED";
-mineBtn.disabled = true;
-
-}else if(mineMission >= 50){
-
-mineBtn.innerText = "CLAIM";
-
-}else{
-
-mineBtn.innerText = "IN PROGRESS";
-
-}
-
-}
-
-let chestBtn =
-document.getElementById(
-"chestMissionBtn"
-);
-
-if(chestBtn){
-
-if(chestMissionClaimed === "yes"){
-
-chestBtn.innerText = "COMPLETED";
-chestBtn.disabled = true;
-
-}else if(chestMission >= 3){
-
-chestBtn.innerText = "CLAIM";
-
-}else{
-
-chestBtn.innerText = "IN PROGRESS";
-
-}
-
-}
-
-let levelBtn =
-document.getElementById(
-"levelMissionBtn"
-);
-
-if(levelBtn){
-
-if(levelMissionClaimed === "yes"){
-
-levelBtn.innerText = "COMPLETED";
-levelBtn.disabled = true;
-
-}else if(level >= 5){
-
-levelBtn.innerText = "CLAIM";
-
-}else{
-
-levelBtn.innerText = "IN PROGRESS";
-
-}
-
-}
-
-}
-
-/* CLAIMS */
-
-function claimMineMission(){
-
-if(mineMission < 50) return;
-
-if(mineMissionClaimed === "yes")
-return;
-
-coins += 200;
-
-mineMissionClaimed = "yes";
-
-localStorage.setItem(
-"mineMissionClaimed",
-"yes"
-);
-
-save();
-update();
-updateMissions();
-
-showToast(
-"🎯 Mission Complete +200"
-);
-
-}
-
-function claimChestMission(){
-
-if(chestMission < 3) return;
-
-if(chestMissionClaimed === "yes")
-return;
-
-coins += 150;
-
-chestMissionClaimed = "yes";
-
-localStorage.setItem(
-"chestMissionClaimed",
-"yes"
-);
-
-save();
-update();
-updateMissions();
-
-showToast(
-"🎯 Chest Mission +150"
-);
-
-}
-
-function claimLevelMission(){
-
-if(level < 5) return;
-
-if(levelMissionClaimed === "yes")
-return;
-
-coins += 500;
-
-levelMissionClaimed = "yes";
-
-localStorage.setItem(
-"levelMissionClaimed",
-"yes"
-);
-
-save();
-update();
-updateMissions();
-
-showToast(
-"🏆 Level Mission +500"
-);
-
-}
- /* STREAK SYSTEM */
-
-function claimStreak(){
-
-let now = Date.now();
-
-if(now - lastStreakClaim < 86400000){
-
-showToast(
-"Already claimed today"
-);
-
-return;
-
-}
-
-/* RESET IF MISSED 48h */
-
-if(
-now - lastStreakClaim >
-172800000
-){
-
-streakDay = 0;
-
-}
-
-streakDay++;
-
-if(streakDay > 7){
-
-streakDay = 1;
-
-}
-
-lastStreakClaim = now;
-
-localStorage.setItem(
-"streakDay",
-streakDay
-);
-
-localStorage.setItem(
-"lastStreakClaim",
-lastStreakClaim
-);
-
-/* REWARDS */
-
-if(streakDay === 1){
-
-coins += 50;
-
-}
-
-if(streakDay === 2){
-
-coins += 100;
-
-}
-
-if(streakDay === 3){
-
-freeSpinUsed = "no";
-
-localStorage.setItem(
-"freeSpinUsed",
-"no"
-);
-
-}
-
-if(streakDay === 4){
-
-xpBoost += 1;
-
-}
-
-if(streakDay === 5){
-
-coins += 500;
-
-}
-
-if(streakDay === 6){
-
-minePower += 2;
-
-}
-
-if(streakDay === 7){
-
-coins += 1000;
-
-showToast(
-"🔥 JACKPOT DAY!"
-);
-
-}
-
-save();
-update();
-updateStreak();
-
-showToast(
-"🔥 Day " +
-streakDay +
-" Claimed"
-);
-
-}
-
-/* BOOST TIMERS */
-
-setInterval(updateBoostTimers,1000);
-
-function updateBoostTimers(){
-
-let now = Date.now();
-
-let turboTimer =
-document.getElementById("turboTimer");
-
-let energyTimer =
-document.getElementById("energyTimer");
-
-let xpTimer =
-document.getElementById("xpTimer");
-
-/* TURBO */
-
-if(turboTimer){
-
-if(turboEnd > now){
-
-let left =
-Math.floor((turboEnd - now)/1000);
-
-let mins =
-Math.floor(left/60);
-
-let secs = left % 60;
-
-turboTimer.innerText =
-"⏳ " + mins + "m " + secs + "s";
-
-}else{
-
-turboTimer.innerText =
-"Ready to activate";
-
-}
-
-}
-
-/* ENERGY */
-
-if(energyTimer){
-
-if(autoMinerEnd > now){
-
-let left =
-Math.floor((autoMinerEnd - now)/1000);
-
-let mins =
-Math.floor(left/60);
-
-let secs = left % 60;
-
-energyTimer.innerText =
-"⏳ " + mins + "m " + secs + "s";
-
-}else{
-
-energyTimer.innerText =
-"Ready to install";
-
-}
-
-}
-
-/* XP */
-
-if(xpTimer){
-
-if(xpEnd > now){
-
-let left =
-Math.floor((xpEnd - now)/1000);
-
-let mins =
-Math.floor(left/60);
-
-let secs = left % 60;
-
-xpTimer.innerText =
-"⏳ " + mins + "m " + secs + "s";
-
-}else{
-
-xpTimer.innerText =
-"Ready to activate";
-
-}
-
-}
-
-/* ENERGY */
-
-if(autoMinerEnd > now){
-
-let left =
-Math.floor((autoMinerEnd - now)/1000);
-
-let mins =
-Math.floor(left/60);
-
-let secs = left % 60;
-
-energyTimer.innerText =
-"⏳ " + mins + "m " + secs + "s";
-
-}else{
-
-energyTimer.innerText =
-"Ready to install";
-
-}
-
-/* XP */
-
-if(xpEnd > now){
-
-let left =
-Math.floor((xpEnd - now)/1000);
-
-let mins =
-Math.floor(left/60);
-
-let secs = left % 60;
-
-xpTimer.innerText =
-"⏳ " + mins + "m " + secs + "s";
-
-}else{
-
-xpTimer.innerText =
-"Ready to activate";
-
-}
-
-} 
-
-function updateStreak(){
-
-for(let i=1;i<=7;i++){
-
-let card =
-document.getElementById(
-"day"+i
-);
-
-if(!card) continue;
-
-if(i < streakDay){
-
-card.style.border =
-"2px solid #00ff99";
-
-card.style.boxShadow =
-"0 0 20px rgba(0,255,153,.4)";
-
-}
-
-if(i === streakDay){
-
-card.style.border =
-"2px solid #ffd54a";
-
-card.style.boxShadow =
-"0 0 25px rgba(255,213,74,.5)";
-
-}
-
-}
-
-}
- /* REWARD POPUP */
-
-function showRewardPopup(
-title,
-coinsReward,
-emoji
-){
-
-let popup =
-document.getElementById(
-"rewardPopup"
-);
-
-document.getElementById(
-"rewardTitle"
-).innerText = title;
-
-document.getElementById(
-"rewardCoins"
-).innerText =
-"+" + coinsReward + " Coins";
-
-document.getElementById(
-"rewardEmoji"
-).innerText = emoji;
-
-popup.style.display = "block";
-
-setTimeout(()=>{
-
-popup.style.transform =
-"translate(-50%,-50%) scale(1)";
-
-},50);
-
-/* AUTO CLOSE */
-
-setTimeout(()=>{
-
-popup.style.transform =
-"translate(-50%,-50%) scale(.7)";
-
-setTimeout(()=>{
-
-popup.style.display = "none";
-
-},250);
-
-},2200);
-
-}
-  /* TOAST */
-function triggerRewardEffect(type){
-
-let flash =
-document.createElement("div");
-
-flash.className =
-"flashEffect";
-
-if(type === "legendary"){
-
-flash.classList.add(
-"goldFlash"
-);
-
-document.body.classList.add(
-"shakeScreen"
-);
-
-}
-
-if(type === "epic"){
-
-flash.classList.add(
-"purpleFlash"
-);
-
-}
-
-if(type === "mythic"){
-
-flash.classList.add(
-"rainbowFlash"
-);
-
-document.body.classList.add(
-"shakeScreen"
-);
-
-}
-
-document.body.appendChild(flash);
-
-setTimeout(()=>{
-
-flash.remove();
-
-document.body.classList.remove(
-"shakeScreen"
-);
-
-},800);
-
-}
- function chestPopEffect(text){
-
-let el = document.createElement("div");
-
-el.innerText = text;
-
-el.style.position = "fixed";
-el.style.left = "50%";
-el.style.top = "50%";
-el.style.transform = "translate(-50%,-50%) scale(.4)";
-el.style.fontSize = "46px";
-el.style.fontWeight = "900";
-el.style.letterSpacing = "2px";
-el.style.color = "#ffffff";
-el.style.textShadow = `
-0 0 10px #00ffff,
-0 0 25px #00ffff,
-0 0 60px #ff00ff
-`;
-
-el.style.zIndex = "999999";
-el.style.opacity = "0";
-
-document.body.appendChild(el);
-
-setTimeout(()=>{
-
-el.style.transition = ".45s";
-
-el.style.opacity = "1";
-
-el.style.transform =
-"translate(-50%,-58%) scale(1.15)";
-
-},50);
-
-setTimeout(()=>{
-
-el.style.opacity = "0";
-
-el.style.transform =
-"translate(-50%,-75%) scale(.9)";
-
-},900);
-
-setTimeout(()=>{
-
-el.remove();
-
-},1400);
-
-}
-function showToast(text){
-
-  let toast = document.getElementById("toast");
-
-  toast.innerText = text;
-
-  toast.style.display = "block";
-
-  setTimeout(()=>{
-    toast.style.display = "none";
-  },3500);
-}
- function setSaveStatus(text,color="#00ff99"){
-
-console.log("SAVE STATUS:", text);
-
-}
-  /* SHOP */
-
-function buyUpgrade(){
-
-  if(coins < 100){
-
-    showToast("Need 100 coins!");
-    return;
-  }
-
-  coins -= 100;
-
-  minePower += 1;
-
   save();
   update();
-
-  showToast("Mining upgraded!");
+  showToast("+30 Coins");
+  taskDone = false;
 }
-  /* SHOP */
-function buyTurbo(){
-
-if(Date.now() < turboEnd){
-
-showToast("Turbo already active");
-
-return;
-
+function openFacebook() {
+  window.open("https://www.facebook.com/share/14eXqwaWvzK/");
+  facebookTaskDone = true;
 }
-
-if(coins < turboPrice){
-
-showToast("Need " + turboPrice + " coins");
-
-return;
-
+function claimFacebookTask() {
+  if (!facebookTaskDone) { showToast("Complete Facebook task first!"); return; }
+  coins += 30;
+  save();
+  update();
+  showToast("+30 Coins");
+  facebookTaskDone = false;
 }
 
-coins -= turboPrice;
-
-minePower += 2;
-
-turboEnd = Date.now() + 7200000;
-
-turboPrice += 150;
-
-localStorage.setItem("turboPrice", turboPrice);
-localStorage.setItem("turboEnd", turboEnd);
-
-save();
-update();
-
-showToast("⚡ Turbo Activated");
-
+// ===================== CHEST =====================
+function openChest() {
+  if (spinning) return;
+  let today = new Date().toDateString();
+  let savedDay = localStorage.getItem("spinDay");
+  if (savedDay !== today) {
+    localStorage.setItem("spinDay", today);
+    freeSpinUsed = "no";
+    localStorage.setItem("freeSpinUsed", "no");
+    paidChestPrice = 20;
+    localStorage.setItem("paidChestPrice", 20);
+  }
+  if (freeSpinUsed === "yes") {
+    if (coins < paidChestPrice) { showToast("Need " + paidChestPrice + " coins"); return; }
+    coins -= paidChestPrice;
+    save();
+    update();
+    showToast("-" + paidChestPrice + " Coins");
+    paidChestPrice += 10;
+    localStorage.setItem("paidChestPrice", paidChestPrice);
+  } else {
+    freeSpinUsed = "yes";
+    localStorage.setItem("freeSpinUsed", "yes");
+    showToast("FREE CHEST");
+  }
+  chestMission++;
+  localStorage.setItem("chestMission", chestMission);
+  spinning = true;
+  setTimeout(() => { spinning = false; }, 2500);
+  let chest = document.getElementById("cyberChest");
+  chest.classList.add("opening");
+  setTimeout(() => chest.classList.remove("opening"), 1800);
+  chest.style.boxShadow = "0 0 60px rgba(0,255,255,.9),0 0 140px rgba(255,0,200,.5)";
+  chest.style.filter = "brightness(1.4)";
+  document.getElementById("spinSound").play().catch(() => {});
+  let random = Math.random();
+  let reward, rewardType;
+  if (random < 0.40) { reward = 10; rewardType = "coins"; }
+  else if (random < 0.65) { reward = 25; rewardType = "coins"; }
+  else if (random < 0.80) { reward = 1; rewardType = "spin"; }
+  else if (random < 0.92) { reward = 1; rewardType = "crate"; }
+  else if (random < 0.98) { reward = 2; rewardType = "xp"; }
+  else { reward = 1; rewardType = "turbo"; }
+  setTimeout(() => {
+    try {
+      let rewardText = "";
+      if (rewardType === "coins") { coins += reward; rewardText = "💰 +" + reward + " COINS"; }
+      if (rewardType === "spin") { freeSpins += reward; rewardText = "🎟 FREE SPIN"; }
+      if (rewardType === "crate") { rareCrates += reward; rewardText = "📦 RARE CRATE"; }
+      if (rewardType === "xp") { xpBoost += reward; rewardText = "🔥 XP BOOST +" + reward; }
+      if (rewardType === "turbo") { minePower += reward; rewardText = "🚀 TURBO +" + reward; }
+      chestPopEffect(rewardText);
+      save();
+      update();
+      document.getElementById("winSound").play().catch(() => {});
+      chest.style.boxShadow = "0 0 35px rgba(0,255,255,.4),0 0 100px rgba(255,0,200,.2)";
+      chest.style.filter = "brightness(1)";
+      spinning = false;
+    } catch(e) {
+      console.log("Chest error:", e);
+      spinning = false;
+    }
+  }, 1800);
 }
 
-function buyEnergy(){
-
-if(Date.now() < autoMinerEnd){
-
-showToast("Auto Miner already active");
-
-return;
-
+// ===================== RARE CRATE =====================
+function openRareCrate() {
+  if (rareCrates <= 0) { showToast("No rare crates"); return; }
+  rareCrates--;
+  let random = Math.random();
+  let reward;
+  if (random < 0.50) { reward = 100; coins += reward; showRewardPopup("RARE COINS", reward, "💎"); }
+  else if (random < 0.80) { reward = 3; xpBoost += reward; showRewardPopup("XP BOOST", reward, "🔥"); }
+  else if (random < 0.95) { reward = 2; minePower += reward; showRewardPopup("TURBO POWER", reward, "🚀"); }
+  else { reward = 1000; coins += reward; showRewardPopup("LEGENDARY JACKPOT", reward, "👑"); triggerRewardEffect("mythic"); }
+  save();
+  update();
 }
 
-if(coins < autoMinerPrice){
-
-showToast("Need " + autoMinerPrice);
-
-return;
-
+// ===================== LEADERBOARD =====================
+function loadLeaderboard() {
+  const board = document.getElementById("leaderboardList");
+  if (!db) { board.innerHTML = "Firebase not connected"; return; }
+  board.innerHTML = "Loading...";
+  db.collection("players").orderBy("coins","desc").limit(10).onSnapshot(snapshot => {
+    let html = "";
+    let rank = 1;
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      let medal = rank;
+      if (rank===1) medal="🥇"; if (rank===2) medal="🥈"; if (rank===3) medal="🥉";
+      html += `<div class="card" style="margin-bottom:12px;padding:14px;display:flex;justify-content:space-between;align-items:center;"><div>${medal} ${data.username||"Unknown"}</div><div>💰 ${data.coins||0}</div></div>`;
+      rank++;
+    });
+    board.innerHTML = html;
+  }, err => { board.innerHTML = "Failed to load leaderboard"; });
 }
 
-coins -= autoMinerPrice;
-
-autoMinerEnd =
-Date.now() + 7200000;
-
-autoMinerPrice += 200;
-
-localStorage.setItem(
-"autoMinerPrice",
-autoMinerPrice
-);
-
-localStorage.setItem(
-"autoMinerEnd",
-autoMinerEnd
-);
-
-save();
-update();
-
-showToast("🤖 Auto Miner Activated");
-
+// ===================== MISSIONS =====================
+function updateMissions() {
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+  set("mineMissionText", mineMission + " / 50");
+  set("chestMissionText", chestMission + " / 3");
+  set("levelMissionText", "Level " + level + " / 5");
+  const mineBtn = document.getElementById("mineMissionBtn");
+  if (mineBtn) {
+    if (mineMissionClaimed==="yes") { mineBtn.innerText="COMPLETED"; mineBtn.disabled=true; }
+    else if (mineMission>=50) mineBtn.innerText="CLAIM";
+    else mineBtn.innerText="IN PROGRESS";
+  }
+  const chestBtn = document.getElementById("chestMissionBtn");
+  if (chestBtn) {
+    if (chestMissionClaimed==="yes") { chestBtn.innerText="COMPLETED"; chestBtn.disabled=true; }
+    else if (chestMission>=3) chestBtn.innerText="CLAIM";
+    else chestBtn.innerText="IN PROGRESS";
+  }
+  const levelBtn = document.getElementById("levelMissionBtn");
+  if (levelBtn) {
+    if (levelMissionClaimed==="yes") { levelBtn.innerText="COMPLETED"; levelBtn.disabled=true; }
+    else if (level>=5) levelBtn.innerText="CLAIM";
+    else levelBtn.innerText="IN PROGRESS";
+  }
+}
+function claimMineMission() {
+  if (mineMission<50||mineMissionClaimed==="yes") return;
+  coins += 200; mineMissionClaimed="yes";
+  localStorage.setItem("mineMissionClaimed","yes");
+  save(); update(); updateMissions(); showToast("🎯 Mission Complete +200");
+}
+function claimChestMission() {
+  if (chestMission<3||chestMissionClaimed==="yes") return;
+  coins += 150; chestMissionClaimed="yes";
+  localStorage.setItem("chestMissionClaimed","yes");
+  save(); update(); updateMissions(); showToast("🎯 Chest Mission +150");
+}
+function claimLevelMission() {
+  if (level<5||levelMissionClaimed==="yes") return;
+  coins += 500; levelMissionClaimed="yes";
+  localStorage.setItem("levelMissionClaimed","yes");
+  save(); update(); updateMissions(); showToast("🏆 Level Mission +500");
 }
 
-function buyXP(){
-
-if(Date.now() < xpEnd){
-
-showToast("XP Boost already active");
-
-return;
-
+// ===================== STREAK =====================
+function claimStreak() {
+  let now = Date.now();
+  if (now - lastStreakClaim < 86400000) { showToast("Already claimed today"); return; }
+  if (now - lastStreakClaim > 172800000) streakDay = 0;
+  streakDay++;
+  if (streakDay > 7) streakDay = 1;
+  lastStreakClaim = now;
+  localStorage.setItem("streakDay", streakDay);
+  localStorage.setItem("lastStreakClaim", lastStreakClaim);
+  if (streakDay===1) coins += 50;
+  if (streakDay===2) coins += 100;
+  if (streakDay===3) { freeSpinUsed="no"; localStorage.setItem("freeSpinUsed","no"); }
+  if (streakDay===4) xpBoost += 1;
+  if (streakDay===5) coins += 500;
+  if (streakDay===6) minePower += 2;
+  if (streakDay===7) { coins += 1000; showToast("🔥 JACKPOT DAY!"); }
+  save(); update(); updateStreak();
+  showToast("🔥 Day " + streakDay + " Claimed");
+}
+function updateStreak() {
+  for (let i=1; i<=7; i++) {
+    let card = document.getElementById("day"+i);
+    if (!card) continue;
+    if (i < streakDay) { card.style.border="2px solid #00ff99"; card.style.boxShadow="0 0 20px rgba(0,255,153,.4)"; }
+    if (i === streakDay) { card.style.border="2px solid #ffd54a"; card.style.boxShadow="0 0 25px rgba(255,213,74,.5)"; }
+  }
 }
 
-if(coins < xpPrice){
-
-showToast("Need " + xpPrice);
-
-return;
-
+// ===================== SHOP =====================
+function buyTurbo() {
+  if (Date.now()<turboEnd) { showToast("Turbo already active"); return; }
+  if (coins<turboPrice) { showToast("Need "+turboPrice+" coins"); return; }
+  coins -= turboPrice; minePower += 2;
+  turboEnd = Date.now()+7200000; turboPrice += 150;
+  localStorage.setItem("turboPrice",turboPrice);
+  localStorage.setItem("turboEnd",turboEnd);
+  save(); update(); showToast("⚡ Turbo Activated");
+}
+function buyEnergy() {
+  if (Date.now()<autoMinerEnd) { showToast("Auto Miner already active"); return; }
+  if (coins<autoMinerPrice) { showToast("Need "+autoMinerPrice); return; }
+  coins -= autoMinerPrice;
+  autoMinerEnd = Date.now()+7200000; autoMinerPrice += 200;
+  localStorage.setItem("autoMinerPrice",autoMinerPrice);
+  localStorage.setItem("autoMinerEnd",autoMinerEnd);
+  save(); update(); showToast("🤖 Auto Miner Activated");
+}
+function buyXP() {
+  if (Date.now()<xpEnd) { showToast("XP Boost already active"); return; }
+  if (coins<xpPrice) { showToast("Need "+xpPrice); return; }
+  coins -= xpPrice; xpBoost = 3;
+  xpEnd = Date.now()+14400000; xpPrice += 250;
+  localStorage.setItem("xpPrice",xpPrice);
+  localStorage.setItem("xpEnd",xpEnd);
+  save(); update(); showToast("🔥 XP Boost Activated");
+}
+function updateShopUI() {
+  const turboBtn = document.querySelector(".shopBtn");
+  const allBtns = document.querySelectorAll(".shopBtn");
+  if (allBtns.length < 3) return;
+  const tBtn = allBtns[0], aBtn = allBtns[1], xBtn = allBtns[2];
+  const tPrice = document.getElementById("turboPriceText");
+  const aPrice = document.getElementById("autoMinerPriceText");
+  const xPrice = document.getElementById("xpPriceText");
+  if (tPrice) tPrice.innerText = turboPrice;
+  if (aPrice) aPrice.innerText = autoMinerPrice;
+  if (xPrice) xPrice.innerText = xpPrice;
+  const now = Date.now();
+  if (now<turboEnd) { tBtn.innerText="ACTIVATED"; tBtn.classList.add("activeBoost"); } else { tBtn.innerText="UPGRADE"; tBtn.classList.remove("activeBoost"); }
+  if (now<autoMinerEnd) { aBtn.innerText="ACTIVE"; aBtn.classList.add("activeBoost"); } else { aBtn.innerText="INSTALL"; aBtn.classList.remove("activeBoost"); }
+  if (now<xpEnd) { xBtn.innerText="BOOSTED"; xBtn.classList.add("activeBoost"); } else { xBtn.innerText="ACTIVATE"; xBtn.classList.remove("activeBoost"); xpBoost=1; }
 }
 
-coins -= xpPrice;
+// ===================== BOOST TIMERS =====================
+setInterval(() => {
+  const now = Date.now();
+  const tTimer = document.getElementById("turboTimer");
+  const eTimer = document.getElementById("energyTimer");
+  const xTimer = document.getElementById("xpTimer");
+  const fmt = (ms) => { let s=Math.floor(ms/1000); return Math.floor(s/60)+"m "+(s%60)+"s"; };
+  if (tTimer) tTimer.innerText = now<turboEnd ? "⏳ "+fmt(turboEnd-now) : "Ready to activate";
+  if (eTimer) eTimer.innerText = now<autoMinerEnd ? "⏳ "+fmt(autoMinerEnd-now) : "Ready to install";
+  if (xTimer) xTimer.innerText = now<xpEnd ? "⏳ "+fmt(xpEnd-now) : "Ready to activate";
+}, 1000);
 
-xpBoost = 3;
+// ===================== ENERGY REGEN =====================
+setInterval(() => {
+  if (energy < maxEnergy) { energy += 1; save(); update(); }
+}, 3000);
 
-xpEnd = Date.now() + 14400000;
+// ===================== PASSIVE MINING =====================
+setInterval(() => {
+  let passiveIncome = Math.floor(level / 3);
+  if (Date.now() < autoMinerEnd) passiveIncome *= 3;
+  if (passiveIncome > 0) { coins += passiveIncome; save(); update(); }
+}, 15000);
 
-xpPrice += 250;
-
-localStorage.setItem("xpPrice", xpPrice);
-localStorage.setItem("xpEnd", xpEnd);
-
-save();
-update();
-
-showToast("🔥 XP Boost Activated");
-
-}
- function updateShopUI(){
-
-let buttons =
-document.querySelectorAll(".shopBtn");
-
-if(buttons.length < 3) return;
-
-let turboBtn = buttons[0];
-let autoBtn = buttons[1];
-let xpBtn = buttons[2];
-
-/* PRICE */
-
-document.getElementById(
-"turboPriceText"
-).innerText = turboPrice;
-document.getElementById("autoMinerPriceText").innerText = autoMinerPrice;
-
-document.getElementById(
-"xpPriceText"
-).innerText = xpPrice;
-
-/* ACTIVE STATES */
-
-if(Date.now() < turboEnd){
-
-turboBtn.innerText = "ACTIVATED";
-
-turboBtn.style.opacity = "1";
-
-turboBtn.classList.add("activeBoost");
-
-}else{
-
-turboBtn.innerText = "UPGRADE";
-
-turboBtn.style.opacity = "1";
-
-turboBtn.classList.remove("activeBoost");
-
+// ===================== REFERRAL =====================
+function copyRefLink() {
+  let refLink = document.getElementById("refLink");
+  if (refLink) { refLink.select(); document.execCommand("copy"); showToast("Referral link copied"); }
 }
 
-if(Date.now() < autoMinerEnd){
-
-autoBtn.innerText = "ACTIVE";
-
-autoBtn.style.opacity = "1";
-
-autoBtn.classList.add("activeBoost");
-
-}else{
-
-autoBtn.innerText = "INSTALL";
-
-autoBtn.style.opacity = "1";
-
-autoBtn.classList.remove("activeBoost");
-
+// ===================== OFFLINE MINING =====================
+function checkOfflineMining() {
+  let now = Date.now();
+  let offlineTime = now - lastOnline;
+  if (now < offlineCooldown) return;
+  let maxHours = 1;
+  if (Date.now() < turboEnd) maxHours = 2;
+  if (Date.now() < autoMinerEnd) maxHours = 3;
+  let maxTime = maxHours * 60 * 60 * 1000;
+  if (offlineTime > maxTime) offlineTime = maxTime;
+  if (offlineTime < 60000) return;
+  let seconds = Math.floor(offlineTime / 1000);
+  let reward = Math.floor(seconds * (minePower / 12));
+  if (reward <= 0) return;
+  window.offlineReward = reward;
+  let popup = document.getElementById("offlinePopup");
+  document.getElementById("offlineCoins").innerText = "+" + reward + " Coins";
+  popup.style.display = "block";
+  setTimeout(() => { popup.style.transform = "translate(-50%,-50%) scale(1)"; }, 50);
 }
-
-if(Date.now() < xpEnd){
-
-xpBtn.innerText = "BOOSTED";
-
-xpBtn.style.opacity = "1";
-
-xpBtn.classList.add("activeBoost");
-
-}else{
-
-xpBtn.innerText = "ACTIVATE";
-
-xpBtn.style.opacity = "1";
-
-xpBtn.classList.remove("activeBoost");
-
-xpBoost = 1;
-
+function claimOfflineReward() {
+  let reward = window.offlineReward || 0;
+  coins += reward;
+  save(); update();
+  let popup = document.getElementById("offlinePopup");
+  popup.style.transform = "translate(-50%,-50%) scale(.8)";
+  setTimeout(() => { popup.style.display = "none"; }, 250);
+  showToast("⚡ +" + reward + " Offline Coins");
+  offlineCooldown = Date.now() + 1800000;
+  localStorage.setItem("offlineCooldown", offlineCooldown);
 }
+window.addEventListener("beforeunload", () => { localStorage.setItem("lastOnline", Date.now()); });
 
-}
- /* REFERRAL */
-
-function copyRefLink(){
-
-let refLink =
-document.getElementById("refLink");
-
-refLink.select();
-
-document.execCommand("copy");
-
-showToast("Referral link copied");
-
-}
-/* OFFLINE MINING */
-
-function checkOfflineMining(){
-
-let now = Date.now();
-
-let offlineTime =
-now - lastOnline;
-
-/* 30 MIN COOLDOWN */
-
-if(now < offlineCooldown){
-
-showToast(
-"⏳ Offline mining cooldown active"
-);
-
-return;
-
-}
-
-/* VIP BOOSTS */
-
-let maxHours = 1;
-
-if(Date.now() < turboEnd){
-
-maxHours = 2;
-
-}
-
-if(Date.now() < autoMinerEnd){
-
-maxHours = 3;
-
-}
-
-let maxTime =
-maxHours * 60 * 60 * 1000;
- /* WARNING NOTIFICATION */
-
-let notifyTime =
-Math.max(
-10000,
-maxTime - 1800000
-);
-
-setTimeout(()=>{
-
-if(Notification.permission === "granted"){
-
-new Notification(
-"⚡ Nilma Coin",{
-body:
-"Hurry up! Claim your offline reward before it expires!"
-});
-
-}
-
-}, notifyTime);
-
-/* LIMIT */
-
-if(offlineTime > maxTime){
-
-offlineTime = maxTime;
-
-}
-
-/* TOO SMALL */
-
-if(offlineTime < 60000){
-
-return;
-
-}
-
-/* CALCULATE */
-
-let seconds =
-Math.floor(offlineTime / 1000);
-
-let reward =
-Math.floor(
-seconds * (minePower / 12)
-);
-
-if(reward <= 0){
-
-return;
-
-}
-
-/* SAVE TEMP */
-
-window.offlineReward = reward;
-
-let popup =
-document.getElementById(
-"offlinePopup"
-);
-
-document.getElementById(
-"offlineCoins"
-).innerText =
-"+" + reward + " Coins";
-
-popup.style.display = "block";
-
-setTimeout(()=>{
-
-popup.style.transform =
-"translate(-50%,-50%) scale(1)";
-
-},50);
-
-}
-
-function claimOfflineReward(){
-
-let reward =
-window.offlineReward || 0;
-
-coins += reward;
-
-save();
-update();
-
-let popup =
-document.getElementById(
-"offlinePopup"
-);
-
-popup.style.transform =
-"translate(-50%,-50%) scale(.8)";
-
-setTimeout(()=>{
-
-popup.style.display = "none";
-
-},250);
-
-showToast(
-"⚡ +" + reward + " Offline Coins"
-);
-
-/* START 30 MIN COOLDOWN */
-
-offlineCooldown =
-Date.now() + 1800000;
-
-localStorage.setItem(
-"offlineCooldown",
-offlineCooldown
-);
-
-}
-
-/* TRACK ONLINE */
-
-window.addEventListener(
-"beforeunload",
-()=>{
-
-localStorage.setItem(
-"lastOnline",
-Date.now()
-);
-
-}
-);
-/* AUDIO */
-
+// ===================== AUDIO =====================
 let audioUnlocked = false;
-
 function unlockAudio() {
-
   if (audioUnlocked) return;
-
-  const sounds = [
-    "spinSound",
-    "winSound",
-    "clickSound"
-  ];
-
-  sounds.forEach(id => {
-
-    let sound = document.getElementById(id);
-
-    sound.muted = true;
-
-    sound.play().then(() => {
-
-      sound.pause();
-
-      sound.currentTime = 0;
-
-      sound.muted = false;
-
-    }).catch(()=>{});
+  ["spinSound","winSound","clickSound"].forEach(id => {
+    let s = document.getElementById(id);
+    s.muted = true;
+    s.play().then(() => { s.pause(); s.currentTime=0; s.muted=false; }).catch(()=>{});
   });
-
   audioUnlocked = true;
 }
- if(!firstJoin){
 
-coins += 500;
-
-localStorage.setItem(
-"firstJoin",
-"yes"
-);
-
-save();
-
+// ===================== POPUP / TOAST =====================
+function showRewardPopup(title, coinsReward, emoji) {
+  let popup = document.getElementById("rewardPopup");
+  document.getElementById("rewardTitle").innerText = title;
+  document.getElementById("rewardCoins").innerText = "+" + coinsReward + " Coins";
+  document.getElementById("rewardEmoji").innerText = emoji;
+  popup.style.display = "block";
+  setTimeout(() => { popup.style.transform = "translate(-50%,-50%) scale(1)"; }, 50);
+  setTimeout(() => {
+    popup.style.transform = "translate(-50%,-50%) scale(.7)";
+    setTimeout(() => { popup.style.display = "none"; }, 250);
+  }, 2200);
+}
+function triggerRewardEffect(type) {
+  let flash = document.createElement("div");
+  flash.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99998;";
+  if (type==="mythic") flash.style.background = "radial-gradient(circle,rgba(255,0,200,.3),transparent 70%)";
+  if (type==="legendary") flash.style.background = "radial-gradient(circle,rgba(255,200,0,.3),transparent 70%)";
+  if (type==="epic") flash.style.background = "radial-gradient(circle,rgba(160,0,255,.3),transparent 70%)";
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 800);
+}
+function chestPopEffect(text) {
+  let el = document.createElement("div");
+  el.innerText = text;
+  el.style.cssText = "position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.4);font-size:46px;font-weight:900;letter-spacing:2px;color:#fff;text-shadow:0 0 10px #00ffff,0 0 25px #00ffff,0 0 60px #ff00ff;z-index:999999;opacity:0;";
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.transition=".45s"; el.style.opacity="1"; el.style.transform="translate(-50%,-58%) scale(1.15)"; }, 50);
+  setTimeout(() => { el.style.opacity="0"; el.style.transform="translate(-50%,-75%) scale(.9)"; }, 900);
+  setTimeout(() => el.remove(), 1400);
+}
+function showToast(text) {
+  let toast = document.getElementById("toast");
+  toast.innerText = text;
+  toast.style.display = "block";
+  setTimeout(() => { toast.style.display = "none"; }, 3500);
 }
 
-/* GLOBAL ERROR DEBUGGER */
-window.onerror = function(message, source, line, col, error){
-
-console.log("GLOBAL ERROR:", error);
-
-showToast(
-"ERROR: " + message +
-" | LINE: " + line
-);
-
-};
-
-/* START GAME */
- try{
-
-if(db){
-  loadPlayerData();
-}
-
-}catch(e){
-
-console.log("Load error", e);
-
-}
-
-update();
-showScreen("homeScreen");
- setInterval(()=>{
-
-save();
-
-localStorage.setItem(
-"lastOnline",
-Date.now()
-);
-
-},15000);
- setInterval(updateDailyTimer,1000);
-
-updateDailyTimer();
- updateMissions();
- updateStreak();
- setTimeout(()=>{
-
-checkOfflineMining();
-
-},2000);
- const machineData=[
-{name:"QUANTUM LATTICE",power:1,cost:0,levelReq:1,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/aa.jpeg",statPower:"1x",statLv:"LV1",statOutput:"+1/tap"},
-{name:"CRYSTAL CUBE",power:3,cost:500,levelReq:1,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/bb.jpeg",statPower:"3x",statLv:"LV5",statOutput:"+3/tap"},
-{name:"PLASMA FUSION",power:8,cost:2000,levelReq:10,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/cc.jpeg",statPower:"8x",statLv:"LV10",statOutput:"+8/tap"},
-{name:"MECH SPHERE",power:20,cost:5000,levelReq:15,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/dd.jpeg",statPower:"20x",statLv:"LV15",statOutput:"+20/tap"}
+// ===================== MACHINES =====================
+const machineData = [
+  {name:"QUANTUM LATTICE",power:1,cost:0,levelReq:1,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/aa.jpeg",statPower:"1x",statLv:"LV1",statOutput:"+1/tap"},
+  {name:"CRYSTAL CUBE",power:3,cost:500,levelReq:1,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/bb.jpeg",statPower:"3x",statLv:"LV5",statOutput:"+3/tap"},
+  {name:"PLASMA FUSION",power:8,cost:2000,levelReq:10,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/cc.jpeg",statPower:"8x",statLv:"LV10",statOutput:"+8/tap"},
+  {name:"MECH SPHERE",power:20,cost:5000,levelReq:15,img:"https://raw.githubusercontent.com/saam009/nilma-app/main/dd.jpeg",statPower:"20x",statLv:"LV15",statOutput:"+20/tap"}
 ];
-let currentMachine=parseInt(localStorage.getItem("currentMachine"))||0;
-let ownedMachines=JSON.parse(localStorage.getItem("ownedMachines"))||[true,false,false,false];
-function updateReactor(){
-  const m=machineData[currentMachine];
-  const img=document.getElementById("reactorCoreImg");
-  if(img)img.src=m.img;
-  const rp=document.getElementById("reactorPower");
-  if(rp)rp.innerText=m.statPower;
-  const rm=document.getElementById("reactorMachine");
-  if(rm)rm.innerText=m.statLv;
-  const ro=document.getElementById("reactorOutput");
-  if(ro)ro.innerText=m.statOutput;
-  minePower=m.power;
+let currentMachine = parseInt(localStorage.getItem("currentMachine")) || 0;
+let ownedMachines = JSON.parse(localStorage.getItem("ownedMachines")) || [true,false,false,false];
+
+function updateReactor() {
+  const m = machineData[currentMachine];
+  const img = document.getElementById("reactorCoreImg"); if(img) img.src = m.img;
+  const rp = document.getElementById("reactorPower"); if(rp) rp.innerText = m.statPower;
+  const rm = document.getElementById("reactorMachine"); if(rm) rm.innerText = m.statLv;
+  const ro = document.getElementById("reactorOutput"); if(ro) ro.innerText = m.statOutput;
+  minePower = m.power;
 }
-function buyMachine(i){
-  const m=machineData[i];
-  if(ownedMachines[i]){
-    currentMachine=i;
-    localStorage.setItem("currentMachine",i);
-    updateReactor();updateMachineUI();
-    showToast("✅ "+m.name+" ACTIVATED");return;
+function buyMachine(i) {
+  const m = machineData[i];
+  if (ownedMachines[i]) {
+    currentMachine = i;
+    localStorage.setItem("currentMachine", i);
+    updateReactor(); updateMachineUI();
+    showToast("✅ " + m.name + " ACTIVATED");
+    return;
   }
-  if(level<m.levelReq){showToast("🔒 Need Level "+m.levelReq);return;}
-  if(coins<m.cost){showToast("💰 Need "+m.cost+" coins");return;}
-  coins-=m.cost;
-  ownedMachines[i]=true;
-  currentMachine=i;
-  localStorage.setItem("currentMachine",i);
-  localStorage.setItem("ownedMachines",JSON.stringify(ownedMachines));
-  updateReactor();updateMachineUI();save();update();
-  showToast("🚀 "+m.name+" UNLOCKED!");
+  if (level < m.levelReq) { showToast("🔒 Need Level " + m.levelReq); return; }
+  if (coins < m.cost) { showToast("💰 Need " + m.cost + " coins"); return; }
+  coins -= m.cost;
+  ownedMachines[i] = true;
+  currentMachine = i;
+  localStorage.setItem("currentMachine", i);
+  localStorage.setItem("ownedMachines", JSON.stringify(ownedMachines));
+  updateReactor(); updateMachineUI(); save(); update();
+  showToast("🚀 " + m.name + " UNLOCKED!");
 }
-function updateMachineUI(){
-  machineData.forEach((m,i)=>{
-    const btn=document.getElementById("machineBtn"+i);
-    const card=document.getElementById("machineCard"+i);
-    const tag=document.getElementById("activeTag"+i);
-    if(!btn||!card)return;
-    if(i===currentMachine){
-      card.style.border="1px solid rgba(0,255,153,.4)";
-      card.style.opacity="1";
-      if(tag)tag.style.display="block";
-      btn.innerText="✅ ACTIVE";
-      btn.style.background="linear-gradient(90deg,#00ff99,#00c853)";
-      btn.style.color="white";
-    }else if(ownedMachines[i]){
-      card.style.opacity="1";
-      card.style.border="1px solid rgba(0,255,255,.3)";
-      if(tag)tag.style.display="none";
-      btn.innerText="ACTIVATE";
-      btn.style.background="linear-gradient(90deg,#00e5ff,#8a2eff)";
-      btn.style.color="white";
-    }else if(level>=m.levelReq){
-      card.style.opacity="1";
-      card.style.border="1px solid rgba(255,255,255,.08)";
-      if(tag)tag.style.display="none";
-      btn.innerText="BUY "+m.cost;
-      btn.style.background="linear-gradient(90deg,#00e5ff,#8a2eff)";
-      btn.style.color="white";
-    }else{
-      card.style.opacity=".5";
-      card.style.border="1px solid rgba(255,255,255,.08)";
-      if(tag)tag.style.display="none";
-      btn.innerText="🔒 REQ LV"+m.levelReq;
-      btn.style.background="rgba(255,255,255,.08)";
-      btn.style.color="#555";
+function updateMachineUI() {
+  machineData.forEach((m, i) => {
+    const btn = document.getElementById("machineBtn"+i);
+    const card = document.getElementById("machineCard"+i);
+    const tag = document.getElementById("activeTag"+i);
+    if (!btn || !card) return;
+    if (i === currentMachine) {
+      card.style.border="1px solid rgba(0,255,153,.4)"; card.style.opacity="1";
+      if(tag) tag.style.display="block";
+      btn.innerText="✅ ACTIVE"; btn.style.background="linear-gradient(90deg,#00ff99,#00c853)"; btn.style.color="white";
+    } else if (ownedMachines[i]) {
+      card.style.opacity="1"; card.style.border="1px solid rgba(0,255,255,.3)";
+      if(tag) tag.style.display="none";
+      btn.innerText="ACTIVATE"; btn.style.background="linear-gradient(90deg,#00e5ff,#8a2eff)"; btn.style.color="white";
+    } else if (level >= m.levelReq) {
+      card.style.opacity="1"; card.style.border="1px solid rgba(255,255,255,.08)";
+      if(tag) tag.style.display="none";
+      btn.innerText="BUY "+m.cost; btn.style.background="linear-gradient(90deg,#00e5ff,#8a2eff)"; btn.style.color="white";
+    } else {
+      card.style.opacity=".5"; card.style.border="1px solid rgba(255,255,255,.08)";
+      if(tag) tag.style.display="none";
+      btn.innerText="🔒 REQ LV"+m.levelReq; btn.style.background="rgba(255,255,255,.08)"; btn.style.color="#555";
     }
   });
 }
-document.getElementById("reactorWrap").addEventListener("click",(e)=>mine(e));
-updateReactor();
-updateMachineUI();
- console.log("App Loaded Successfully");
-document.getElementById("cyberChest").addEventListener("click", openChest);
-</script>
 
+// ===================== LOADING BAR =====================
+let load = 0;
+let loadingInterval = setInterval(() => {
+  load += Math.random() * 20;
+  if (load >= 100) {
+    load = 100;
+    clearInterval(loadingInterval);
+    setTimeout(() => {
+      let ls = document.getElementById("loadingScreen");
+      if (ls) { ls.style.transition="0.5s"; ls.style.opacity="0"; setTimeout(()=>ls.remove(), 500); }
+    }, 400);
+  }
+  const lb = document.getElementById("loadingBar");
+  if (lb) lb.style.width = load + "%";
+}, 250);
+
+// ===================== INIT =====================
+window.onerror = function(message, source, line, col, error) {
+  console.log("GLOBAL ERROR:", message, "LINE:", line);
+};
+
+// Attach events
+document.getElementById("reactorWrap").addEventListener("click", (e) => mine(e));
+document.getElementById("cyberChest").addEventListener("click", openChest);
+
+// Start
+if (db) loadPlayerData();
+update();
+showScreen("homeScreen");
+updateDailyTimer();
+updateMissions();
+updateStreak();
+setInterval(updateDailyTimer, 1000);
+setInterval(() => { save(); localStorage.setItem("lastOnline", Date.now()); }, 15000);
+setTimeout(checkOfflineMining, 2000);
+
+console.log("✅ App Loaded Successfully");
+</script>
 </body>
 </html>
