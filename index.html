@@ -2393,8 +2393,7 @@ mineBtn.style.boxShadow = `
   
 setTimeout(()=>{
 
-}
- 2 * xpBoost;
+xp += 2 * xpBoost;
   energy -= 1;
   const reactor = document.getElementById("reactorWrap");
 
@@ -4328,7 +4327,6 @@ updateReactor();
 updateMachineUI();
  console.log("App Loaded Successfully");
 document.getElementById("cyberChest").addEventListener("click", openChest);
-document.getElementById("mineButton").addEventListener("click", (e) => mine(e));
 </script>
 
 </body>
