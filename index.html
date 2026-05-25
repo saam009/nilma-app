@@ -1129,6 +1129,7 @@ async function verifyPayment(){
 // =================== MINE ===================
 function mine(e){
   if(energy<=0){showToast("⚡ No energy!");return;}
+  unlockAudio();
   let crit=Math.random()<0.1;
   let earned=crit?minePower*5:minePower;
   coins+=earned;
@@ -1142,10 +1143,8 @@ function mine(e){
   const rw=document.getElementById("reactorWrap");
   if(rw){rw.style.transform="scale(.93)";setTimeout(()=>{rw.style.transform="scale(1)";},100);}
   checkLevelUp();
-  if(window.Telegram?.WebApp)try{Telegram.WebApp.HapticFeedback.impactOccurred("light");}catch(e){}
   save();update();
   showCoin(e?.clientX||window.innerWidth/2,e?.clientY||200,earned);
-  document.getElementById("clickSound").play().catch(()=>{});
 }
 
 function checkLevelUp(){
@@ -1153,6 +1152,7 @@ function checkLevelUp(){
     xp-=xpMax;level++;
     coins+=level*50;lifetimeCoins+=level*50;
     xpMax=Math.floor(xpMax*1.5);
+    playLevelUp();
     showToast("🎉 LEVEL UP "+level+"! +"+level*50+" coins");
   }
 }
@@ -1168,6 +1168,9 @@ function showCoin(x,y,amt){
 // =================== CHEST ===================
 function openChest(){
   if(spinning)return;
+  unlockAudio();
+  playChestOpen();
+  doHaptic("medium");
   if(freeSpinUsed==="yes"){
     if(coins<paidChestPrice){showToast("Need "+paidChestPrice+" coins!");return;}
     coins-=paidChestPrice;paidChestPrice+=10;
@@ -1395,26 +1398,7 @@ function claimStreak(){
 }
 
 // =================== LEADERBOARD ===================
-function loadLeaderboard(){
-  const board=document.getElementById("leaderboardList");
-  if(!db){board.innerHTML="Firebase not connected";return;}
-  board.innerHTML="Loading...";
-  db.collection("players").orderBy("coins","desc").limit(15).onSnapshot(snap=>{
-    let html="";let rank=1;
-    snap.forEach(doc=>{
-      const d=doc.data();
-      let medal=rank;
-      if(rank===1)medal="🥇";else if(rank===2)medal="🥈";else if(rank===3)medal="🥉";
-      const isMe=doc.id===playerId;
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:8px;border-radius:12px;background:${isMe?"rgba(255,215,0,.08)":"rgba(255,255,255,.03)"};border:1px solid ${isMe?"rgba(255,215,0,.3)":"rgba(255,255,255,.05)"};">
-        <span>${medal} ${d.username||"Player"} ${isMe?"(you)":""}</span>
-        <span style="color:var(--gold);font-weight:bold;">💰 ${(d.coins||0).toLocaleString()}</span>
-      </div>`;
-      rank++;
-    });
-    board.innerHTML=html||"No players yet";
-  },err=>{board.innerHTML="Failed to load";});
-}
+// loadLeaderboard is defined below in weekly section
 
 // =================== REFERRAL ===================
 function copyRefLink(){
@@ -1547,17 +1531,6 @@ function claimOfflineReward(){
   showToast("⚡ +"+r.toLocaleString()+" offline coins!");
 }
 window.addEventListener("beforeunload",()=>{localStorage.setItem("lastOnline",Date.now());});
-
-// =================== AUDIO ===================
-let audioUnlocked=false;
-function unlockAudio(){
-  if(audioUnlocked)return;
-  ["winSound","clickSound","spinSound"].forEach(id=>{
-    const s=document.getElementById(id);
-    s.muted=true;s.play().then(()=>{s.pause();s.currentTime=0;s.muted=false;}).catch(()=>{});
-  });
-  audioUnlocked=true;
-}
 
 // =================== RENDER ALL ===================
 function renderAll(){
@@ -1789,7 +1762,7 @@ const loadInt=setInterval(()=>{
 let audioUnlocked=false;
 function unlockAudio(){
   if(audioUnlocked)return;
-  ["rewardSound","clickSound2","chestOpenSound","levelUpSound","winSound","clickSound","spinSound"].forEach(id=>{
+  ["rewardSound","clickSound2","chestOpenSound","levelUpSound"].forEach(id=>{
     const s=document.getElementById(id);
     if(!s)return;
     s.muted=true;s.play().then(()=>{s.pause();s.currentTime=0;s.muted=false;}).catch(()=>{});
@@ -1798,25 +1771,9 @@ function unlockAudio(){
   if(musicOn){const bg=document.getElementById("bgMusic");if(bg){bg.volume=0.25;bg.play().catch(()=>{});}}
 }
 
-// =================== PATCH mine() to use new sound/haptic ===================
-const _origMine = mine;
-// Patch openChest to use new sounds
-const _origOpenChest = openChest;
-window.openChest = function(){
-  playChestOpen();
-  doHaptic("medium");
-  _origOpenChest();
-};
-// Patch checkLevelUp to play level up sound
-const _origCheckLevelUp = checkLevelUp;
-window.checkLevelUp = function(){
-  const wasLevel = level;
-  _origCheckLevelUp();
-  if(level > wasLevel) playLevelUp();
-};
-
 // =================== EVENT LISTENERS ===================
 document.getElementById("reactorWrap").addEventListener("click",e=>{
+  unlockAudio();
   playClick();
   doHaptic("light");
   mine(e);
