@@ -30,11 +30,57 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 #spinScreen.active{display:flex!important;flex-direction:column;}
 
 /* TOP BAR */
-.topHeader{padding:14px;position:sticky;top:0;z-index:100;background:rgba(0,0,0,.6);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.05);}
-.balanceRow{display:flex;justify-content:space-between;gap:10px;}
-.balanceBox{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);border-radius:14px;padding:10px 14px;flex:1;}
-.balanceTitle{font-size:11px;opacity:.7;letter-spacing:1px;}
-.balanceValue{font-size:20px;font-weight:bold;color:var(--gold);}
+.topHeader{padding:10px 14px;position:sticky;top:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06);}
+.balanceRow{display:flex;justify-content:space-between;gap:8px;align-items:center;}
+.balanceBox{border-radius:16px;padding:10px 12px;flex:1;position:relative;overflow:hidden;transition:.2s;}
+.balanceBox:active{transform:scale(.96);}
+.balanceBox::before{content:"";position:absolute;inset:0;opacity:.12;z-index:0;}
+.balanceBox .balanceTitle{font-size:9px;opacity:.75;letter-spacing:1.5px;text-transform:uppercase;position:relative;z-index:1;}
+.balanceBox .balanceValue{font-size:17px;font-weight:900;position:relative;z-index:1;margin-top:2px;}
+.balanceBox .balIcon{font-size:18px;position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:.25;z-index:0;}
+
+/* COINS BOX - Blue */
+.balCoins{background:linear-gradient(135deg,rgba(0,100,255,.18),rgba(0,200,255,.08));border:1px solid rgba(0,150,255,.35);box-shadow:0 0 18px rgba(0,150,255,.12),inset 0 1px 0 rgba(255,255,255,.06);}
+.balCoins .balanceValue{color:#4fc3f7;text-shadow:0 0 10px rgba(79,195,247,.5);}
+.balCoins .balanceTitle{color:#81d4fa;}
+
+/* ENERGY BOX - Purple */
+.balEnergy{background:linear-gradient(135deg,rgba(120,0,255,.18),rgba(180,0,255,.08));border:1px solid rgba(150,0,255,.35);box-shadow:0 0 18px rgba(138,46,255,.12),inset 0 1px 0 rgba(255,255,255,.06);}
+.balEnergy .balanceValue{color:#ce93d8;text-shadow:0 0 10px rgba(206,147,216,.5);}
+.balEnergy .balanceTitle{color:#e1bee7;}
+
+/* LEVEL BOX - Green/Cyan mix */
+.balLevel{background:linear-gradient(135deg,rgba(0,200,100,.18),rgba(0,255,200,.08));border:1px solid rgba(0,220,130,.35);box-shadow:0 0 18px rgba(0,200,130,.12),inset 0 1px 0 rgba(255,255,255,.06);}
+.balLevel .balanceValue{color:#80cbc4;text-shadow:0 0 10px rgba(128,203,196,.5);}
+.balLevel .balanceTitle{color:#b2dfdb;}
+
+/* SETTINGS ICON */
+.settingsBtn{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;transition:.2s;backdrop-filter:blur(8px);}
+.settingsBtn:hover{background:rgba(255,255,255,.14);transform:rotate(30deg);}
+.settingsBtn:active{transform:scale(.9) rotate(20deg);}
+
+/* SETTINGS MODAL */
+.settingsModal{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:99999;display:none;justify-content:center;align-items:flex-end;}
+.settingsModal.open{display:flex;}
+.settingsSheet{background:linear-gradient(180deg,rgba(8,8,20,.98),rgba(4,4,14,.98));border:1px solid rgba(255,255,255,.08);border-radius:28px 28px 0 0;padding:20px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease;}
+.settingsSheet h2{font-size:20px;font-weight:900;margin-bottom:18px;text-align:center;color:var(--cyan);}
+.settingRow{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.settingRow:last-child{border-bottom:none;}
+.settingLabel{font-size:14px;font-weight:600;}
+.settingDesc{font-size:11px;opacity:.5;margin-top:2px;}
+/* TOGGLE */
+.toggle{width:50px;height:26px;border-radius:30px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);position:relative;cursor:pointer;transition:.3s;flex-shrink:0;}
+.toggle.on{background:linear-gradient(90deg,var(--cyan),var(--purple));border-color:transparent;box-shadow:0 0 12px rgba(0,255,255,.4);}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+.toggle.on::after{left:26px;}
+
+/* AIRDROP TIMER */
+.airdropTimer{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,100,0,.06));border:1px solid rgba(255,215,0,.2);border-radius:18px;padding:16px;margin:14px 0;text-align:center;}
+.airdropTitle{font-size:11px;letter-spacing:3px;color:var(--gold);opacity:.8;margin-bottom:10px;}
+.airdropCountdown{display:flex;justify-content:center;gap:10px;margin-top:8px;}
+.airdropUnit{background:rgba(0,0,0,.4);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:8px 10px;min-width:52px;text-align:center;}
+.airdropNum{font-size:22px;font-weight:900;color:var(--gold);line-height:1;font-family:monospace;}
+.airdropLabel{font-size:8px;opacity:.6;letter-spacing:1px;margin-top:3px;}
 
 /* CARDS */
 .heroCard{margin:15px;padding:18px;border-radius:22px;background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,140,0,.06));border:1px solid rgba(255,215,0,.2);backdrop-filter:blur(12px);}
@@ -179,9 +225,22 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
 <div id="homeScreen" class="screen active">
 <div class="topHeader">
 <div class="balanceRow">
-<div class="balanceBox"><div class="balanceTitle">COINS</div><div class="balanceValue">💰 <span id="balance">0</span></div></div>
-<div class="balanceBox"><div class="balanceTitle">ENERGY</div><div class="balanceValue">⚡ <span id="energy">100</span></div></div>
-<div class="balanceBox"><div class="balanceTitle">LEVEL</div><div class="balanceValue">⭐ <span id="levelBadge">1</span></div></div>
+<div class="balanceBox balCoins" onclick="playClick()">
+  <div class="balIcon">💎</div>
+  <div class="balanceTitle">COINS</div>
+  <div class="balanceValue"><span id="balance">0</span></div>
+</div>
+<div class="balanceBox balEnergy" onclick="playClick()">
+  <div class="balIcon">⚡</div>
+  <div class="balanceTitle">ENERGY</div>
+  <div class="balanceValue"><span id="energy">100</span></div>
+</div>
+<div class="balanceBox balLevel" onclick="playClick()">
+  <div class="balIcon">🌟</div>
+  <div class="balanceTitle">LEVEL</div>
+  <div class="balanceValue"><span id="levelBadge">1</span></div>
+</div>
+<div class="settingsBtn" onclick="openSettings()">⚙️</div>
 </div>
 </div>
 
@@ -251,8 +310,15 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
 <!-- MAIN CHEST -->
 <div id="megaChest" class="megaChest" onclick="openChest()">
 <div class="chestGlow"></div>
-<div class="chestIcon">🏆</div>
-<div class="chestLabel">TAP TO OPEN</div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;">
+  <div style="font-size:16px;font-weight:900;color:var(--cyan);letter-spacing:3px;margin-bottom:8px;text-shadow:0 0 10px cyan;">TREASURE</div>
+  <div style="width:100px;height:100px;position:relative;">
+    <div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(0,255,255,.3),transparent 70%);animation:pulse 2s infinite;"></div>
+    <div style="font-size:72px;line-height:1;filter:drop-shadow(0 0 20px cyan) drop-shadow(0 0 40px purple);">💠</div>
+  </div>
+  <div style="margin-top:8px;font-size:10px;letter-spacing:3px;color:var(--cyan);opacity:.8;">TAP TO OPEN</div>
+  <div style="margin-top:6px;font-size:11px;color:rgba(255,255,255,.5);" id="chestCostLabel">🆓 FREE TODAY</div>
+</div>
 </div>
 
 <!-- REWARD ODDS -->
@@ -321,8 +387,28 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
 <!-- ===== LEADERBOARD ===== -->
 <div id="leaderboardScreen" class="screen">
 <button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
-<h2 style="text-align:center;margin:20px 0;">🏆 Leaderboard</h2>
-<div style="padding:16px;"><div id="leaderboardList" class="card">Loading...</div></div>
+<div class="heroCard" style="text-align:center;">
+  <h2 style="font-size:22px;font-weight:900;">🏆 Weekly League</h2>
+  <p style="opacity:.7;margin-top:4px;font-size:13px;">Top 10 earn coins every week!</p>
+  <div style="margin-top:12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:10px;">
+    <div style="font-size:10px;letter-spacing:2px;opacity:.6;margin-bottom:6px;">⏳ WEEK RESETS IN</div>
+    <div id="weekTimer" style="font-size:20px;font-weight:900;color:var(--gold);font-family:monospace;">--:--:--</div>
+  </div>
+</div>
+
+<!-- WEEKLY PRIZES -->
+<div style="padding:16px;">
+<div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:10px;">🎁 WEEKLY PRIZE POOL</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+<div style="background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,150,0,.08));border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:10px;text-align:center;"><div style="font-size:20px;">🥇</div><div style="font-size:11px;font-weight:900;color:var(--gold);">10,000 coins</div><div style="font-size:9px;opacity:.6;">1st Place</div></div>
+<div style="background:linear-gradient(135deg,rgba(180,180,200,.1),rgba(120,120,160,.06));border:1px solid rgba(200,200,255,.2);border-radius:12px;padding:10px;text-align:center;"><div style="font-size:20px;">🥈</div><div style="font-size:11px;font-weight:900;color:#b0bec5;">6,000 coins</div><div style="font-size:9px;opacity:.6;">2nd Place</div></div>
+<div style="background:linear-gradient(135deg,rgba(200,120,0,.1),rgba(160,80,0,.06));border:1px solid rgba(200,140,0,.2);border-radius:12px;padding:10px;text-align:center;"><div style="font-size:20px;">🥉</div><div style="font-size:11px;font-weight:900;color:#ffb74d;">4,000 coins</div><div style="font-size:9px;opacity:.6;">3rd Place</div></div>
+<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px;text-align:center;"><div style="font-size:16px;">🏅</div><div style="font-size:11px;font-weight:900;color:#90caf9;">4–10 Place</div><div style="font-size:9px;opacity:.6;">500–2500 coins</div></div>
+</div>
+
+<div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:10px;">📊 LIVE RANKINGS</div>
+<div id="leaderboardList">Loading...</div>
+</div>
 </div>
 
 <!-- ===== REFERRAL ===== -->
@@ -439,9 +525,74 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
 
 <div id="toast">Toast</div>
 
-<audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
-<audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>
-<audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3"></audio>
+<!-- SETTINGS MODAL -->
+<div class="settingsModal" id="settingsModal">
+<div class="settingsSheet">
+  <div style="width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:0 auto 18px;"></div>
+  <h2>⚙️ Settings</h2>
+
+  <!-- SOUND -->
+  <div class="settingRow">
+    <div>
+      <div class="settingLabel">🔊 Sound Effects</div>
+      <div class="settingDesc">Tap sounds, chest opening, rewards</div>
+    </div>
+    <div class="toggle" id="soundToggle" onclick="toggleSound()"></div>
+  </div>
+
+  <!-- MUSIC -->
+  <div class="settingRow">
+    <div>
+      <div class="settingLabel">🎵 Background Music</div>
+      <div class="settingDesc">Ambient mining soundtrack</div>
+    </div>
+    <div class="toggle" id="musicToggle" onclick="toggleMusic()"></div>
+  </div>
+
+  <!-- HAPTICS -->
+  <div class="settingRow">
+    <div>
+      <div class="settingLabel">📳 Vibration</div>
+      <div class="settingDesc">Haptic feedback on tap</div>
+    </div>
+    <div class="toggle" id="hapticToggle" onclick="toggleHaptic()"></div>
+  </div>
+
+  <!-- AIRDROP TIMER -->
+  <div class="airdropTimer">
+    <div class="airdropTitle">🚀 AIRDROP COUNTDOWN</div>
+    <div style="font-size:11px;opacity:.6;margin-bottom:10px;">Mining ends — tokens launch!</div>
+    <div class="airdropCountdown">
+      <div class="airdropUnit"><div class="airdropNum" id="adDays">000</div><div class="airdropLabel">DAYS</div></div>
+      <div style="font-size:24px;color:var(--gold);opacity:.5;align-self:center;">:</div>
+      <div class="airdropUnit"><div class="airdropNum" id="adHours">00</div><div class="airdropLabel">HRS</div></div>
+      <div style="font-size:24px;color:var(--gold);opacity:.5;align-self:center;">:</div>
+      <div class="airdropUnit"><div class="airdropNum" id="adMins">00</div><div class="airdropLabel">MIN</div></div>
+      <div style="font-size:24px;color:var(--gold);opacity:.5;align-self:center;">:</div>
+      <div class="airdropUnit"><div class="airdropNum" id="adSecs">00</div><div class="airdropLabel">SEC</div></div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--gold);opacity:.7;">Hold your coins — rewards incoming 🔥</div>
+  </div>
+
+  <!-- INFO -->
+  <div class="settingRow">
+    <div><div class="settingLabel">📱 App Version</div><div class="settingDesc">Nilma Coin v2.0 — Cyber Edition</div></div>
+    <div style="font-size:12px;color:var(--cyan);opacity:.7;">v2.0</div>
+  </div>
+  <div class="settingRow">
+    <div><div class="settingLabel">🆔 Player ID</div><div class="settingDesc" id="settingsPlayerId">—</div></div>
+  </div>
+
+  <button onclick="closeSettings()" style="width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.07);color:white;font-size:15px;font-weight:700;margin-top:8px;cursor:pointer;">Close</button>
+</div>
+</div>
+
+<!-- EXTRA AUDIO -->
+<audio id="rewardSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+<audio id="clickSound2" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav" preload="auto"></audio>
+<audio id="chestOpenSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3" preload="auto"></audio>
+<audio id="levelUpSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.wav" preload="auto"></audio>
+<audio id="bgMusic" src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" loop preload="none"></audio>
 
 <script>
 // =================== FIREBASE ===================
@@ -1032,7 +1183,7 @@ function openChest(){
   const chest=document.getElementById("megaChest");
   chest.classList.add("opening");
   setTimeout(()=>chest.classList.remove("opening"),1800);
-  document.getElementById("spinSound").play().catch(()=>{});
+  playChestOpen();
   // Rewards
   const r=Math.random();
   let rewardText,rewardEmoji="📦";
@@ -1045,7 +1196,8 @@ function openChest(){
   else{minePower+=1;rewardText="🚀 TURBO POWER +1";rewardEmoji="🚀";}
   setTimeout(()=>{
     chestPopEffect(rewardText);
-    document.getElementById("winSound").play().catch(()=>{});
+    playWin();
+    updateChestLabel();
     save();update();
   },1800);
 }
@@ -1416,6 +1568,208 @@ function renderAll(){
   renderShopMachines();
 }
 
+// =================== SETTINGS ===================
+let soundOn = localStorage.getItem("soundOn") !== "false";
+let musicOn = localStorage.getItem("musicOn") === "true";
+let hapticOn = localStorage.getItem("hapticOn") !== "false";
+
+function openSettings(){
+  playClick();
+  document.getElementById("settingsModal").classList.add("open");
+  document.getElementById("settingsPlayerId").innerText = playerId;
+  syncToggles();
+}
+function closeSettings(){
+  document.getElementById("settingsModal").classList.remove("open");
+}
+function syncToggles(){
+  document.getElementById("soundToggle").classList.toggle("on", soundOn);
+  document.getElementById("musicToggle").classList.toggle("on", musicOn);
+  document.getElementById("hapticToggle").classList.toggle("on", hapticOn);
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  localStorage.setItem("soundOn",soundOn);
+  syncToggles();
+  if(soundOn)playClick();
+}
+function toggleMusic(){
+  musicOn=!musicOn;
+  localStorage.setItem("musicOn",musicOn);
+  syncToggles();
+  const bg=document.getElementById("bgMusic");
+  if(bg){
+    if(musicOn){bg.volume=0.25;bg.play().catch(()=>{});}
+    else{bg.pause();}
+  }
+}
+function toggleHaptic(){
+  hapticOn=!hapticOn;
+  localStorage.setItem("hapticOn",hapticOn);
+  syncToggles();
+}
+// Close settings tapping outside
+document.getElementById("settingsModal").addEventListener("click",function(e){
+  if(e.target===this)closeSettings();
+});
+
+// =================== SOUND HELPERS ===================
+function playClick(){
+  if(!soundOn)return;
+  const s=document.getElementById("clickSound2")||document.getElementById("clickSound");
+  if(s){s.currentTime=0;s.play().catch(()=>{});}
+}
+function playWin(){
+  if(!soundOn)return;
+  const s=document.getElementById("rewardSound")||document.getElementById("winSound");
+  if(s){s.currentTime=0;s.play().catch(()=>{});}
+}
+function playChestOpen(){
+  if(!soundOn)return;
+  const s=document.getElementById("chestOpenSound")||document.getElementById("spinSound");
+  if(s){s.currentTime=0;s.play().catch(()=>{});}
+}
+function playLevelUp(){
+  if(!soundOn)return;
+  const s=document.getElementById("levelUpSound");
+  if(s){s.currentTime=0;s.play().catch(()=>{});}
+  else playWin();
+}
+function doHaptic(type="light"){
+  if(!hapticOn)return;
+  if(window.Telegram?.WebApp)try{Telegram.WebApp.HapticFeedback.impactOccurred(type);}catch(e){}
+}
+
+// =================== AIRDROP TIMER ===================
+// 6 months from first launch
+const AIRDROP_TARGET = (() => {
+  let saved = localStorage.getItem("airdropTarget");
+  if(!saved){
+    // 6 months from now
+    const t = Date.now() + (183 * 24 * 60 * 60 * 1000);
+    localStorage.setItem("airdropTarget", t);
+    return t;
+  }
+  return parseInt(saved);
+})();
+
+function updateAirdropTimer(){
+  const now = Date.now();
+  const diff = Math.max(0, AIRDROP_TARGET - now);
+  const days = Math.floor(diff / 86400000);
+  const hrs  = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const pad = (n,l=2)=>String(n).padStart(l,"0");
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.innerText=v;};
+  s("adDays",pad(days,3));
+  s("adHours",pad(hrs));
+  s("adMins",pad(mins));
+  s("adSecs",pad(secs));
+}
+setInterval(updateAirdropTimer, 1000);
+updateAirdropTimer();
+
+// =================== WEEKLY LEADERBOARD ===================
+// Week resets every Sunday 00:00 UTC
+function getWeekStart(){
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun
+  const diff = now.getUTCDate() - day;
+  const weekStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), diff, 0,0,0));
+  return weekStart.getTime();
+}
+function getWeekEnd(){
+  return getWeekStart() + 7*24*60*60*1000;
+}
+
+const WEEKLY_PRIZES = [10000,6000,4000,2500,2000,1500,1200,1000,700,500];
+
+function updateWeekTimer(){
+  const diff = Math.max(0, getWeekEnd() - Date.now());
+  const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  const el=document.getElementById("weekTimer");
+  if(el)el.innerText=`${d}d ${String(h).padStart(2,"0")}h ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`;
+}
+setInterval(updateWeekTimer,1000);
+updateWeekTimer();
+
+// Check & distribute weekly rewards
+async function checkWeeklyRewards(){
+  if(!db)return;
+  const weekStart=getWeekStart();
+  const myKey="weekRewarded_"+weekStart;
+  if(localStorage.getItem(myKey))return;
+  // Check if we're in a new week compared to last check
+  const lastWeek=parseInt(localStorage.getItem("lastWeekStart")||"0");
+  if(lastWeek===weekStart)return;
+  // New week — distribute rewards to top 10 from last week
+  // We use Firebase to check who was top last week via 'weekCoins' field
+  try{
+    const snap=await db.collection("players").orderBy("weekCoins","desc").limit(10).get();
+    let rank=1;
+    const batch=db.batch();
+    snap.forEach(doc=>{
+      const prize=WEEKLY_PRIZES[rank-1]||0;
+      if(prize>0){
+        batch.update(doc.ref,{coins:firebase.firestore.FieldValue.increment(prize),weekCoins:0});
+        if(doc.id===playerId){
+          coins+=prize;lifetimeCoins+=prize;
+          setTimeout(()=>showToast("🏆 Weekly Reward: +"+prize.toLocaleString()+" coins! (Rank #"+rank+")"),1500);
+        }
+      }
+      rank++;
+    });
+    await batch.commit();
+  }catch(e){console.log("Weekly reward err:",e);}
+  localStorage.setItem("lastWeekStart",weekStart);
+  localStorage.setItem(myKey,"done");
+}
+
+function loadLeaderboard(){
+  const board=document.getElementById("leaderboardList");
+  if(!db){board.innerHTML="<div style='text-align:center;opacity:.5;'>Firebase not connected</div>";return;}
+  board.innerHTML="<div style='text-align:center;opacity:.5;'>Loading...</div>";
+  // Save current week coins to firebase for weekly tracking
+  if(db){
+    db.collection("players").doc(playerId).update({weekCoins:coins}).catch(()=>{
+      db.collection("players").doc(playerId).set({weekCoins:coins},{merge:true}).catch(()=>{});
+    });
+  }
+  db.collection("players").orderBy("coins","desc").limit(15).onSnapshot(snap=>{
+    let html="";let rank=1;
+    snap.forEach(doc=>{
+      const d=doc.data();
+      const isMe=doc.id===playerId;
+      const prize=WEEKLY_PRIZES[rank-1]||0;
+      let medal=rank<=3?["🥇","🥈","🥉"][rank-1]:"#"+rank;
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;margin-bottom:8px;border-radius:14px;background:${isMe?"linear-gradient(135deg,rgba(0,255,255,.07),rgba(138,46,255,.05))":"rgba(255,255,255,.03)"};border:1px solid ${isMe?"rgba(0,255,255,.25)":"rgba(255,255,255,.05)"};animation:slideUp .3s ease;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:18px;min-width:28px;">${medal}</div>
+          <div>
+            <div style="font-weight:700;font-size:13px;">${d.username||"Player"} ${isMe?"<span style='color:var(--cyan);font-size:10px;'>(you)</span>":""}</div>
+            <div style="font-size:10px;color:var(--gold);opacity:.7;">Lv${d.level||1} · ⚡${d.minePower||1}/tap</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:900;color:var(--gold);font-size:13px;">💰 ${(d.coins||0).toLocaleString()}</div>
+          ${prize?`<div style="font-size:10px;color:var(--green);opacity:.8;">+${prize.toLocaleString()} prize</div>`:""}
+        </div>
+      </div>`;
+      rank++;
+    });
+    board.innerHTML=html||"<div style='text-align:center;opacity:.5;'>No players yet</div>";
+  },err=>{board.innerHTML="Failed to load";});
+}
+
+// =================== UPDATE CHEST LABEL ===================
+function updateChestLabel(){
+  const el=document.getElementById("chestCostLabel");
+  if(!el)return;
+  if(freeSpinUsed==="no"){el.innerText="🆓 FREE TODAY";el.style.color="var(--green)";}
+  else{el.innerText="💰 "+paidChestPrice+" coins";el.style.color="var(--gold)";}
+}
+
 // =================== LOADING BAR ===================
 let loadPct=0;
 const loadInt=setInterval(()=>{
@@ -1431,8 +1785,42 @@ const loadInt=setInterval(()=>{
   if(lb)lb.style.width=loadPct+"%";
 },220);
 
+// =================== AUDIO UNLOCK ===================
+let audioUnlocked=false;
+function unlockAudio(){
+  if(audioUnlocked)return;
+  ["rewardSound","clickSound2","chestOpenSound","levelUpSound","winSound","clickSound","spinSound"].forEach(id=>{
+    const s=document.getElementById(id);
+    if(!s)return;
+    s.muted=true;s.play().then(()=>{s.pause();s.currentTime=0;s.muted=false;}).catch(()=>{});
+  });
+  audioUnlocked=true;
+  if(musicOn){const bg=document.getElementById("bgMusic");if(bg){bg.volume=0.25;bg.play().catch(()=>{});}}
+}
+
+// =================== PATCH mine() to use new sound/haptic ===================
+const _origMine = mine;
+// Patch openChest to use new sounds
+const _origOpenChest = openChest;
+window.openChest = function(){
+  playChestOpen();
+  doHaptic("medium");
+  _origOpenChest();
+};
+// Patch checkLevelUp to play level up sound
+const _origCheckLevelUp = checkLevelUp;
+window.checkLevelUp = function(){
+  const wasLevel = level;
+  _origCheckLevelUp();
+  if(level > wasLevel) playLevelUp();
+};
+
 // =================== EVENT LISTENERS ===================
-document.getElementById("reactorWrap").addEventListener("click",e=>mine(e));
+document.getElementById("reactorWrap").addEventListener("click",e=>{
+  playClick();
+  doHaptic("light");
+  mine(e);
+});
 
 // =================== INIT ===================
 window.onerror=(msg,src,ln)=>{console.log("ERR:",msg,"L:",ln);};
@@ -1441,8 +1829,11 @@ update();
 renderAll();
 showScreen("homeScreen");
 updateDailyTimer();
+updateChestLabel();
+syncToggles();
 setTimeout(checkOfflineMining,2500);
-console.log("✅ Nilma Coin v2 Loaded");
+setTimeout(checkWeeklyRewards,3000);
+console.log("✅ Nilma Coin v3 Loaded");
 </script>
 </body>
 </html>
