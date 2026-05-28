@@ -962,7 +962,11 @@ async function loadPlayerData(){
 }
 
 // ===== SAVE =====
+// Debounce timer for Firebase saves
+let _saveTimer = null;
+
 function save(){
+  // Save to localStorage immediately
   localStorage.setItem("coins",coins);
   localStorage.setItem("energy",energy);
   localStorage.setItem("level",level);
@@ -986,20 +990,44 @@ function save(){
   localStorage.setItem("dailyEpicCrates",dailyEpicCrates);
   localStorage.setItem("streakDay",streakDay);
   localStorage.setItem("bestStreak",bestStreak);
+
   // Anti-cheat cap
   const cap=(level*10000)+100000;
   if(coins>cap)coins=cap;
   if(coins<0)coins=0;
   if(energy<0)energy=0;
-  if(db){
+
+  // Debounce Firebase saves — max once every 3 seconds
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(()=>{
+    if(!db) return;
     db.collection("players").doc(playerId).set({
-      username,coins,energy,level,xp,xpMax,minePower,xpBoost,
-      machineOwned,currentMachine,referrals,
-      lifetimeCoins,lifetimeMines,lifetimeChests,
-      commonCrates,epicCrates,legendaryCrates,mythicCrates,
-      streakDay,updated:Date.now()
-    },{merge:true}).catch(e=>console.log(e));
-  }
+      username,
+      coins,
+      energy,
+      level,
+      xp,
+      xpMax,
+      minePower,
+      xpBoost,
+      machineOwned,
+      currentMachine,
+      referrals,
+      lifetimeCoins,
+      lifetimeMines,
+      lifetimeChests,
+      commonCrates,
+      epicCrates,
+      legendaryCrates,
+      mythicCrates,
+      streakDay,
+      bestStreak,
+      weekCoins: coins,
+lastActive: Date.now(),
+vipEnd: vipEnd,
+updated: Date.now()
+    },{merge:true}).catch(e=>console.log("Save error:",e));
+  }, 3000);
 }
 
 // ===== UPDATE UI =====
@@ -1547,44 +1575,116 @@ function updateWeekTimer(){
   if(el)el.innerText=`${d}d ${String(h).padStart(2,"0")}h ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`;
 }
 setInterval(updateWeekTimer,1000);updateWeekTimer();
+let lbListener = null;
 
-let lbListener=null;
 function loadLeaderboard(){
-  const board=document.getElementById("leaderboardList");
-  if(!board)return;
-  if(!db){board.innerHTML="<div style='text-align:center;opacity:.5;padding:20px;'>Firebase not connected</div>";return;}
-  board.innerHTML="<div style='text-align:center;opacity:.5;padding:20px;'>Loading...</div>";
-  // Update this player's weekCoins
-  db.collection("players").doc(playerId).set({weekCoins:coins},{merge:true}).catch(()=>{});
+  const board = document.getElementById("leaderboardList");
+  if(!board) return;
+
+  if(!db){
+    board.innerHTML = "<div style='text-align:center;opacity:.5;padding:20px;'>Firebase not connected</div>";
+    return;
+  }
+
+  board.innerHTML = `<div style='text-align:center;padding:30px;'>
+    <div style='font-size:30px;animation:spin 1s linear infinite;display:inline-block;'>⚙️</div>
+    <div style='margin-top:10px;opacity:.5;font-size:13px;'>Loading live rankings...</div>
+  </div>`;
+
   // Unsubscribe previous listener
-  if(lbListener)lbListener();
-  lbListener=db.collection("players").orderBy("coins","desc").limit(15).onSnapshot(snap=>{
-    let html="";let rank=1;
-    snap.forEach(doc=>{
-      const d=doc.data();const isMe=doc.id===playerId;
-      const prize=WEEKLY_PRIZES[rank-1]||0;
-      const medal=rank<=3?["🥇","🥈","🥉"][rank-1]:"<span style='font-size:12px;opacity:.7;'>#"+rank+"</span>";
-      html+=`<div class="lbRow${isMe?" me":""}">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="font-size:18px;min-width:26px;text-align:center;">${medal}</div>
-          <div>
-            <div style="font-weight:700;font-size:13px;">${(d.username||"Player").substring(0,16)}${isMe?" <span style='color:var(--cyan);font-size:10px;'>(you)</span>":""}</div>
-            <div style="font-size:10px;color:var(--gold);opacity:.7;">Lv${d.level||1} · ⚡${d.minePower||1}/tap${d.streakDay>0?" · 🔥"+d.streakDay:""}
+  if(lbListener){
+    try{ lbListener(); }catch(e){}
+    lbListener = null;
+  }
+
+  // Real-time listener — updates instantly when any player's coins change
+  lbListener = db.collection("players")
+    .orderBy("coins", "desc")
+    .limit(20)
+    .onSnapshot(snap => {
+      if(snap.empty){
+        board.innerHTML = "<div style='text-align:center;opacity:.5;padding:20px;'>No players yet</div>";
+        return;
+      }
+
+      let html = "";
+      let rank = 1;
+      let myRank = null;
+      let myDataFound = false;
+
+      snap.forEach(doc => {
+        const d = doc.data();
+        const isMe = doc.id === playerId;
+        if(isMe){ myRank = rank; myDataFound = true; }
+        const prize = WEEKLY_PRIZES[rank-1] || 0;
+        const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `<span style='font-size:11px;opacity:.6;'>#${rank}</span>`;
+
+        // Online indicator — active in last 5 minutes
+        const isOnline = d.lastActive && (Date.now() - d.lastActive) < 300000;
+        const onlineDot = isOnline
+          ? `<span style='display:inline-block;width:7px;height:7px;border-radius:50%;background:#00ff99;margin-left:5px;box-shadow:0 0 6px #00ff99;'></span>`
+          : "";
+
+        // Streak badge
+        const streakBadge = d.streakDay > 0
+          ? `<span style='font-size:10px;color:#ff9800;margin-left:4px;'>🔥${d.streakDay}</span>`
+          : "";
+
+        html += `
+          <div class="lbRow${isMe ? " me" : ""}" style="animation:slideUp .3s ease ${(rank-1)*0.05}s both;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="font-size:20px;min-width:28px;text-align:center;">${medal}</div>
+              <div>
+                <div style="font-weight:700;font-size:13px;display:flex;align-items:center;">
+                  ${(d.username||"Player").substring(0,16)}
+                  ${isMe ? `<span style='color:var(--cyan);font-size:10px;margin-left:4px;'>(you)</span>` : ""}
+                  ${onlineDot}
+                  ${d.vipEnd && Date.now() < d.vipEnd ? `<span style='font-size:9px;padding:1px 6px;border-radius:10px;background:linear-gradient(90deg,#ffd54a,#ff9800);color:black;font-weight:900;margin-left:4px;'>VIP</span>` : ""}
+                </div>
+                <div style="font-size:10px;opacity:.6;margin-top:2px;">
+                  Lv${d.level||1} · ⚡${d.minePower||1}/tap${streakBadge}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-weight:900;color:var(--gold);font-size:13px;">💰 ${(d.coins||0).toLocaleString()}</div>
-          ${prize?`<div style="font-size:10px;color:var(--green);opacity:.8;">+${prize.toLocaleString()} prize</div>`:""}
-        </div>
-      </div>`;
-      rank++;
+            <div style="text-align:right;">
+              <div style="font-weight:900;color:var(--gold);font-size:14px;">💰 ${(d.coins||0).toLocaleString()}</div>
+              ${prize ? `<div style="font-size:10px;color:var(--green);margin-top:2px;">🏆 +${prize.toLocaleString()}</div>` : ""}
+            </div>
+          </div>`;
+        rank++;
+      });
+
+      // Show player's rank if not in top 20
+      if(!myDataFound){
+        html += `
+          <div style="text-align:center;padding:12px;opacity:.5;font-size:12px;border-top:1px solid rgba(255,255,255,.05);margin-top:8px;">
+            You are not in top 20 yet — keep mining!
+          </div>`;
+      } else {
+        html += `
+          <div style="text-align:center;padding:10px;opacity:.5;font-size:11px;">
+            Your rank: #${myRank} of ${snap.size}+ players
+          </div>`;
+      }
+
+      board.innerHTML = html;
+
+    }, err => {
+      console.log("Leaderboard error:", err);
+      // If index error, fall back to one-time fetch
+      if(err.code === "failed-precondition" || err.code === "unimplemented"){
+        board.innerHTML = `<div style='text-align:center;padding:20px;'>
+          <div style='font-size:13px;color:#ff9800;margin-bottom:10px;'>⚠️ Setting up leaderboard index...</div>
+          <div style='font-size:11px;opacity:.5;'>This takes ~2 minutes on first launch</div>
+          <button onclick='loadLeaderboard()' style='margin-top:14px;padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:700;cursor:pointer;'>🔄 Retry</button>
+        </div>`;
+      } else {
+        board.innerHTML = `<div style='text-align:center;padding:20px;opacity:.5;'>
+          Failed to load. 
+          <button onclick='loadLeaderboard()' style='margin-top:10px;padding:8px 16px;border:none;border-radius:8px;background:rgba(255,255,255,.1);color:white;cursor:pointer;'>Retry</button>
+        </div>`;
+      }
     });
-    board.innerHTML=html||"<div style='text-align:center;opacity:.5;padding:20px;'>No players yet</div>";
-  },err=>{
-    console.log("LB error:",err);
-    board.innerHTML="<div style='text-align:center;opacity:.5;padding:20px;'>Leaderboard loading failed. Check Firebase indexes.</div>";
-  });
 }
 
 // ===== REFERRAL =====
@@ -2267,7 +2367,10 @@ function claimOfflineReward(){
   offlineCooldown=Date.now()+1800000;localStorage.setItem("offlineCooldown",offlineCooldown);
   showToast("⚡ +"+r.toLocaleString()+" offline coins!");
 }
-window.addEventListener("beforeunload",()=>localStorage.setItem("lastOnline",Date.now()));
+window.addEventListener("beforeunload",()=>{
+  localStorage.setItem("lastOnline", Date.now());
+  if(lbListener){ try{ lbListener(); }catch(e){} }
+});
 
 // ===== INTERVALS =====
 setInterval(()=>{if(energy<maxEnergy){energy++;update();}},3000);
