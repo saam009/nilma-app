@@ -238,6 +238,32 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webk
 .notifItem.unread{border-left-color:var(--gold);background:rgba(255,213,74,.05);}
 .notifItem .notifTime{font-size:10px;opacity:.45;margin-top:4px;}
 .notifClear{width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:#aaa;cursor:pointer;margin-top:8px;}
+  /* VIP MEMBERSHIP */
+.vipBadge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:900;letter-spacing:1px;background:linear-gradient(90deg,#ffd54a,#ff9800);color:black;margin-left:8px;}
+.vipCard{border-radius:22px;padding:20px;background:linear-gradient(135deg,rgba(255,213,74,.12),rgba(255,150,0,.07));border:1px solid rgba(255,213,74,.35);margin-bottom:14px;position:relative;overflow:hidden;}
+.vipCard::before{content:"";position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,213,74,.15),transparent 70%);border-radius:50%;}
+.vipPerk{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.vipPerk:last-child{border-bottom:none;}
+.vipPerkIcon{font-size:20px;flex-shrink:0;}
+.vipModal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:99999;display:none;justify-content:center;align-items:flex-end;}
+.vipModal.open{display:flex;}
+.vipSheet{background:linear-gradient(180deg,rgba(10,8,2,.98),rgba(5,4,1,.98));border:1px solid rgba(255,213,74,.2);border-radius:28px 28px 0 0;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .3s ease;}
+
+/* STAKING */
+.stakeCard{border-radius:20px;padding:18px;background:linear-gradient(135deg,rgba(0,255,153,.07),rgba(0,200,100,.04));border:1px solid rgba(0,255,153,.2);margin-bottom:14px;}
+.stakePool{border-radius:14px;padding:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);margin-bottom:10px;cursor:pointer;transition:.2s;}
+.stakePool:hover{transform:translateY(-2px);border-color:rgba(0,255,153,.3);}
+.stakePool.active{border-color:rgba(0,255,153,.5);background:rgba(0,255,153,.06);}
+.stakeBar{height:8px;background:rgba(255,255,255,.07);border-radius:20px;overflow:hidden;margin-top:8px;}
+.stakeBarFill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),#00c853);transition:.4s;}
+
+/* CLAN */
+.clanCard{border-radius:20px;padding:18px;background:linear-gradient(135deg,rgba(138,46,255,.09),rgba(100,0,200,.05));border:1px solid rgba(138,46,255,.25);margin-bottom:14px;}
+.clanMember{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.clanMember:last-child{border-bottom:none;}
+.clanBadge{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(138,46,255,.2);color:#c060ff;border:1px solid rgba(138,46,255,.3);}
+.clanInput{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(138,46,255,.3);background:rgba(255,255,255,.05);color:white;font-size:14px;margin:8px 0;outline:none;}
+.clanInput:focus{border-color:rgba(138,46,255,.6);}
 </style>
 </head>
 <body onclick="unlockAudio()">
@@ -597,15 +623,91 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webk
   <div style="text-align:center;margin-top:14px;opacity:.55;font-size:12px;">🏆 Best this session: <span id="puzzleBest">0</span> coins</div>
 </div>
 </div>
+<!-- ===== VIP SCREEN (modal trigger only, sheet below) ===== -->
+<!-- VIP MODAL -->
+<div class="vipModal" id="vipModal">
+<div class="vipSheet">
+  <div style="width:40px;height:4px;background:rgba(255,213,74,.3);border-radius:4px;margin:0 auto 18px;"></div>
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:56px;filter:drop-shadow(0 0 16px gold);">👑</div>
+    <div style="font-size:24px;font-weight:900;background:linear-gradient(90deg,#ffd54a,#ff9800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VIP MEMBERSHIP</div>
+    <div style="font-size:12px;opacity:.6;margin-top:4px;">Unlock elite mining privileges</div>
+    <div id="vipStatusText" style="margin-top:10px;font-size:13px;color:var(--gold);font-weight:700;"></div>
+  </div>
 
+  <!-- PERKS -->
+  <div class="vipCard">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--gold);opacity:.7;margin-bottom:12px;">👑 VIP PERKS</div>
+    <div class="vipPerk"><div class="vipPerkIcon">⚡</div><div><div style="font-weight:700;">2× Mine Power</div><div style="font-size:11px;opacity:.6;">Double coins every tap</div></div></div>
+    <div class="vipPerk"><div class="vipPerkIcon">🎁</div><div><div style="font-weight:700;">3 Free Chests Daily</div><div style="font-size:11px;opacity:.6;">Instead of 1 free chest</div></div></div>
+    <div class="vipPerk"><div class="vipPerkIcon">📈</div><div><div style="font-weight:700;">+50% Staking Rewards</div><div style="font-size:11px;opacity:.6;">Bonus on all staking pools</div></div></div>
+    <div class="vipPerk"><div class="vipPerkIcon">🏆</div><div><div style="font-weight:700;">Exclusive Leaderboard Badge</div><div style="font-size:11px;opacity:.6;">Stand out on the rankings</div></div></div>
+    <div class="vipPerk"><div class="vipPerkIcon">🔋</div><div><div style="font-weight:700;">+50 Max Energy</div><div style="font-size:11px;opacity:.6;">Mine longer without breaks</div></div></div>
+    <div class="vipPerk"><div class="vipPerkIcon">👑</div><div><div style="font-weight:700;">VIP Badge on Profile</div><div style="font-size:11px;opacity:.6;">Exclusive gold crown badge</div></div></div>
+  </div>
+
+  <!-- PLANS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div id="vipPlan1" onclick="selectVipPlan(1)" style="border-radius:16px;padding:16px;text-align:center;border:2px solid rgba(255,213,74,.3);background:rgba(255,213,74,.05);cursor:pointer;transition:.2s;">
+      <div style="font-size:11px;opacity:.6;margin-bottom:4px;">MONTHLY</div>
+      <div style="font-size:24px;font-weight:900;color:var(--gold);">9.3</div>
+      <div style="font-size:11px;color:var(--gold);">TON / month</div>
+      <div style="font-size:10px;opacity:.5;margin-top:6px;">30 days access</div>
+    </div>
+    <div id="vipPlan2" onclick="selectVipPlan(2)" style="border-radius:16px;padding:16px;text-align:center;border:2px solid rgba(255,213,74,.3);background:rgba(255,213,74,.05);cursor:pointer;transition:.2s;position:relative;">
+      <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#ffd54a,#ff9800);color:black;font-size:9px;font-weight:900;padding:2px 10px;border-radius:10px;">BEST VALUE</div>
+      <div style="font-size:11px;opacity:.6;margin-bottom:4px;">YEARLY</div>
+      <div style="font-size:24px;font-weight:900;color:var(--gold);">79</div>
+      <div style="font-size:11px;color:var(--gold);">TON / year</div>
+      <div style="font-size:10px;color:var(--green);margin-top:6px;">Save 33%!</div>
+    </div>
+  </div>
+
+  <button onclick="buyVip()" style="width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(90deg,#ffd54a,#ff9800);color:black;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 0 24px rgba(255,213,74,.4);">👑 BECOME VIP</button>
+  <div style="font-size:10px;opacity:.4;text-align:center;margin-top:8px;">Secure payment via TON blockchain</div>
+  <button onclick="closeVipModal()" style="width:100%;padding:12px;border:none;border-radius:12px;background:rgba(255,255,255,.06);color:#aaa;margin-top:10px;cursor:pointer;">Maybe Later</button>
+</div>
+</div>
+
+<!-- ===== STAKING SCREEN ===== -->
+<div id="stakingScreen" class="screen">
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard" style="text-align:center;">
+  <h2>📈 Staking System</h2>
+  <p style="opacity:.7;margin-top:4px;">Lock coins — earn passive rewards</p>
+  <div style="display:flex;justify-content:center;gap:16px;margin-top:12px;">
+    <div style="text-align:center;"><div style="font-size:17px;font-weight:900;color:var(--green);" id="stakeTotalStaked">0</div><div style="font-size:9px;opacity:.6;">TOTAL STAKED</div></div>
+    <div style="text-align:center;"><div style="font-size:17px;font-weight:900;color:var(--gold);" id="stakeTotalEarned">0</div><div style="font-size:9px;opacity:.6;">TOTAL EARNED</div></div>
+    <div style="text-align:center;"><div style="font-size:17px;font-weight:900;color:#ff6eb4;" id="stakeActiveCount">0</div><div style="font-size:9px;opacity:.6;">ACTIVE STAKES</div></div>
+  </div>
+</div>
+<div style="padding:16px;">
+  <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:12px;">⚡ STAKING POOLS</div>
+  <div id="stakePoolList"></div>
+  <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin:18px 0 12px;">📊 YOUR ACTIVE STAKES</div>
+  <div id="myStakeList"><div style="text-align:center;opacity:.4;font-size:13px;">No active stakes</div></div>
+</div>
+</div>
+
+<!-- ===== CLAN SCREEN ===== -->
+<div id="clanScreen" class="screen">
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard" style="text-align:center;">
+  <h2>⚔️ Clan System</h2>
+  <p style="opacity:.7;margin-top:4px;">Create or join a squad — mine together</p>
+  <div id="clanHeaderInfo" style="margin-top:10px;font-size:13px;color:var(--purple);font-weight:700;"></div>
+</div>
+<div style="padding:16px;" id="clanContent"></div>
+</div>
 <!-- ===== NAV ===== -->
 <div class="bottomNav">
 <div class="navItem active" onclick="showScreen('homeScreen')"><div class="navIcon">🏠</div>Home</div>
 <div class="navItem" onclick="showScreen('spinScreen')"><div class="navIcon">🎁</div>Chest</div>
-<div class="navItem" onclick="showScreen('taskScreen')"><div class="navIcon">📋</div>Tasks</div>
 <div class="navItem" onclick="showScreen('shopScreen')"><div class="navIcon">💎</div>Shop</div>
+<div class="navItem" onclick="showScreen('stakingScreen')"><div class="navIcon">📈</div>Stake</div>
+<div class="navItem" onclick="showScreen('clanScreen')"><div class="navIcon">⚔️</div>Clan</div>
 <div class="navItem" onclick="showScreen('leaderboardScreen')"><div class="navIcon">🥇</div>Top</div>
-<div class="navItem" onclick="showScreen('referralScreen')"><div class="navIcon">👥</div>Refer</div>
+<div class="navItem" onclick="openVipModal()"><div class="navIcon">👑</div>VIP</div>
 </div>
 <!-- PROFILE MODAL -->
 <div class="profileModal" id="profileModal">
@@ -1202,6 +1304,8 @@ function showScreen(id){
   const idx=map[id];
   if(idx!==undefined){const items=document.querySelectorAll(".navItem");if(items[idx])items[idx].classList.add("active");}
   if(id==="leaderboardScreen")loadLeaderboard();
+if(id==="stakingScreen")renderStaking();
+if(id==="clanScreen")renderClan();
   if(id==="taskScreen")renderTasks();
   if(id==="missionScreen")renderMissions();
   if(id==="streakScreen")renderStreak();
@@ -1901,6 +2005,8 @@ function renderAll(){
   renderStreak();
   renderShopMachines();
   renderCalendar();
+  renderStaking();
+  renderClan();
 }
 
 // =================== SETTINGS ===================
@@ -2529,6 +2635,459 @@ setTimeout(()=>{
 },3000);
 updateNotifDot();
 // =================== END OF SCRIPT ===================
+ // =================== VIP MEMBERSHIP ===================
+let vipEnd = parseInt(localStorage.getItem("vipEnd")||"0");
+let vipPlanSelected = 1;
+let isVip = Date.now() < vipEnd;
+
+function openVipModal(){
+  playClick();
+  updateVipStatus();
+  document.getElementById("vipModal").classList.add("open");
+}
+function closeVipModal(){
+  document.getElementById("vipModal").classList.remove("open");
+}
+function selectVipPlan(plan){
+  vipPlanSelected = plan;
+  document.getElementById("vipPlan1").style.borderColor = plan===1?"rgba(255,213,74,.8)":"rgba(255,213,74,.3)";
+  document.getElementById("vipPlan2").style.borderColor = plan===2?"rgba(255,213,74,.8)":"rgba(255,213,74,.3)";
+  document.getElementById("vipPlan1").style.background = plan===1?"rgba(255,213,74,.15)":"rgba(255,213,74,.05)";
+  document.getElementById("vipPlan2").style.background = plan===2?"rgba(255,213,74,.15)":"rgba(255,213,74,.05)";
+}
+function updateVipStatus(){
+  isVip = Date.now() < vipEnd;
+  const el = document.getElementById("vipStatusText");
+  if(!el) return;
+  if(isVip){
+    const rem = vipEnd - Date.now();
+    const days = Math.floor(rem/86400000);
+    el.innerHTML = `✅ VIP ACTIVE — <span style="color:var(--green)">${days} days remaining</span>`;
+    applyVipPerks();
+  } else {
+    el.innerHTML = `<span style="opacity:.6">Not a VIP member yet</span>`;
+  }
+}
+function applyVipPerks(){
+  if(!isVip) return;
+  // +50 max energy
+  if(maxEnergy < 150){ maxEnergy = 150; localStorage.setItem("maxEnergy",150); }
+}
+function buyVip(){
+  const ton = vipPlanSelected===1 ? 9.3 : 79;
+  const days = vipPlanSelected===1 ? 30 : 365;
+  const label = vipPlanSelected===1 ? "VIP Monthly" : "VIP Yearly";
+  pendingPayment = {type:"vip", days, tonAmount:ton, machineName:label};
+  document.getElementById("payTitle").innerText = "Unlock "+label;
+  document.getElementById("payDesc").innerText = "Send EXACTLY "+ton+" TON to our wallet. Enter your transaction hash to activate VIP.";
+  document.getElementById("payAmount").innerText = ton+" TON";
+  document.getElementById("payTxHash").value = "";
+  closeVipModal();
+  document.getElementById("payModal").classList.add("open");
+}
+// Patch verifyPayment to handle VIP
+const _origVerify = verifyPayment;
+verifyPayment = async function(){
+  if(pendingPayment?.type === "vip"){
+    const txHash = document.getElementById("payTxHash").value.trim();
+    if(!txHash||txHash.length<20){showToast("Enter a valid transaction hash");return;}
+    const usedKey = "usedTx_"+txHash;
+    if(localStorage.getItem(usedKey)){showToast("❌ Transaction already used!");return;}
+    if(db){
+      try{
+        const txDoc = await db.collection("payments").doc(txHash).get();
+        if(txDoc.exists){showToast("❌ Transaction already used!");return;}
+        await db.collection("payments").doc(txHash).set({playerId,type:"vip",days:pendingPayment.days,tonAmount:pendingPayment.tonAmount,timestamp:Date.now(),status:"pending_review"});
+      }catch(e){console.log(e);}
+    }
+    localStorage.setItem(usedKey,"used_"+Date.now());
+    const addMs = pendingPayment.days * 86400000;
+    vipEnd = Math.max(Date.now(), vipEnd) + addMs;
+    localStorage.setItem("vipEnd", vipEnd);
+    isVip = true;
+    applyVipPerks();
+    closePayModal();
+    showToast("👑 VIP ACTIVATED for "+pendingPayment.days+" days!");
+    addNotification("VIP Activated 👑","Welcome to VIP! Your perks are now active.","👑");
+    save(); update();
+    return;
+  }
+  _origVerify();
+};
+// VIP badge on profile name
+setTimeout(()=>{
+  isVip = Date.now() < vipEnd;
+  if(isVip){
+    const nm = document.getElementById("profileName");
+    if(nm && !nm.querySelector(".vipBadge")){
+      const badge = document.createElement("span");
+      badge.className = "vipBadge"; badge.innerText = "VIP";
+      nm.appendChild(badge);
+    }
+    applyVipPerks();
+  }
+},500);
+document.getElementById("vipModal").addEventListener("click",function(e){if(e.target===this)closeVipModal();});
+selectVipPlan(1);
+
+// =================== STAKING SYSTEM ===================
+const STAKE_POOLS = [
+  {id:"bronze",icon:"🥉",name:"Bronze Pool",apy:8,minStake:500,lockDays:7,color:"#cd7f32",desc:"Low risk — 8% APY over 7 days"},
+  {id:"silver",icon:"🥈",name:"Silver Pool",apy:15,minStake:2000,lockDays:14,color:"#b0bec5",desc:"Medium risk — 15% APY over 14 days"},
+  {id:"gold",icon:"🥇",name:"Gold Pool",apy:25,minStake:5000,lockDays:30,color:"#ffd54a",desc:"High reward — 25% APY over 30 days"},
+  {id:"diamond",icon:"💎",name:"Diamond Pool",apy:50,minStake:20000,lockDays:60,color:"#00e5ff",desc:"Elite pool — 50% APY over 60 days"},
+];
+
+let myStakes = JSON.parse(localStorage.getItem("myStakes")||"[]");
+let totalStakeEarned = parseInt(localStorage.getItem("totalStakeEarned")||"0");
+
+function renderStaking(){
+  const poolList = document.getElementById("stakePoolList");
+  const myList = document.getElementById("myStakeList");
+  const totalStaked = myStakes.reduce((a,s)=>a+s.amount,0);
+  const activeCount = myStakes.filter(s=>!s.claimed).length;
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.innerText=v;};
+  s("stakeTotalStaked", totalStaked.toLocaleString());
+  s("stakeTotalEarned", totalStakeEarned.toLocaleString());
+  s("stakeActiveCount", activeCount);
+  if(!poolList) return;
+  poolList.innerHTML = "";
+  STAKE_POOLS.forEach(pool => {
+    const div = document.createElement("div");
+    div.className = "stakePool";
+    div.style.borderColor = pool.color+"44";
+    const vipBonus = isVip ? " <span style='color:var(--gold);font-size:10px;'>+50% VIP</span>" : "";
+    const effectiveApy = isVip ? Math.floor(pool.apy*1.5) : pool.apy;
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:28px;">${pool.icon}</div>
+          <div>
+            <div style="font-weight:900;font-size:14px;">${pool.name}</div>
+            <div style="font-size:11px;opacity:.6;">${pool.desc}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:900;color:var(--green);">${effectiveApy}%${vipBonus}</div>
+          <div style="font-size:9px;opacity:.5;">APY</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;opacity:.7;">
+        <span>Min: 💰 ${pool.minStake.toLocaleString()}</span>
+        <span>Lock: ${pool.lockDays} days</span>
+      </div>
+      <button onclick="openStakeModal('${pool.id}')" style="width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--green),#00c853);color:white;font-weight:900;font-size:13px;cursor:pointer;margin-top:10px;">STAKE NOW</button>
+    `;
+    poolList.appendChild(div);
+  });
+  if(!myList) return;
+  // Collect expired stakes
+  const now = Date.now();
+  let hasActive = false;
+  myList.innerHTML = "";
+  myStakes.forEach((stake, idx) => {
+    if(stake.claimed) return;
+    hasActive = true;
+    const pool = STAKE_POOLS.find(p=>p.id===stake.poolId);
+    const timeLeft = Math.max(0, stake.unlockTime - now);
+    const done = timeLeft === 0;
+    const pct = Math.min(100, ((now - stake.startTime)/(stake.unlockTime - stake.startTime))*100);
+    const div = document.createElement("div");
+    div.className = "stakeCard";
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-weight:900;">${pool?.icon||"📈"} ${pool?.name||"Pool"}</div>
+        <div style="font-size:12px;color:var(--gold);margin-top:2px;">Staked: 💰 ${stake.amount.toLocaleString()}</div>
+        <div style="font-size:12px;color:var(--green);margin-top:2px;">Reward: +💰 ${stake.reward.toLocaleString()}</div></div>
+        <div style="text-align:right;">
+          ${done
+            ? `<button onclick="claimStake(${idx})" style="padding:10px 16px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-weight:900;cursor:pointer;">CLAIM</button>`
+            : `<div style="font-size:12px;color:#ff9800;">${Math.floor(timeLeft/86400000)}d ${Math.floor((timeLeft%86400000)/3600000)}h left</div>`
+          }
+        </div>
+      </div>
+      <div class="stakeBar"><div class="stakeBarFill" style="width:${pct}%"></div></div>
+    `;
+    myList.appendChild(div);
+  });
+  if(!hasActive) myList.innerHTML = "<div style='text-align:center;opacity:.4;font-size:13px;'>No active stakes — stake some coins!</div>";
+}
+
+function openStakeModal(poolId){
+  const pool = STAKE_POOLS.find(p=>p.id===poolId);
+  if(!pool) return;
+  const effectiveApy = isVip ? Math.floor(pool.apy*1.5) : pool.apy;
+  const amount = parseInt(prompt(`Stake coins in ${pool.name}\n\nMin: ${pool.minStake.toLocaleString()} coins\nAPY: ${effectiveApy}%\nLock: ${pool.lockDays} days\n\nYour balance: ${coins.toLocaleString()} coins\n\nHow many coins to stake?`));
+  if(!amount || isNaN(amount)) return;
+  if(amount < pool.minStake){ showToast("Minimum stake is "+pool.minStake.toLocaleString()+" coins"); return; }
+  if(amount > coins){ showToast("Not enough coins!"); return; }
+  const reward = Math.floor(amount * (effectiveApy/100) * (pool.lockDays/365));
+  coins -= amount;
+  const stake = {
+    poolId, amount, reward,
+    startTime: Date.now(),
+    unlockTime: Date.now() + (pool.lockDays * 86400000),
+    claimed: false
+  };
+  myStakes.push(stake);
+  localStorage.setItem("myStakes", JSON.stringify(myStakes));
+  save(); update(); renderStaking();
+  showToast("📈 Staked "+amount.toLocaleString()+" coins! Reward: +"+reward.toLocaleString());
+  addNotification("Coins Staked 📈","You staked "+amount.toLocaleString()+" coins in "+pool.name,"📈");
+}
+
+function claimStake(idx){
+  const stake = myStakes[idx];
+  if(!stake || stake.claimed) return;
+  if(Date.now() < stake.unlockTime){ showToast("Still locked!"); return; }
+  const total = stake.amount + stake.reward;
+  coins += total; lifetimeCoins += stake.reward;
+  totalStakeEarned += stake.reward;
+  stake.claimed = true;
+  localStorage.setItem("myStakes", JSON.stringify(myStakes));
+  localStorage.setItem("totalStakeEarned", totalStakeEarned);
+  save(); update(); renderStaking();
+  playWin();
+  showRewardPopup("STAKE CLAIMED!", total, "📈");
+  addNotification("Stake Claimed! 💰","You received "+total.toLocaleString()+" coins from staking!","💰");
+}
+
+// Update stake timer every minute
+setInterval(()=>{
+  const stakingActive = document.getElementById("stakingScreen")?.classList.contains("active");
+  if(stakingActive) renderStaking();
+  // Check matured stakes
+  const now = Date.now();
+  myStakes.forEach(s=>{
+    if(!s.claimed && now>=s.unlockTime && !s._notified){
+      s._notified = true;
+      addNotification("Stake Ready! 📈","Your staked coins are ready to claim!","📈");
+    }
+  });
+},60000);
+
+// =================== CLAN SYSTEM ===================
+let myClan = JSON.parse(localStorage.getItem("myClan")||"null");
+let clanInviteCode = localStorage.getItem("clanInviteCode")||"";
+
+function renderClan(){
+  const content = document.getElementById("clanContent");
+  const header = document.getElementById("clanHeaderInfo");
+  if(!content) return;
+  if(myClan){
+    header.innerText = "⚔️ "+myClan.name;
+    renderClanDashboard(content);
+  } else {
+    header.innerText = "No clan yet";
+    renderClanJoin(content);
+  }
+}
+
+function renderClanJoin(content){
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:60px;margin-bottom:10px;">⚔️</div>
+      <div style="font-size:16px;font-weight:700;">You're not in a clan</div>
+      <div style="font-size:13px;opacity:.6;margin-top:4px;">Create one or join an existing clan</div>
+    </div>
+
+    <div class="clanCard">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--purple);opacity:.8;margin-bottom:12px;">⚔️ CREATE CLAN</div>
+      <input class="clanInput" id="newClanName" placeholder="Clan name (e.g. CryptoWolves)">
+      <input class="clanInput" id="newClanTag" placeholder="Tag (3-5 letters, e.g. CW)" maxlength="5">
+      <select id="newClanFlag" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(138,46,255,.3);background:rgba(255,255,255,.05);color:white;font-size:20px;margin:8px 0;">
+        <option>🔥</option><option>⚡</option><option>💎</option><option>🌕</option>
+        <option>🦁</option><option>🐉</option><option>🦊</option><option>🦅</option>
+        <option>⚔️</option><option>🛡️</option>
+      </select>
+      <button onclick="createClan()" style="width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--purple),#c060ff);color:white;font-weight:900;font-size:14px;cursor:pointer;margin-top:6px;">CREATE CLAN (500 coins)</button>
+    </div>
+
+    <div class="clanCard" style="margin-top:14px;">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--cyan);opacity:.8;margin-bottom:12px;">🔗 JOIN BY CODE</div>
+      <input class="clanInput" id="joinClanCode" placeholder="Enter clan invite code">
+      <button onclick="joinClanByCode()" style="width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:14px;cursor:pointer;margin-top:6px;">JOIN CLAN</button>
+    </div>
+
+    <div class="clanCard" style="margin-top:14px;">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--gold);opacity:.8;margin-bottom:12px;">🏆 TOP CLANS</div>
+      <div id="topClanList"><div style="text-align:center;opacity:.4;font-size:13px;">Loading...</div></div>
+    </div>
+  `;
+  loadTopClans();
+}
+
+function renderClanDashboard(content){
+  const clan = myClan;
+  const isLeader = clan.leaderId === playerId;
+  const myCode = clan.inviteCode || "";
+  content.innerHTML = `
+    <div class="clanCard">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+        <div style="font-size:50px;">${clan.flag||"⚔️"}</div>
+        <div>
+          <div style="font-size:20px;font-weight:900;">${clan.name} <span style="font-size:12px;color:var(--purple);opacity:.8;">[${clan.tag||"??"}]</span></div>
+          <div style="font-size:12px;opacity:.6;margin-top:2px;">Members: ${(clan.members||[]).length}/20</div>
+          <div style="font-size:12px;color:var(--gold);margin-top:2px;">Total Power: ⚡ ${(clan.totalPower||0).toLocaleString()}</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px;margin-bottom:12px;">
+        <div style="font-size:10px;opacity:.5;margin-bottom:4px;">🔗 INVITE CODE</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:16px;font-weight:900;color:var(--cyan);letter-spacing:3px;">${myCode}</div>
+          <button onclick="copyClanCode('${myCode}')" style="padding:6px 12px;border:none;border-radius:8px;background:rgba(0,255,255,.1);color:var(--cyan);font-size:12px;cursor:pointer;">COPY</button>
+        </div>
+      </div>
+      <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:10px;">👥 MEMBERS</div>
+      <div id="clanMemberList"><div style="opacity:.4;text-align:center;">Loading members...</div></div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button onclick="donateToClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-weight:900;font-size:12px;cursor:pointer;">💰 DONATE</button>
+        ${isLeader
+          ? `<button onclick="disbandClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-weight:900;font-size:12px;cursor:pointer;">DISBAND</button>`
+          : `<button onclick="leaveClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-weight:900;font-size:12px;cursor:pointer;">LEAVE</button>`
+        }
+      </div>
+    </div>
+  `;
+  loadClanMembers();
+}
+
+function createClan(){
+  const name = document.getElementById("newClanName")?.value.trim();
+  const tag = document.getElementById("newClanTag")?.value.trim().toUpperCase();
+  const flag = document.getElementById("newClanFlag")?.value || "⚔️";
+  if(!name||name.length<3){showToast("Clan name must be at least 3 characters");return;}
+  if(!tag||tag.length<2){showToast("Tag must be 2-5 letters");return;}
+  if(coins<500){showToast("Need 500 coins to create a clan");return;}
+  coins -= 500;
+  const code = Math.random().toString(36).substring(2,8).toUpperCase();
+  const clan = {
+    id:"clan_"+Date.now(), name, tag, flag,
+    leaderId:playerId, leaderName:username,
+    inviteCode:code, members:[{id:playerId,name:username,power:minePower,role:"Leader"}],
+    totalPower:minePower, createdAt:Date.now()
+  };
+  myClan = clan;
+  localStorage.setItem("myClan", JSON.stringify(myClan));
+  if(db){
+    db.collection("clans").doc(clan.id).set(clan).catch(e=>console.log(e));
+    db.collection("players").doc(playerId).update({clanId:clan.id,clanName:clan.name}).catch(()=>{});
+  }
+  save(); update(); renderClan();
+  showToast("⚔️ Clan '"+name+"' created!");
+  addNotification("Clan Created ⚔️","You created the clan '"+name+"'! Share code: "+code,"⚔️");
+}
+
+function joinClanByCode(){
+  const code = document.getElementById("joinClanCode")?.value.trim().toUpperCase();
+  if(!code||code.length<4){showToast("Enter a valid invite code");return;}
+  if(!db){showToast("Firebase required to join clans");return;}
+  db.collection("clans").where("inviteCode","==",code).limit(1).get().then(snap=>{
+    if(snap.empty){showToast("❌ Clan not found!");return;}
+    const doc = snap.docs[0];
+    const clan = doc.data();
+    if((clan.members||[]).length>=20){showToast("Clan is full (20/20)");return;}
+    if((clan.members||[]).find(m=>m.id===playerId)){showToast("Already in this clan!");return;}
+    const newMember = {id:playerId,name:username,power:minePower,role:"Member"};
+    clan.members.push(newMember);
+    clan.totalPower = (clan.totalPower||0)+minePower;
+    db.collection("clans").doc(doc.id).update({members:clan.members,totalPower:clan.totalPower}).then(()=>{
+      myClan = clan;
+      localStorage.setItem("myClan",JSON.stringify(myClan));
+      db.collection("players").doc(playerId).update({clanId:doc.id,clanName:clan.name}).catch(()=>{});
+      renderClan();
+      showToast("✅ Joined clan: "+clan.name);
+      addNotification("Joined Clan ⚔️","You joined '"+clan.name+"'!","⚔️");
+    });
+  }).catch(e=>{showToast("Error: "+e.message);});
+}
+
+function loadClanMembers(){
+  const list = document.getElementById("clanMemberList");
+  if(!list||!myClan) return;
+  const members = myClan.members||[];
+  list.innerHTML = members.map(m=>`
+    <div class="clanMember">
+      <div style="font-size:22px;">${m.role==="Leader"?"👑":"⚔️"}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">${m.name} ${m.id===playerId?"<span style='color:var(--cyan);font-size:10px;'>(you)</span>":""}</div>
+        <div style="font-size:11px;opacity:.6;">⚡ ${m.power||1}/tap</div>
+      </div>
+      <span class="clanBadge">${m.role}</span>
+    </div>
+  `).join("");
+}
+
+function loadTopClans(){
+  const list = document.getElementById("topClanList");
+  if(!list||!db) return;
+  db.collection("clans").orderBy("totalPower","desc").limit(5).get().then(snap=>{
+    if(snap.empty){list.innerHTML="<div style='text-align:center;opacity:.4;'>No clans yet</div>";return;}
+    let html="";let r=1;
+    snap.forEach(doc=>{
+      const c=doc.data();
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:11px;opacity:.5;">#${r}</div>
+          <div style="font-size:20px;">${c.flag||"⚔️"}</div>
+          <div><div style="font-weight:700;font-size:13px;">${c.name} [${c.tag||"?"}]</div><div style="font-size:10px;opacity:.5;">${(c.members||[]).length} members</div></div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--gold);">⚡ ${(c.totalPower||0).toLocaleString()}</div>
+          <button onclick="joinClanDirect('${c.inviteCode}')" style="padding:4px 10px;border:none;border-radius:8px;background:linear-gradient(90deg,var(--purple),#c060ff);color:white;font-size:10px;font-weight:700;cursor:pointer;margin-top:4px;">JOIN</button>
+        </div>
+      </div>`;
+      r++;
+    });
+    list.innerHTML=html;
+  }).catch(()=>{list.innerHTML="<div style='opacity:.4;text-align:center;'>Failed to load</div>";});
+}
+
+function joinClanDirect(code){
+  const input = document.getElementById("joinClanCode");
+  if(input) input.value = code;
+  joinClanByCode();
+}
+
+function donateToClan(){
+  const amt = parseInt(prompt("Donate coins to clan treasury\nYour balance: "+coins.toLocaleString()+"\n\nHow many coins?"));
+  if(!amt||isNaN(amt)||amt<=0) return;
+  if(amt>coins){showToast("Not enough coins!");return;}
+  coins -= amt;
+  if(myClan){
+    myClan.treasury = (myClan.treasury||0)+amt;
+    localStorage.setItem("myClan",JSON.stringify(myClan));
+    if(db) db.collection("clans").doc(myClan.id).update({treasury:firebase.firestore.FieldValue.increment(amt)}).catch(()=>{});
+  }
+  save(); update();
+  showToast("💰 Donated "+amt.toLocaleString()+" coins to clan!");
+}
+
+function leaveClan(){
+  if(!confirm("Leave your clan?")) return;
+  if(myClan&&db){
+    const updated = (myClan.members||[]).filter(m=>m.id!==playerId);
+    db.collection("clans").doc(myClan.id).update({members:updated,totalPower:Math.max(0,(myClan.totalPower||0)-minePower)}).catch(()=>{});
+    db.collection("players").doc(playerId).update({clanId:"",clanName:""}).catch(()=>{});
+  }
+  myClan = null;
+  localStorage.removeItem("myClan");
+  renderClan();
+  showToast("Left clan");
+}
+
+function disbandClan(){
+  if(!confirm("Disband your clan? This cannot be undone!")) return;
+  if(myClan&&db) db.collection("clans").doc(myClan.id).delete().catch(()=>{});
+  myClan = null;
+  localStorage.removeItem("myClan");
+  renderClan();
+  showToast("Clan disbanded");
+}
+
+function copyClanCode(code){
+  navigator.clipboard.writeText(code).then(()=>showToast("🔗 Invite code copied: "+code)).catch(()=>showToast("Code: "+code));
+}
   console.log("✅ Nilma Coin v3.1 Loaded");
 </script>
 </body>
