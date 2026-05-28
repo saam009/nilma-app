@@ -1366,18 +1366,19 @@ function renderMachineBtn(i,owned,isActive,nextLv,m){
   btns+=`</div>`;
   return btns;
 }
-
 function showUpgradeOptions(i){
   const m=machineData[i];
   const owned=machineOwned[i]||0;
   if(owned>=5){showToast("Already max level!");return;}
   const next=m.levels[owned];
-  const txt=`LV${next.lv}: ${next.coinCost.toLocaleString()} coins OR ${next.tonCost} TON`;
-  if(confirm(`Upgrade ${m.name} to Level ${next.lv}?\n\n${txt}\n\nPress OK for COINS, Cancel to pay TON`)){
-    upgradeMachine(i);
-  }else{
-    openPayModal(i,next.lv);
-  }
+  showConfirmSheet(
+    "Upgrade "+m.name+" to LV"+next.lv,
+    "Pay "+next.coinCost.toLocaleString()+" coins OR "+next.tonCost+" TON",
+    "PAY COINS",
+    ()=>upgradeMachine(i)
+  );
+  // Also offer TON option via a second button — show toast hint
+  setTimeout(()=>showToast("Or tap CANCEL then use TON payment in Shop"),100);
 }
 
 function activateMachine(i){
@@ -1472,27 +1473,39 @@ function renderShopMachines(){
     el.appendChild(div);
   });
 }
-
 function handleShopLvl(machineId,lvNum){
   const m=machineData[machineId];
   const owned=machineOwned[machineId]||0;
   if(lvNum<=owned){showToast("Already owned LV"+lvNum);return;}
   if(lvNum>owned+1){showToast("Must unlock LV"+(owned+1)+" first");return;}
   const lv=m.levels[lvNum-1];
-  if(machineId===0){
-    // Coin only
-    upgradeMachine(machineId);return;
-  }
-  if(owned===0&&lvNum===1){
-    // First unlock
-    const txt=`Unlock ${m.name} LV1\n${lv.coinCost.toLocaleString()} coins OR ${lv.tonCost} TON`;
-    if(confirm(txt+"\n\nOK = Coins | Cancel = TON")){buyMachineCoins(machineId);}
-    else{openPayModal(machineId,lvNum);}
-    return;
-  }
-  const txt=`Upgrade ${m.name} to LV${lvNum}\n${lv.coinCost.toLocaleString()} coins OR ${lv.tonCost} TON`;
-  if(confirm(txt+"\n\nOK = Coins | Cancel = TON")){upgradeMachine(machineId);}
-  else{openPayModal(machineId,lvNum);}
+  if(machineId===0){upgradeMachine(machineId);return;}
+  showMachinePurchaseSheet(machineId, lvNum);
+}
+
+function showMachinePurchaseSheet(machineId, lvNum){
+  const m = machineData[machineId];
+  const lv = m.levels[lvNum-1];
+  const owned = machineOwned[machineId]||0;
+  const actionLabel = owned===0&&lvNum===1 ? "UNLOCK" : "UPGRADE";
+  const ex = document.getElementById("machinePurchaseSheet");
+  if(ex) ex.remove();
+  const panel = document.createElement("div");
+  panel.id = "machinePurchaseSheet";
+  panel.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:999999;display:flex;justify-content:center;align-items:flex-end;";
+  panel.innerHTML = `
+    <div style="background:linear-gradient(180deg,rgba(5,10,20,.98),rgba(2,5,15,.98));border:1px solid rgba(0,136,204,.3);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;">
+      <div style="width:40px;height:4px;background:rgba(0,136,204,.3);border-radius:4px;margin:0 auto 18px;"></div>
+      <div style="font-size:18px;font-weight:900;color:white;margin-bottom:4px;">${actionLabel}: ${m.name} LV${lvNum}</div>
+      <div style="font-size:12px;opacity:.6;margin-bottom:20px;">Choose your payment method</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <button onclick="(()=>{document.getElementById('machinePurchaseSheet').remove();${owned===0&&lvNum===1?'buyMachineCoins('+machineId+')':'upgradeMachine('+machineId+')'};})()" style="flex:1;padding:14px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:14px;cursor:pointer;">💰 ${lv.coinCost.toLocaleString()} Coins</button>
+        <button onclick="(()=>{document.getElementById('machinePurchaseSheet').remove();openPayModal(${machineId},${lvNum});})();" style="flex:1;padding:14px;border:none;border-radius:12px;background:linear-gradient(90deg,#0088cc,#00b4ff);color:white;font-weight:900;font-size:14px;cursor:pointer;">💎 ${lv.tonCost} TON</button>
+      </div>
+      <button onclick="document.getElementById('machinePurchaseSheet').remove()" style="width:100%;padding:11px;border:none;border-radius:12px;background:rgba(255,255,255,.06);color:#aaa;cursor:pointer;">Cancel</button>
+    </div>`;
+  document.body.appendChild(panel);
+  panel.addEventListener("click", function(e){ if(e.target===this) this.remove(); });
 }
 
 // =================== TON PAYMENT ===================
@@ -1515,48 +1528,7 @@ function copyWallet(){
     const t=document.createElement("textarea");t.value=TON_WALLET;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();showToast("💎 Wallet address copied!");
   });
 }
-async function verifyPayment(){
-  const txHash=document.getElementById("payTxHash").value.trim();
-  if(!txHash||txHash.length<20){showToast("Enter a valid transaction hash");return;}
-  if(!pendingPayment){showToast("No pending payment");return;}
-  // Check if this tx hash was already used
-  const usedKey="usedTx_"+txHash;
-  if(localStorage.getItem(usedKey)){showToast("❌ This transaction was already used!");return;}
-  // Check on Firebase for duplicate
-  if(db){
-    try{
-      const txDoc=await db.collection("payments").doc(txHash).get();
-      if(txDoc.exists){showToast("❌ Transaction already used!");return;}
-      // Save to Firebase to prevent reuse
-      await db.collection("payments").doc(txHash).set({
-        playerId,machineId:pendingPayment.machineId,lvNum:pendingPayment.lvNum,
-        tonAmount:pendingPayment.tonAmount,timestamp:Date.now(),status:"pending_review"
-      });
-    }catch(e){console.log(e);}
-  }
-  // Mark as used locally — prevents replay
-  localStorage.setItem(usedKey,"used_"+Date.now());
-  // Deliver reward
-  if(pendingPayment.type==="chestpack"){
-    // Grant 50 free chests by resetting paidChestPrice and giving free opens
-    freeSpins+=50;
-    localStorage.setItem("freeSpins",freeSpins);
-    save();update();
-    showToast("✅ 50 Chest Packs unlocked via TON!");
-  }else{
-    const{machineId,lvNum}=pendingPayment;
-    if(machineOwned[machineId]<lvNum){
-      machineOwned[machineId]=lvNum;
-      localStorage.setItem("machineOwned",JSON.stringify(machineOwned));
-      currentMachine=machineId;
-      localStorage.setItem("currentMachine",machineId);
-      updateReactor();renderMachineGrid();renderShopMachines();
-      save();update();
-      showToast("✅ "+machineData[machineId].name+" LV"+lvNum+" UNLOCKED via TON!");
-    }
-  }
-  closePayModal();
-}
+
 
 // =================== BUY CHEST PACK (50 chests for 9.3 TON) ===================
 function buyChestPack(){
@@ -1696,26 +1668,8 @@ function openRareCrate(type){
   showRewardPopup(title,reward||0,emoji);
   save();update();
 }
-
 // =================== DAILY ===================
-function daily(){
-  const now=Date.now();
-  if(now-lastDaily<86400000){showToast("Come back tomorrow!");return;}
-  coins+=50;lifetimeCoins+=50;
-  lastDaily=now;localStorage.setItem("lastDaily",lastDaily);
-  save();update();updateDailyTimer();
-  showToast("🎁 +50 Coins!");
-}
-function updateDailyTimer(){
-  const btn=document.getElementById("dailyBtn");
-  const timer=document.getElementById("dailyTimer");
-  if(!timer)return;
-  const rem=86400000-(Date.now()-lastDaily);
-  if(rem<=0){if(btn){btn.disabled=false;btn.style.opacity="1";}timer.innerText="✅ Ready to claim!";return;}
-  if(btn){btn.disabled=true;btn.style.opacity=".6";}
-  const h=Math.floor(rem/3600000),mn=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);
-  timer.innerText="⏳ "+h+"h "+mn+"m "+s+"s";
-}
+// daily() and updateDailyTimer() are defined in the DAILY CALENDAR section below
 
 // =================== TASKS ===================
 function renderTasks(){
@@ -1967,7 +1921,26 @@ function showToast(text){
   clearTimeout(window._toastTimer);
   window._toastTimer=setTimeout(()=>{t.style.display="none";},3000);
 }
-
+// Universal confirm sheet (replaces all confirm() calls in Telegram)
+function showConfirmSheet(title, desc, btnLabel, onConfirm){
+  const ex = document.getElementById("confirmSheet");
+  if(ex) ex.remove();
+  const panel = document.createElement("div");
+  panel.id = "confirmSheet";
+  panel.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9999999;display:flex;justify-content:center;align-items:flex-end;";
+  panel.innerHTML = `
+    <div style="background:linear-gradient(180deg,rgba(10,5,5,.98),rgba(5,2,2,.98));border:1px solid rgba(255,80,80,.2);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;">
+      <div style="font-size:18px;font-weight:900;color:#ff6666;margin-bottom:6px;">⚠️ ${title}</div>
+      <div style="font-size:13px;opacity:.6;margin-bottom:20px;">${desc}</div>
+      <div style="display:flex;gap:10px;">
+        <button id="confirmYesBtn" style="flex:1;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#ff4444,#cc0000);color:white;font-weight:900;font-size:15px;cursor:pointer;">${btnLabel}</button>
+        <button onclick="document.getElementById('confirmSheet').remove()" style="flex:1;padding:13px;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:#aaa;cursor:pointer;">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(panel);
+  document.getElementById("confirmYesBtn").onclick = ()=>{ panel.remove(); onConfirm(); };
+  panel.addEventListener("click", function(e){ if(e.target===this) this.remove(); });
+}
 // =================== OFFLINE MINING ===================
 function checkOfflineMining(){
   const now=Date.now();
@@ -3198,26 +3171,6 @@ function disbandClan(){
   });
 }
 
-// Universal confirm sheet (replaces all confirm() calls in Telegram)
-function showConfirmSheet(title, desc, btnLabel, onConfirm){
-  const ex = document.getElementById("confirmSheet");
-  if(ex) ex.remove();
-  const panel = document.createElement("div");
-  panel.id = "confirmSheet";
-  panel.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9999999;display:flex;justify-content:center;align-items:flex-end;";
-  panel.innerHTML = `
-    <div style="background:linear-gradient(180deg,rgba(10,5,5,.98),rgba(5,2,2,.98));border:1px solid rgba(255,80,80,.2);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;">
-      <div style="font-size:18px;font-weight:900;color:#ff6666;margin-bottom:6px;">⚠️ ${title}</div>
-      <div style="font-size:13px;opacity:.6;margin-bottom:20px;">${desc}</div>
-      <div style="display:flex;gap:10px;">
-        <button id="confirmYesBtn" style="flex:1;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#ff4444,#cc0000);color:white;font-weight:900;font-size:15px;cursor:pointer;">${btnLabel}</button>
-        <button onclick="document.getElementById('confirmSheet').remove()" style="flex:1;padding:13px;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:#aaa;cursor:pointer;">Cancel</button>
-      </div>
-    </div>`;
-  document.body.appendChild(panel);
-  document.getElementById("confirmYesBtn").onclick = ()=>{ panel.remove(); onConfirm(); };
-  panel.addEventListener("click", function(e){ if(e.target===this) this.remove(); });
-}
 
 function copyClanCode(code){
   navigator.clipboard.writeText(code).then(()=>showToast("🔗 Invite code copied: "+code)).catch(()=>showToast("Code: "+code));
