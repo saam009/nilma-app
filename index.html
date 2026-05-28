@@ -1893,7 +1893,7 @@ setInterval(()=>{
   if(p>0){coins+=p;lifetimeCoins+=p;save();update();}
 },15000);
 setInterval(updateShopUI,1000);
-setInterval(updateDailyTimer,1000);
+setInterval(()=>{ if(typeof updateDailyTimer==="function") updateDailyTimer(); },1000);
 setInterval(()=>{save();localStorage.setItem("lastOnline",Date.now());},15000);
 
 // =================== POPUP / TOAST ===================
@@ -2365,7 +2365,7 @@ function answerPuzzle(chosen,btn,allBtns){
     puzzleSessionStreak=0;
     document.getElementById("puzzleStreak").innerText=0;
     document.getElementById("puzzleFeedback").innerHTML=`<span style="color:#ff4444">❌ Wrong! Answer: ${currentPuzzle.ans}</span>`;
-    playTone(200,'sawtooth',0.3,0.2);
+    _t(200,'sawtooth',0.3,0.2);
     setTimeout(nextPuzzle,1200);
   }
 }
@@ -2654,7 +2654,6 @@ function buyVip(){
   document.getElementById("payModal").classList.add("open");
 }
 // Patch verifyPayment to handle VIP
-const _origVerifyFn = verifyPayment;
 verifyPayment = async function(){
   if(pendingPayment?.type === "vip"){
     const txHash = document.getElementById("payTxHash").value.trim();
