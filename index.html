@@ -1300,7 +1300,7 @@ function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelectorAll(".navItem").forEach(n=>n.classList.remove("active"));
-  const map={homeScreen:0,spinScreen:1,taskScreen:2,shopScreen:3,leaderboardScreen:4,referralScreen:5};
+  const map={homeScreen:0,spinScreen:1,shopScreen:2,stakingScreen:3,clanScreen:4,leaderboardScreen:5,referralScreen:6,taskScreen:2,missionScreen:2,streakScreen:2,dailyScreen:2,puzzleScreen:2};
   const idx=map[id];
   if(idx!==undefined){const items=document.querySelectorAll(".navItem");if(items[idx])items[idx].classList.add("active");}
   if(id==="leaderboardScreen")loadLeaderboard();
@@ -1594,14 +1594,13 @@ function checkLevelUp(){
   while(xp>=xpMax){
     xp-=xpMax;level++;
     coins+=level*100;lifetimeCoins+=level*100;
-    // Hard exponential curve:
-    // Lv1→2: 500 | Lv5: ~3k | Lv10: ~57k | Lv15: ~1M | Lv20: ~20M
     xpMax=Math.floor(500*Math.pow(2.1,level-1));
     playLevelUp();
     showRewardPopup("LEVEL "+level+" UNLOCKED!",level*100,"⭐");
+    if(typeof addNotification === "function")
+      addNotification("Level Up! 🎉","You reached Level "+level+"!","⭐");
   }
 }
-
 function showCoin(x,y,amt){
   let c=document.createElement("div");
   c.className="coin";c.innerText="+"+amt;
@@ -2615,12 +2614,8 @@ function requestNotifPermission(){
     }else{showToast("Notifications blocked by browser");}
   });
 }
-const _origCheckLevelUp = checkLevelUp;
-checkLevelUp = function(){
-  const prevLevel = level;
-  _origCheckLevelUp();
-  if(level > prevLevel) addNotification("Level Up! 🎉","You reached Level "+level+"!","⭐");
-};
+// Level up notification is now built into checkLevelUp directly — no patch needed
+// (handled below inside checkLevelUp itself)
 setTimeout(()=>{
   const rem = 86400000-(Date.now()-lastCalClaim);
   if(rem<=0 && calDay<30) addNotification("Daily Bonus Ready!","Your daily login reward is waiting 🎁","🎁");
@@ -2686,7 +2681,7 @@ function buyVip(){
   document.getElementById("payModal").classList.add("open");
 }
 // Patch verifyPayment to handle VIP
-const _origVerify = verifyPayment;
+const _origVerifyFn = verifyPayment;
 verifyPayment = async function(){
   if(pendingPayment?.type === "vip"){
     const txHash = document.getElementById("payTxHash").value.trim();
@@ -2712,7 +2707,55 @@ verifyPayment = async function(){
     save(); update();
     return;
   }
-  _origVerify();
+  // Handle chest pack
+  if(pendingPayment?.type === "chestpack"){
+    const txHash = document.getElementById("payTxHash").value.trim();
+    if(!txHash||txHash.length<20){showToast("Enter a valid transaction hash");return;}
+    const usedKey = "usedTx_"+txHash;
+    if(localStorage.getItem(usedKey)){showToast("❌ Transaction already used!");return;}
+    if(db){
+      try{
+        const txDoc = await db.collection("payments").doc(txHash).get();
+        if(txDoc.exists){showToast("❌ Transaction already used!");return;}
+        await db.collection("payments").doc(txHash).set({playerId,type:"chestpack",tonAmount:9.3,timestamp:Date.now(),status:"pending_review"});
+      }catch(e){console.log(e);}
+    }
+    localStorage.setItem(usedKey,"used_"+Date.now());
+    freeSpins+=50;
+    localStorage.setItem("freeSpins",freeSpins);
+    save();update();
+    closePayModal();
+    showToast("✅ 50 Chest Packs unlocked via TON!");
+    return;
+  }
+  // Handle machine unlock
+  const txHash = document.getElementById("payTxHash").value.trim();
+  if(!txHash||txHash.length<20){showToast("Enter a valid transaction hash");return;}
+  if(!pendingPayment){showToast("No pending payment");return;}
+  const usedKey2 = "usedTx_"+txHash;
+  if(localStorage.getItem(usedKey2)){showToast("❌ This transaction was already used!");return;}
+  if(db){
+    try{
+      const txDoc2 = await db.collection("payments").doc(txHash).get();
+      if(txDoc2.exists){showToast("❌ Transaction already used!");return;}
+      await db.collection("payments").doc(txHash).set({
+        playerId,machineId:pendingPayment.machineId,lvNum:pendingPayment.lvNum,
+        tonAmount:pendingPayment.tonAmount,timestamp:Date.now(),status:"pending_review"
+      });
+    }catch(e){console.log(e);}
+  }
+  localStorage.setItem(usedKey2,"used_"+Date.now());
+  const{machineId,lvNum}=pendingPayment;
+  if(machineId!=null && machineOwned[machineId]<lvNum){
+    machineOwned[machineId]=lvNum;
+    localStorage.setItem("machineOwned",JSON.stringify(machineOwned));
+    currentMachine=machineId;
+    localStorage.setItem("currentMachine",machineId);
+    updateReactor();renderMachineGrid();renderShopMachines();
+    save();update();
+    showToast("✅ "+machineData[machineId].name+" LV"+lvNum+" UNLOCKED via TON!");
+  }
+  closePayModal();
 };
 // VIP badge on profile name
 setTimeout(()=>{
@@ -2817,8 +2860,52 @@ function openStakeModal(poolId){
   const pool = STAKE_POOLS.find(p=>p.id===poolId);
   if(!pool) return;
   const effectiveApy = isVip ? Math.floor(pool.apy*1.5) : pool.apy;
-  const amount = parseInt(prompt(`Stake coins in ${pool.name}\n\nMin: ${pool.minStake.toLocaleString()} coins\nAPY: ${effectiveApy}%\nLock: ${pool.lockDays} days\n\nYour balance: ${coins.toLocaleString()} coins\n\nHow many coins to stake?`));
-  if(!amount || isNaN(amount)) return;
+  const reward100 = Math.floor(100 * (effectiveApy/100) * (pool.lockDays/365));
+  // Remove any existing stake input panel
+  const existing = document.getElementById("stakeInputPanel");
+  if(existing) existing.remove();
+  // Build inline input panel
+  const panel = document.createElement("div");
+  panel.id = "stakeInputPanel";
+  panel.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:999999;display:flex;justify-content:center;align-items:flex-end;";
+  panel.innerHTML = `
+    <div style="background:linear-gradient(180deg,rgba(8,20,8,.98),rgba(4,10,4,.98));border:1px solid rgba(0,255,153,.2);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;">
+      <div style="width:40px;height:4px;background:rgba(0,255,153,.3);border-radius:4px;margin:0 auto 18px;"></div>
+      <div style="font-size:20px;font-weight:900;color:var(--green);margin-bottom:4px;">${pool.icon} ${pool.name}</div>
+      <div style="font-size:12px;opacity:.6;margin-bottom:16px;">${effectiveApy}% APY · Lock ${pool.lockDays} days</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;opacity:.7;margin-bottom:8px;">
+        <span>Your balance: 💰 ${coins.toLocaleString()}</span>
+        <span>Min: ${pool.minStake.toLocaleString()}</span>
+      </div>
+      <input id="stakeAmountInput" type="number" placeholder="Enter amount to stake"
+        style="width:100%;padding:14px;border-radius:12px;border:1px solid rgba(0,255,153,.3);background:rgba(255,255,255,.05);color:white;font-size:16px;margin-bottom:8px;outline:none;">
+      <div id="stakeRewardPreview" style="font-size:12px;color:var(--green);opacity:.8;margin-bottom:14px;min-height:18px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="confirmStake('${poolId}')" style="flex:1;padding:14px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--green),#00c853);color:white;font-weight:900;font-size:15px;cursor:pointer;">STAKE NOW</button>
+        <button onclick="document.getElementById('stakeInputPanel').remove()" style="padding:14px 20px;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:#aaa;cursor:pointer;">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(panel);
+  // Live reward preview
+  document.getElementById("stakeAmountInput").addEventListener("input", function(){
+    const amt = parseInt(this.value)||0;
+    if(amt >= pool.minStake){
+      const r = Math.floor(amt * (effectiveApy/100) * (pool.lockDays/365));
+      document.getElementById("stakeRewardPreview").innerText = "Estimated reward: +💰 "+r.toLocaleString()+" after "+pool.lockDays+" days";
+    } else {
+      document.getElementById("stakeRewardPreview").innerText = amt>0?"Minimum is "+pool.minStake.toLocaleString()+" coins":"";
+    }
+  });
+  panel.addEventListener("click", function(e){ if(e.target===this) this.remove(); });
+}
+
+function confirmStake(poolId){
+  const pool = STAKE_POOLS.find(p=>p.id===poolId);
+  if(!pool) return;
+  const effectiveApy = isVip ? Math.floor(pool.apy*1.5) : pool.apy;
+  const input = document.getElementById("stakeAmountInput");
+  const amount = parseInt(input?.value);
+  if(!amount || isNaN(amount)){ showToast("Enter a valid amount"); return; }
   if(amount < pool.minStake){ showToast("Minimum stake is "+pool.minStake.toLocaleString()+" coins"); return; }
   if(amount > coins){ showToast("Not enough coins!"); return; }
   const reward = Math.floor(amount * (effectiveApy/100) * (pool.lockDays/365));
@@ -2831,6 +2918,7 @@ function openStakeModal(poolId){
   };
   myStakes.push(stake);
   localStorage.setItem("myStakes", JSON.stringify(myStakes));
+  document.getElementById("stakeInputPanel")?.remove();
   save(); update(); renderStaking();
   showToast("📈 Staked "+amount.toLocaleString()+" coins! Reward: +"+reward.toLocaleString());
   addNotification("Coins Staked 📈","You staked "+amount.toLocaleString()+" coins in "+pool.name,"📈");
@@ -3050,8 +3138,30 @@ function joinClanDirect(code){
 }
 
 function donateToClan(){
-  const amt = parseInt(prompt("Donate coins to clan treasury\nYour balance: "+coins.toLocaleString()+"\n\nHow many coins?"));
-  if(!amt||isNaN(amt)||amt<=0) return;
+  // Remove existing panel
+  const ex = document.getElementById("donatePanel");
+  if(ex) ex.remove();
+  const panel = document.createElement("div");
+  panel.id = "donatePanel";
+  panel.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:999999;display:flex;justify-content:center;align-items:flex-end;";
+  panel.innerHTML = `
+    <div style="background:linear-gradient(180deg,rgba(10,8,2,.98),rgba(5,4,1,.98));border:1px solid rgba(255,213,74,.2);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;">
+      <div style="font-size:18px;font-weight:900;color:var(--gold);margin-bottom:6px;">💰 Donate to Clan</div>
+      <div style="font-size:12px;opacity:.6;margin-bottom:14px;">Your balance: ${coins.toLocaleString()} coins</div>
+      <input id="donateAmountInput" type="number" placeholder="How many coins to donate?"
+        style="width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,213,74,.3);background:rgba(255,255,255,.05);color:white;font-size:16px;margin-bottom:14px;outline:none;">
+      <div style="display:flex;gap:10px;">
+        <button onclick="confirmDonate()" style="flex:1;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-weight:900;font-size:15px;cursor:pointer;">DONATE</button>
+        <button onclick="document.getElementById('donatePanel').remove()" style="padding:13px 20px;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:#aaa;cursor:pointer;">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(panel);
+  panel.addEventListener("click", function(e){ if(e.target===this) this.remove(); });
+}
+
+function confirmDonate(){
+  const amt = parseInt(document.getElementById("donateAmountInput")?.value);
+  if(!amt||isNaN(amt)||amt<=0){ showToast("Enter a valid amount"); return; }
   if(amt>coins){showToast("Not enough coins!");return;}
   coins -= amt;
   if(myClan){
@@ -3059,30 +3169,54 @@ function donateToClan(){
     localStorage.setItem("myClan",JSON.stringify(myClan));
     if(db) db.collection("clans").doc(myClan.id).update({treasury:firebase.firestore.FieldValue.increment(amt)}).catch(()=>{});
   }
+  document.getElementById("donatePanel")?.remove();
   save(); update();
   showToast("💰 Donated "+amt.toLocaleString()+" coins to clan!");
 }
 
 function leaveClan(){
-  if(!confirm("Leave your clan?")) return;
-  if(myClan&&db){
-    const updated = (myClan.members||[]).filter(m=>m.id!==playerId);
-    db.collection("clans").doc(myClan.id).update({members:updated,totalPower:Math.max(0,(myClan.totalPower||0)-minePower)}).catch(()=>{});
-    db.collection("players").doc(playerId).update({clanId:"",clanName:""}).catch(()=>{});
-  }
-  myClan = null;
-  localStorage.removeItem("myClan");
-  renderClan();
-  showToast("Left clan");
+  showConfirmSheet("Leave your clan?", "You will lose clan membership.", "LEAVE", ()=>{
+    if(myClan&&db){
+      const updated = (myClan.members||[]).filter(m=>m.id!==playerId);
+      db.collection("clans").doc(myClan.id).update({members:updated,totalPower:Math.max(0,(myClan.totalPower||0)-minePower)}).catch(()=>{});
+      db.collection("players").doc(playerId).update({clanId:"",clanName:""}).catch(()=>{});
+    }
+    myClan = null;
+    localStorage.removeItem("myClan");
+    renderClan();
+    showToast("Left clan");
+  });
 }
 
 function disbandClan(){
-  if(!confirm("Disband your clan? This cannot be undone!")) return;
-  if(myClan&&db) db.collection("clans").doc(myClan.id).delete().catch(()=>{});
-  myClan = null;
-  localStorage.removeItem("myClan");
-  renderClan();
-  showToast("Clan disbanded");
+  showConfirmSheet("Disband clan?", "This cannot be undone! All members will lose their clan.", "DISBAND", ()=>{
+    if(myClan&&db) db.collection("clans").doc(myClan.id).delete().catch(()=>{});
+    myClan = null;
+    localStorage.removeItem("myClan");
+    renderClan();
+    showToast("Clan disbanded");
+  });
+}
+
+// Universal confirm sheet (replaces all confirm() calls in Telegram)
+function showConfirmSheet(title, desc, btnLabel, onConfirm){
+  const ex = document.getElementById("confirmSheet");
+  if(ex) ex.remove();
+  const panel = document.createElement("div");
+  panel.id = "confirmSheet";
+  panel.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9999999;display:flex;justify-content:center;align-items:flex-end;";
+  panel.innerHTML = `
+    <div style="background:linear-gradient(180deg,rgba(10,5,5,.98),rgba(5,2,2,.98));border:1px solid rgba(255,80,80,.2);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;">
+      <div style="font-size:18px;font-weight:900;color:#ff6666;margin-bottom:6px;">⚠️ ${title}</div>
+      <div style="font-size:13px;opacity:.6;margin-bottom:20px;">${desc}</div>
+      <div style="display:flex;gap:10px;">
+        <button id="confirmYesBtn" style="flex:1;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#ff4444,#cc0000);color:white;font-weight:900;font-size:15px;cursor:pointer;">${btnLabel}</button>
+        <button onclick="document.getElementById('confirmSheet').remove()" style="flex:1;padding:13px;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:#aaa;cursor:pointer;">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(panel);
+  document.getElementById("confirmYesBtn").onclick = ()=>{ panel.remove(); onConfirm(); };
+  panel.addEventListener("click", function(e){ if(e.target===this) this.remove(); });
 }
 
 function copyClanCode(code){
