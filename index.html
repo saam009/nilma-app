@@ -207,6 +207,37 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webk
 .payInput{width:100%;padding:11px;border-radius:10px;border:1px solid rgba(0,136,204,.3);background:rgba(255,255,255,.05);color:white;font-size:13px;margin:8px 0;}
 .payVerifyBtn{width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(90deg,#0088cc,#00b4ff);color:white;font-weight:900;font-size:15px;cursor:pointer;margin-top:10px;}
 .payClose{margin-top:10px;background:rgba(255,255,255,.06);border:none;border-radius:10px;padding:8px 20px;color:#aaa;cursor:pointer;}
+  /* DAILY CALENDAR */
+.calendarGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:14px;}
+.calDay{border-radius:12px;padding:10px 4px;text-align:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:.2s;}
+.calDay.claimed{background:linear-gradient(135deg,rgba(0,255,153,.15),rgba(0,200,100,.08));border-color:rgba(0,255,153,.4);}
+.calDay.today{background:linear-gradient(135deg,rgba(255,213,74,.18),rgba(255,150,0,.1));border-color:rgba(255,213,74,.5);box-shadow:0 0 14px rgba(255,213,74,.25);}
+.calDay.locked{opacity:.35;}
+.calDay .calDayNum{font-size:9px;opacity:.5;margin-bottom:4px;}
+.calDay .calDayIcon{font-size:18px;}
+.calDay .calDayReward{font-size:8px;color:var(--gold);margin-top:3px;font-weight:700;}
+
+/* PROFILE MODAL */
+.profileModal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);z-index:99999;display:none;justify-content:center;align-items:flex-end;}
+.profileModal.open{display:flex;}
+.profileSheet{background:linear-gradient(180deg,rgba(8,8,20,.98),rgba(4,4,14,.98));border:1px solid rgba(255,255,255,.08);border-radius:28px 28px 0 0;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .3s ease;}
+.avatarGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px;}
+.avatarOpt{width:100%;aspect-ratio:1;border-radius:16px;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:.2s;}
+.avatarOpt:active{transform:scale(.9);}
+.avatarOpt.selected{border-color:var(--cyan);box-shadow:0 0 14px rgba(0,255,255,.4);background:rgba(0,255,255,.1);}
+.statRow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.statRow:last-child{border-bottom:none;}
+
+/* NOTIFICATION BELL & PANEL */
+.notifBell{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;transition:.2s;}
+.notifBell:active{transform:scale(.9);}
+.notifDot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#ff4444;display:none;animation:pulse 1.5s infinite;}
+.notifPanel{position:fixed;top:0;right:0;width:300px;max-width:95vw;height:100vh;background:linear-gradient(180deg,rgba(5,5,18,.98),rgba(2,2,10,.98));border-left:1px solid rgba(255,255,255,.08);z-index:999999;transform:translateX(100%);transition:.3s;padding:20px;overflow-y:auto;}
+.notifPanel.open{transform:translateX(0);}
+.notifItem{background:rgba(255,255,255,.04);border-radius:12px;padding:12px;margin-bottom:10px;border-left:3px solid var(--cyan);position:relative;}
+.notifItem.unread{border-left-color:var(--gold);background:rgba(255,213,74,.05);}
+.notifItem .notifTime{font-size:10px;opacity:.45;margin-top:4px;}
+.notifClear{width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:#aaa;cursor:pointer;margin-top:8px;}
 </style>
 </head>
 <body onclick="unlockAudio()">
@@ -261,13 +292,14 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webk
   <div class="balanceTitle">LEVEL</div>
   <div class="balanceValue"><span id="levelBadge">1</span></div>
 </div>
+<div class="notifBell" onclick="openNotifPanel()" id="notifBell">🔔<div class="notifDot" id="notifDot"></div></div>
 <div class="settingsBtn" onclick="openSettings()">⚙️</div>
 </div>
 </div>
 
 <!-- PROFILE -->
 <div class="heroCard" style="display:flex;align-items:center;gap:14px;">
-<img id="profilePhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="width:75px;height:75px;border-radius:50%;border:3px solid var(--gold);object-fit:cover;box-shadow:0 0 20px rgba(255,215,0,.4);">
+<img id="profilePhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" onclick="openProfileModal()" style="width:75px;height:75px;border-radius:50%;border:3px solid var(--gold);object-fit:cover;box-shadow:0 0 20px rgba(255,215,0,.4);cursor:pointer;">
 <div style="flex:1;">
 <div id="profileName" style="font-size:22px;font-weight:800;">Player</div>
 <div style="color:var(--gold);font-size:13px;margin-top:4px;">🔥 Ready To Get RICH?</div>
@@ -428,13 +460,19 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webk
 <!-- ===== DAILY SCREEN ===== -->
 <div id="dailyScreen" class="screen">
 <button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
-<div class="heroCard" style="text-align:center;"><h2>🎁 Daily Reward</h2></div>
-<div style="text-align:center;padding:30px;">
-<button id="dailyBtn" onclick="daily()" style="padding:16px 32px;border:none;border-radius:16px;font-size:18px;font-weight:bold;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;box-shadow:0 0 20px rgba(255,152,0,.5);">Claim Daily Reward</button>
-<div id="dailyTimer" style="margin-top:20px;font-size:16px;opacity:.8;">Ready to claim</div>
+<div class="heroCard" style="text-align:center;">
+  <h2>🎁 Daily Login Bonus</h2>
+  <p style="opacity:.7;margin-top:4px;">Login every day — bigger rewards each day!</p>
+  <div style="margin-top:10px;font-size:13px;color:var(--cyan);">Day <span id="calCurrentDay">1</span> of 30</div>
+</div>
+<div style="padding:16px;">
+  <div class="calendarGrid" id="calendarGrid"></div>
+  <div style="text-align:center;margin-top:20px;">
+    <button id="dailyBtn" onclick="daily()" style="padding:16px 32px;border:none;border-radius:16px;font-size:18px;font-weight:bold;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;box-shadow:0 0 20px rgba(255,152,0,.5);">Claim Today's Bonus</button>
+    <div id="dailyTimer" style="margin-top:14px;font-size:15px;opacity:.8;">Ready to claim</div>
+  </div>
 </div>
 </div>
-
 <!-- ===== LEADERBOARD ===== -->
 <div id="leaderboardScreen" class="screen">
 <button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
@@ -569,7 +607,41 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webk
 <div class="navItem" onclick="showScreen('leaderboardScreen')"><div class="navIcon">🥇</div>Top</div>
 <div class="navItem" onclick="showScreen('referralScreen')"><div class="navIcon">👥</div>Refer</div>
 </div>
+<!-- PROFILE MODAL -->
+<div class="profileModal" id="profileModal">
+<div class="profileSheet">
+  <div style="width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:0 auto 18px;"></div>
+  <div style="text-align:center;margin-bottom:16px;">
+    <div id="profileBigAvatar" style="font-size:72px;margin-bottom:8px;filter:drop-shadow(0 0 12px var(--cyan));">🧑</div>
+    <div style="font-size:20px;font-weight:900;" id="profileModalName">Player</div>
+    <div style="font-size:12px;color:var(--cyan);opacity:.7;margin-top:4px;">ID: <span id="profileModalId"></span></div>
+  </div>
+  <div style="background:rgba(255,255,255,.04);border-radius:16px;padding:14px;margin-bottom:16px;">
+    <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:8px;">📊 YOUR STATS</div>
+    <div class="statRow"><span>💰 Total Coins Earned</span><strong id="statLifetimeCoins">0</strong></div>
+    <div class="statRow"><span>⛏ Total Mines</span><strong id="statMines">0</strong></div>
+    <div class="statRow"><span>📦 Chests Opened</span><strong id="statChests">0</strong></div>
+    <div class="statRow"><span>🔥 Current Streak</span><strong id="statStreak">0</strong></div>
+    <div class="statRow"><span>⚡ Mine Power</span><strong id="statPower">1</strong></div>
+    <div class="statRow"><span>👥 Referrals</span><strong id="statRefs">0</strong></div>
+  </div>
+  <div style="font-size:11px;letter-spacing:2px;opacity:.5;margin-bottom:10px;">🎭 CHOOSE AVATAR</div>
+  <div class="avatarGrid" id="avatarGrid"></div>
+  <button onclick="closeProfileModal()" style="width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.07);color:white;font-size:15px;font-weight:700;margin-top:18px;cursor:pointer;">Close</button>
+</div>
+</div>
 
+<!-- NOTIFICATION PANEL -->
+<div class="notifPanel" id="notifPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="font-size:18px;font-weight:900;">🔔 Notifications</div>
+    <button onclick="closeNotifPanel()" style="background:rgba(255,255,255,.07);border:none;border-radius:10px;padding:6px 12px;color:white;cursor:pointer;">✕</button>
+  </div>
+  <button onclick="requestNotifPermission()" id="notifPermBtn" style="width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:14px;display:none;">Enable Push Notifications</button>
+  <div id="notifList"><div style="text-align:center;opacity:.4;font-size:13px;margin-top:30px;">No notifications yet</div></div>
+  <button class="notifClear" onclick="clearNotifs()">Clear All</button>
+</div>
+<div id="notifOverlay" onclick="closeNotifPanel()" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999998;display:none;"></div>
 <!-- REWARD POPUP -->
 <div id="rewardPopup">
 <div class="rEmoji" id="rewardEmoji">🔥</div>
@@ -1828,6 +1900,7 @@ function renderAll(){
   renderMissions();
   renderStreak();
   renderShopMachines();
+  renderCalendar();
 }
 
 // =================== SETTINGS ===================
@@ -2244,9 +2317,219 @@ function exitPuzzle(){
   puzzleActive=false;
   showScreen('missionScreen');
 }
+// =================== DAILY CALENDAR ===================
+const CAL_REWARDS = [
+  {icon:"💰",reward:50},  {icon:"💰",reward:75},  {icon:"📦",reward:0,crate:"common"},
+  {icon:"💰",reward:150}, {icon:"⚡",reward:0,energy:20}, {icon:"💰",reward:200},
+  {icon:"👑",reward:500}, {icon:"💰",reward:100}, {icon:"🔥",reward:0,xpb:2},
+  {icon:"💰",reward:300}, {icon:"📦",reward:0,crate:"epic"}, {icon:"💰",reward:400},
+  {icon:"⚡",reward:0,energy:30},{icon:"💰",reward:600},{icon:"🚀",reward:0,power:2},
+  {icon:"💰",reward:800}, {icon:"📦",reward:0,crate:"legendary"},{icon:"💰",reward:1000},
+  {icon:"🔥",reward:0,xpb:5},{icon:"💰",reward:1200},{icon:"⚡",reward:0,energy:50},
+  {icon:"💰",reward:1500},{icon:"📦",reward:0,crate:"mythic"},{icon:"💰",reward:2000},
+  {icon:"🚀",reward:0,power:5},{icon:"💰",reward:2500},{icon:"🔥",reward:0,xpb:10},
+  {icon:"💰",reward:3000},{icon:"💰",reward:4000},{icon:"👑",reward:10000},
+];
+let calDay = parseInt(localStorage.getItem("calDay")||"0");
+let lastCalClaim = parseInt(localStorage.getItem("lastCalClaim")||"0");
+function renderCalendar(){
+  const grid = document.getElementById("calendarGrid");
+  if(!grid) return;
+  const el = document.getElementById("calCurrentDay");
+  if(el) el.innerText = Math.min(calDay+1, 30);
+  grid.innerHTML = "";
+  CAL_REWARDS.forEach((r, i) => {
+    const div = document.createElement("div");
+    const isClaimed = i < calDay;
+    const isToday = i === calDay;
+    const isLocked = i > calDay;
+    div.className = "calDay " + (isClaimed?"claimed":isToday?"today":"locked");
+    div.innerHTML = `<div class="calDayNum">D${i+1}</div><div class="calDayIcon">${r.icon}</div><div class="calDayReward">${r.reward?"+"+r.reward:r.crate?r.crate.toUpperCase():r.energy?"+"+r.energy+"⚡":r.power?"+"+r.power+"⚡":r.xpb?"XP×"+r.xpb:""}</div>`;
+    grid.appendChild(div);
+  });
+}
+function daily(){
+  const now = Date.now();
+  if(now - lastCalClaim < 86400000){ showToast("Come back tomorrow!"); return; }
+  if(calDay >= 30){ showToast("🎉 All 30 days claimed!"); return; }
+  const r = CAL_REWARDS[calDay];
+  if(r.reward){ coins += r.reward; lifetimeCoins += r.reward; }
+  if(r.crate === "common") commonCrates++;
+  if(r.crate === "epic") epicCrates++;
+  if(r.crate === "legendary") legendaryCrates++;
+  if(r.crate === "mythic") mythicCrates++;
+  if(r.energy){ energy = Math.min(energy + r.energy, maxEnergy); }
+  if(r.power){ minePower += r.power; }
+  if(r.xpb){ xpBoost += r.xpb; }
+  calDay++;
+  lastCalClaim = now;
+  localStorage.setItem("calDay", calDay);
+  localStorage.setItem("lastCalClaim", lastCalClaim);
+  save(); update(); renderCalendar(); updateDailyTimer();
+  playClaim();
+  showRewardPopup("DAY "+calDay+" BONUS!", r.reward||0, r.icon);
+}
+updateDailyTimer = function(){
+  const btn = document.getElementById("dailyBtn");
+  const timer = document.getElementById("dailyTimer");
+  if(!timer) return;
+  const rem = 86400000 - (Date.now() - lastCalClaim);
+  if(rem <= 0 && calDay < 30){
+    if(btn){btn.disabled=false;btn.style.opacity="1";}
+    timer.innerText = "✅ Ready to claim!"; return;
+  }
+  if(calDay >= 30){ timer.innerText = "🎉 All days complete!"; return; }
+  if(btn){btn.disabled=true;btn.style.opacity=".6";}
+  const h=Math.floor(rem/3600000),mn=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);
+  timer.innerText = "⏳ "+h+"h "+mn+"m "+s+"s";
+};
 
+// =================== PROFILE & AVATAR ===================
+const AVATARS = ["🧑","👨‍💻","👩‍💻","🤖","👾","🧙","🦸","🥷","👨‍🚀","👩‍🚀","🎮","💎","🔥","⚡","🌕","🦊","🐉","🦁","🐺","🦅"];
+let selectedAvatar = localStorage.getItem("selectedAvatar") || "🧑";
+function openProfileModal(){
+  playClick();
+  document.getElementById("profileModal").classList.add("open");
+  document.getElementById("profileBigAvatar").innerText = selectedAvatar;
+  document.getElementById("profileModalName").innerText = username;
+  document.getElementById("profileModalId").innerText = playerId;
+  document.getElementById("statLifetimeCoins").innerText = lifetimeCoins.toLocaleString();
+  document.getElementById("statMines").innerText = lifetimeMines.toLocaleString();
+  document.getElementById("statChests").innerText = lifetimeChests.toLocaleString();
+  document.getElementById("statStreak").innerText = streakDay;
+  document.getElementById("statPower").innerText = minePower;
+  document.getElementById("statRefs").innerText = referrals;
+  renderAvatarGrid();
+}
+function closeProfileModal(){
+  document.getElementById("profileModal").classList.remove("open");
+}
+function renderAvatarGrid(){
+  const grid = document.getElementById("avatarGrid");
+  if(!grid) return;
+  grid.innerHTML = "";
+  AVATARS.forEach(av => {
+    const div = document.createElement("div");
+    div.className = "avatarOpt" + (av === selectedAvatar ? " selected" : "");
+    div.innerText = av;
+    div.onclick = () => selectAvatar(av);
+    grid.appendChild(div);
+  });
+}
+function selectAvatar(av){
+  selectedAvatar = av;
+  localStorage.setItem("selectedAvatar", av);
+  document.getElementById("profileBigAvatar").innerText = av;
+  const img = document.getElementById("profilePhoto");
+  if(img && profilePhoto.includes("149071")){
+    img.style.display = "none";
+    let avatarEl = document.getElementById("profileAvatarEmoji");
+    if(!avatarEl){
+      avatarEl = document.createElement("div");
+      avatarEl.id = "profileAvatarEmoji";
+      avatarEl.style.cssText = "width:75px;height:75px;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 0 20px rgba(255,215,0,.4);cursor:pointer;flex-shrink:0;";
+      avatarEl.onclick = openProfileModal;
+      img.parentNode.insertBefore(avatarEl, img);
+    }
+    avatarEl.innerText = av;
+  }
+  renderAvatarGrid();
+  playClick();
+  showToast("Avatar updated: " + av);
+}
+document.getElementById("profileModal").addEventListener("click", function(e){
+  if(e.target === this) closeProfileModal();
+});
+
+// =================== NOTIFICATION SYSTEM ===================
+let notifications = JSON.parse(localStorage.getItem("notifications")||"[]");
+let unreadNotifs = parseInt(localStorage.getItem("unreadNotifs")||"0");
+function addNotification(title, body, icon="🔔"){
+  const notif = {id:Date.now(),title,body,icon,time:new Date().toLocaleTimeString(),read:false};
+  notifications.unshift(notif);
+  if(notifications.length > 30) notifications = notifications.slice(0,30);
+  unreadNotifs++;
+  localStorage.setItem("notifications", JSON.stringify(notifications));
+  localStorage.setItem("unreadNotifs", unreadNotifs);
+  updateNotifDot();
+  if(Notification?.permission === "granted"){
+    try{ new Notification("Nilma Coin: "+title,{body,icon:"https://cdn-icons-png.flaticon.com/512/825/825508.png"}); }catch(e){}
+  }
+}
+function updateNotifDot(){
+  const dot = document.getElementById("notifDot");
+  if(dot) dot.style.display = unreadNotifs > 0 ? "block" : "none";
+}
+function openNotifPanel(){
+  playClick();
+  document.getElementById("notifPanel").classList.add("open");
+  document.getElementById("notifOverlay").style.display = "block";
+  const permBtn = document.getElementById("notifPermBtn");
+  if(permBtn) permBtn.style.display = (Notification && Notification.permission === "default") ? "block" : "none";
+  renderNotifList();
+  notifications.forEach(n => n.read = true);
+  unreadNotifs = 0;
+  localStorage.setItem("notifications", JSON.stringify(notifications));
+  localStorage.setItem("unreadNotifs", "0");
+  updateNotifDot();
+}
+function closeNotifPanel(){
+  document.getElementById("notifPanel").classList.remove("open");
+  document.getElementById("notifOverlay").style.display = "none";
+}
+function renderNotifList(){
+  const list = document.getElementById("notifList");
+  if(!list) return;
+  if(notifications.length === 0){
+    list.innerHTML = "<div style='text-align:center;opacity:.4;font-size:13px;margin-top:30px;'>No notifications yet</div>";
+    return;
+  }
+  list.innerHTML = notifications.map(n =>
+    `<div class="notifItem ${n.read?'':'unread'}">
+      <div style="font-size:15px;">${n.icon} <strong>${n.title}</strong></div>
+      <div style="font-size:12px;opacity:.75;margin-top:3px;">${n.body}</div>
+      <div class="notifTime">${n.time}</div>
+    </div>`
+  ).join("");
+}
+function clearNotifs(){
+  notifications = [];
+  localStorage.setItem("notifications","[]");
+  renderNotifList();
+  showToast("Notifications cleared");
+}
+function requestNotifPermission(){
+  if(!("Notification" in window)){showToast("Not supported in this browser");return;}
+  Notification.requestPermission().then(p=>{
+    const btn = document.getElementById("notifPermBtn");
+    if(p==="granted"){
+      if(btn) btn.style.display="none";
+      showToast("✅ Push notifications enabled!");
+      addNotification("Notifications Enabled","You'll now get mining reminders!","✅");
+    }else{showToast("Notifications blocked by browser");}
+  });
+}
+const _origCheckLevelUp = checkLevelUp;
+checkLevelUp = function(){
+  const prevLevel = level;
+  _origCheckLevelUp();
+  if(level > prevLevel) addNotification("Level Up! 🎉","You reached Level "+level+"!","⭐");
+};
+setTimeout(()=>{
+  const rem = 86400000-(Date.now()-lastCalClaim);
+  if(rem<=0 && calDay<30) addNotification("Daily Bonus Ready!","Your daily login reward is waiting 🎁","🎁");
+},1500);
+let energyNotifSent = false;
+setInterval(()=>{
+  if(energy>=maxEnergy&&!energyNotifSent){energyNotifSent=true;addNotification("Energy Full ⚡","Your energy is maxed — go mine!","⚡");}
+  if(energy<maxEnergy) energyNotifSent=false;
+},10000);
+setTimeout(()=>{
+  if(freeSpinUsed==="no") addNotification("Free Chest Ready!","Open your free daily chest now 📦","📦");
+},3000);
+updateNotifDot();
 // =================== END OF SCRIPT ===================
-console.log("✅ Nilma Coin v3.1 Loaded");
+  console.log("✅ Nilma Coin v3.1 Loaded");
 </script>
 </body>
 </html>
