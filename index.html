@@ -868,6 +868,8 @@ let lifetimeChests=parseInt(localStorage.getItem("lifetimeChests"))||0;
 let lifetimeCoins=parseInt(localStorage.getItem("lifetimeCoins"))||0;
 let claimedStreakToday=localStorage.getItem("claimedStreakToday")==="yes";
 let spinning=false;
+let weeklyEarned=parseInt(localStorage.getItem("weeklyEarned"))||0;
+let lastWeekReset=parseInt(localStorage.getItem("lastWeekReset"))||0;
 let commonCrates=parseInt(localStorage.getItem("commonCrates"))||0;
 let epicCrates=parseInt(localStorage.getItem("epicCrates"))||0;
 let legendaryCrates=parseInt(localStorage.getItem("legendaryCrates"))||0;
@@ -877,6 +879,8 @@ let mythicCrates=parseInt(localStorage.getItem("mythicCrates"))||0;
 let lastDailyReset=localStorage.getItem("lastDailyReset")||"";
 let todayStr=new Date().toDateString();
 let dailyMines=0,dailyChests=0,dailyCoins=0,dailyEpicCrates=0,dailyPuzzleCorrect=0;
+const currentWeekStart=(()=>{const n=new Date();const d=n.getUTCDay();return new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate()-d,0,0,0)).getTime();})();
+if(lastWeekReset!==currentWeekStart){weeklyEarned=0;lastWeekReset=currentWeekStart;localStorage.setItem("weeklyEarned","0");localStorage.setItem("lastWeekReset",currentWeekStart);}
 if(lastDailyReset!==todayStr){
   localStorage.setItem("lastDailyReset",todayStr);
   ["dailyMines","dailyChests","dailyCoins","dailyEpicCrates","dailyPuzzleCorrect"].forEach(k=>localStorage.setItem(k,"0"));
@@ -990,7 +994,7 @@ function save(){
   localStorage.setItem("dailyEpicCrates",dailyEpicCrates);
   localStorage.setItem("streakDay",streakDay);
   localStorage.setItem("bestStreak",bestStreak);
-
+localStorage.setItem("weeklyEarned",weeklyEarned);
   // Anti-cheat cap
   const cap=(level*10000)+100000;
   if(coins>cap)coins=cap;
@@ -1022,7 +1026,7 @@ function save(){
       mythicCrates,
       streakDay,
       bestStreak,
-      weekCoins: coins,
+      weekCoins: weeklyEarned,
 lastActive: Date.now(),
 vipEnd: vipEnd,
 updated: Date.now()
@@ -1304,7 +1308,7 @@ function mine(e){
   unlockAudio();playClick();doHaptic("light");
   let crit=Math.random()<0.1;
   let earned=crit?minePower*5:minePower;
-  coins+=earned;lifetimeCoins+=earned;lifetimeMines++;dailyMines++;dailyCoins+=earned;
+  coins+=earned;lifetimeCoins+=earned;weeklyEarned+=earned;lifetimeMines++;dailyMines++;dailyCoins+=earned;
   xp+=2*xpBoost;energy-=1;
   const rw=document.getElementById("reactorWrap");
   if(rw){rw.style.transform="scale(.93)";setTimeout(()=>{rw.style.transform="scale(1)";},100);}
