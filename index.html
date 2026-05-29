@@ -1603,7 +1603,7 @@ function loadLeaderboard(){
 
   // Real-time listener — updates instantly when any player's coins change
   lbListener = db.collection("players")
-    .orderBy("coins", "desc")
+    .orderBy("weekCoins", "desc")
     .limit(20)
     .onSnapshot(snap => {
       if(snap.empty){
@@ -1651,7 +1651,7 @@ function loadLeaderboard(){
               </div>
             </div>
             <div style="text-align:right;">
-              <div style="font-weight:900;color:var(--gold);font-size:14px;">💰 ${(d.coins||0).toLocaleString()}</div>
+              <div style="font-weight:900;color:var(--gold);font-size:14px;">💰 ${(d.weekCoins||0).toLocaleString()}</div>
               ${prize ? `<div style="font-size:10px;color:var(--green);margin-top:2px;">🏆 +${prize.toLocaleString()}</div>` : ""}
             </div>
           </div>`;
