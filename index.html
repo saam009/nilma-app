@@ -851,18 +851,28 @@ const allTasks=[
   {id:"streak3",icon:"🔥",title:"Maintain 3-Day Streak",reward:300,type:"auto",check:()=>streakDay>=3},
   {id:"invite1",icon:"👥",title:"Invite 1 Friend",reward:500,type:"auto",check:()=>referrals>=1},
   {id:"invite5",icon:"🤝",title:"Invite 5 Friends",reward:2000,type:"auto",check:()=>referrals>=5},
+  {id:"t_chests3",icon:"📦",title:"Open 3 Chests Today",reward:150,type:"auto",check:()=>dailyChests>=3},
+  {id:"t_reach5",icon:"⭐",title:"Reach Level 5",reward:500,type:"auto",check:()=>level>=5},
+  {id:"t_earn500",icon:"💰",title:"Earn 500 Coins Today",reward:100,type:"auto",check:()=>dailyCoins>=500},
+  {id:"t_open_rare",icon:"💜",title:"Open an Epic Crate",reward:400,type:"auto",check:()=>dailyEpicCrates>=1},
+  {id:"t_streak",icon:"🔥",title:"Claim Daily Streak",reward:250,type:"auto",check:()=>claimedStreakToday},
+  {id:"t_mine200",icon:"⚒",title:"Mine 200 Times Today",reward:800,type:"auto",check:()=>dailyMines>=200},
+  {id:"t_invite",icon:"👥",title:"Invite a Friend",reward:1000,type:"auto",check:()=>referrals>=1},
 ];
 
 // ===== MISSIONS =====
 const allMissions=[
-  {id:"m_puzzle",icon:"🧠",title:"Play Brain Puzzle — Score 5 correct",reward:300,check:()=>dailyPuzzleCorrect>=5,progress:()=>dailyPuzzleCorrect,target:5,action:()=>showScreen('puzzleScreen')},
-  {id:"m_chests3",icon:"📦",title:"Open 3 Chests Today",reward:150,check:()=>dailyChests>=3,progress:()=>dailyChests,target:3},
-  {id:"m_reach5",icon:"⭐",title:"Reach Level 5",reward:500,check:()=>level>=5,progress:()=>level,target:5},
-  {id:"m_earn500",icon:"💰",title:"Earn 500 Coins Today",reward:100,check:()=>dailyCoins>=500,progress:()=>dailyCoins,target:500},
-  {id:"m_open_rare",icon:"💜",title:"Open an Epic Crate",reward:400,check:()=>dailyEpicCrates>=1,progress:()=>dailyEpicCrates,target:1},
-  {id:"m_streak",icon:"🔥",title:"Claim Daily Streak",reward:250,check:()=>claimedStreakToday,progress:()=>claimedStreakToday?1:0,target:1},
-  {id:"m_mine200",icon:"⚒",title:"Mine 200 Times Today",reward:800,check:()=>dailyMines>=200,progress:()=>dailyMines,target:200},
-  {id:"m_invite",icon:"👥",title:"Invite a Friend",reward:1000,check:()=>referrals>=1,progress:()=>Math.min(referrals,1),target:1},
+  {id:"m_play1",icon:"🧠",title:"Play 1 Puzzle Game",reward:5,check:()=>dailyPuzzleGames>=1,progress:()=>dailyPuzzleGames,target:1,action:()=>showScreen('puzzleScreen')},
+  {id:"m_play3",icon:"🧠",title:"Play 3 Puzzle Games",reward:10,check:()=>dailyPuzzleGames>=3,progress:()=>dailyPuzzleGames,target:3,action:()=>showScreen('puzzleScreen')},
+  {id:"m_play5",icon:"🧠",title:"Play 5 Puzzle Games",reward:15,check:()=>dailyPuzzleGames>=5,progress:()=>dailyPuzzleGames,target:5,action:()=>showScreen('puzzleScreen')},
+  {id:"m_play10",icon:"🧠",title:"Play 10 Puzzle Games",reward:25,check:()=>dailyPuzzleGames>=10,progress:()=>dailyPuzzleGames,target:10,action:()=>showScreen('puzzleScreen')},
+  {id:"m_correct5",icon:"✅",title:"Score 5 Correct Answers",reward:10,check:()=>dailyPuzzleCorrect>=5,progress:()=>dailyPuzzleCorrect,target:5,action:()=>showScreen('puzzleScreen')},
+  {id:"m_correct10",icon:"✅",title:"Score 10 Correct Answers",reward:15,check:()=>dailyPuzzleCorrect>=10,progress:()=>dailyPuzzleCorrect,target:10,action:()=>showScreen('puzzleScreen')},
+  {id:"m_correct25",icon:"✅",title:"Score 25 Correct Answers",reward:20,check:()=>dailyPuzzleCorrect>=25,progress:()=>dailyPuzzleCorrect,target:25,action:()=>showScreen('puzzleScreen')},
+  {id:"m_correct50",icon:"✅",title:"Score 50 Correct Answers",reward:30,check:()=>dailyPuzzleCorrect>=50,progress:()=>dailyPuzzleCorrect,target:50,action:()=>showScreen('puzzleScreen')},
+  {id:"m_streak3",icon:"🔥",title:"Get 3 Correct in a Row",reward:20,check:()=>dailyPuzzleStreak>=3,progress:()=>dailyPuzzleStreak,target:3,action:()=>showScreen('puzzleScreen')},
+  {id:"m_streak5",icon:"🔥",title:"Get 5 Correct in a Row",reward:30,check:()=>dailyPuzzleStreak>=5,progress:()=>dailyPuzzleStreak,target:5,action:()=>showScreen('puzzleScreen')},
+  {id:"m_streak10",icon:"🔥",title:"Get 10 Correct in a Row",reward:50,check:()=>dailyPuzzleStreak>=10,progress:()=>dailyPuzzleStreak,target:10,action:()=>showScreen('puzzleScreen')},
 ];
 
 // ===== STATE =====
@@ -911,23 +921,26 @@ let mythicCrates=parseInt(localStorage.getItem("mythicCrates"))||0;
 // Daily reset
 let lastDailyReset=localStorage.getItem("lastDailyReset")||"";
 let todayStr=new Date().toDateString();
-let dailyMines=0,dailyChests=0,dailyCoins=0,dailyEpicCrates=0,dailyPuzzleCorrect=0;
+let dailyMines=0,dailyChests=0,dailyCoins=0,dailyEpicCrates=0,dailyPuzzleCorrect=0,dailyPuzzleGames=0,dailyPuzzleStreak=0,bestPuzzleStreak=0;
 const currentWeekStart=(()=>{const n=new Date();const d=n.getUTCDay();return new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate()-d,0,0,0)).getTime();})();
 if(lastWeekReset!==currentWeekStart){weeklyEarned=0;lastWeekReset=currentWeekStart;localStorage.setItem("weeklyEarned","0");localStorage.setItem("lastWeekReset",currentWeekStart);}
 if(lastDailyReset!==todayStr){
   localStorage.setItem("lastDailyReset",todayStr);
-  ["dailyMines","dailyChests","dailyCoins","dailyEpicCrates","dailyPuzzleCorrect"].forEach(k=>localStorage.setItem(k,"0"));
+  ["dailyMines","dailyChests","dailyCoins","dailyEpicCrates","dailyPuzzleCorrect","dailyPuzzleGames","dailyPuzzleStreak"].forEach(k=>localStorage.setItem(k,"0"));
   localStorage.setItem("claimedStreakToday","no");
   claimedStreakToday=false;
   freeSpinUsed="no";localStorage.setItem("freeSpinUsed","no");
   paidChestPrice=20;localStorage.setItem("paidChestPrice","20");
   allMissions.forEach(m=>localStorage.removeItem("mc_"+m.id));
 }else{
-  dailyMines=parseInt(localStorage.getItem("dailyMines"))||0;
+ dailyMines=parseInt(localStorage.getItem("dailyMines"))||0;
   dailyChests=parseInt(localStorage.getItem("dailyChests"))||0;
   dailyCoins=parseInt(localStorage.getItem("dailyCoins"))||0;
   dailyEpicCrates=parseInt(localStorage.getItem("dailyEpicCrates"))||0;
   dailyPuzzleCorrect=parseInt(localStorage.getItem("dailyPuzzleCorrect"))||0;
+  dailyPuzzleGames=parseInt(localStorage.getItem("dailyPuzzleGames"))||0;
+  dailyPuzzleStreak=parseInt(localStorage.getItem("dailyPuzzleStreak"))||0;
+  bestPuzzleStreak=parseInt(localStorage.getItem("bestPuzzleStreak"))||0; 
 }
 
 let tasksClaimed=JSON.parse(localStorage.getItem("tasksClaimed")||"{}");
@@ -1479,19 +1492,31 @@ function claimTask(id){
 // ===== MISSIONS =====
 function renderMissions(){
   const list=document.getElementById("missionList");if(!list)return;list.innerHTML="";
-  allMissions.forEach(m=>{
+  let prevClaimed=true;
+  allMissions.forEach((m,idx)=>{
     const claimed=localStorage.getItem("mc_"+m.id)==="yes";
-    const done=m.check();const prog=m.progress();const pct=Math.min((prog/m.target)*100,100);
+    const unlocked=prevClaimed;
+    const done=unlocked&&m.check();
+    const prog=unlocked?m.progress():0;
+    const pct=Math.min((prog/m.target)*100,100);
     const div=document.createElement("div");div.className="taskCard";
-    const actionBtn=m.action?`<button class="taskBtn" style="background:linear-gradient(90deg,#ff9800,var(--gold));color:black;" onclick="(${m.action.toString()})()">▶ PLAY</button>`:"";
+    div.style.opacity=unlocked?"1":"0.4";
+    const actionBtn=unlocked&&m.action?`<button class="taskBtn" style="background:linear-gradient(90deg,#ff9800,var(--gold));color:black;" onclick="(${m.action.toString()})()">▶ PLAY</button>`:"";
+    let claimLabel=claimed?"✅ DONE":done?"CLAIM":"🔒 LOCKED";
     div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <div style="flex:1;"><div class="taskTitle">${m.icon} ${m.title}</div><div class="taskReward">🎁 +${m.reward} coins</div>
+      <div style="flex:1;">
+        <div class="taskTitle">${m.icon} ${m.title}</div>
+        <div class="taskReward">🎁 +${m.reward} coins</div>
         <div style="margin-top:8px;height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:10px;"></div></div>
-        <div class="taskProgress" style="margin-top:4px;">${prog}/${m.target}</div></div>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-left:10px;">${actionBtn}
-        <button class="taskBtn" onclick="claimMission('${m.id}')" ${done&&!claimed?"":"disabled"}>${claimed?"✅ DONE":done?"CLAIM":"LOCKED"}</button>
-      </div></div>`;
+        <div class="taskProgress" style="margin-top:4px;">${unlocked?prog+"/"+m.target:"Complete previous mission first"}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-left:10px;">
+        ${actionBtn}
+        <button class="taskBtn" onclick="claimMission('${m.id}')" ${done&&!claimed?"":"disabled"}>${claimLabel}</button>
+      </div>
+    </div>`;
     list.appendChild(div);
+    if(!claimed)prevClaimed=false;
   });
 }
 function claimMission(id){
@@ -2247,6 +2272,10 @@ function answerPuzzle(chosen,btn){
 
 function endPuzzle(){
   puzzleActive=false;
+  dailyPuzzleGames++;
+  localStorage.setItem("dailyPuzzleGames",dailyPuzzleGames);
+  if(puzzleSessionStreak>bestPuzzleStreak){bestPuzzleStreak=puzzleSessionStreak;localStorage.setItem("bestPuzzleStreak",bestPuzzleStreak);}
+  if(puzzleSessionStreak>dailyPuzzleStreak){dailyPuzzleStreak=puzzleSessionStreak;localStorage.setItem("dailyPuzzleStreak",dailyPuzzleStreak);}
   if(puzzleSessionScore>puzzleBestScore){puzzleBestScore=puzzleSessionScore;document.getElementById("puzzleBest").innerText=puzzleBestScore;}
   document.getElementById("puzzleChoices").innerHTML="";
   document.getElementById("puzzleQuestion").innerText="⏰ Time's Up!";
