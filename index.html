@@ -273,7 +273,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
   <img id="profilePhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" onclick="openProfileModal()" style="width:70px;height:70px;border-radius:50%;border:3px solid var(--gold);object-fit:cover;cursor:pointer;">
   <div style="flex:1;">
     <div id="profileName" style="font-size:20px;font-weight:800;">Player</div>
-    <div style="color:var(--gold);font-size:12px;margin-top:3px;">🔥 Ready To Get RICH?</div>
+    <div style="color:var(--gold);font-size:12px;margin-top:3px;" id="levelTitle">🪨 ROOKIE</div>
     <div style="font-size:11px;opacity:.7;margin-top:3px;">⛏ Power: <span id="profilePower">1</span> &nbsp;|&nbsp; 👥 Refs: <span id="profileRefs">0</span></div>
     <div class="progress"><div class="progressFill" id="xpBar"></div></div>
     <div style="font-size:10px;opacity:.5;margin-top:3px;">XP: <span id="xpText">0</span> / <span id="xpMaxText">100</span></div>
@@ -848,6 +848,16 @@ let xp=parseInt(localStorage.getItem("xp"))||0;
 let xpMax=parseInt(localStorage.getItem("xpMax"))||500;
 let maxEnergy=parseInt(localStorage.getItem("maxEnergy"))||100;
 let minePower=parseInt(localStorage.getItem("minePower"))||1;
+ function getLevelTitle(lv){
+  if(lv>=100)return"👑 LEGEND";
+  if(lv>=75)return"💎 ELITE";
+  if(lv>=50)return"🚀 VETERAN";
+  if(lv>=30)return"⚡ EXPERT";
+  if(lv>=20)return"🔥 ADVANCED";
+  if(lv>=10)return"⛏ MINER";
+  if(lv>=5)return"🌟 APPRENTICE";
+  return"🪨 ROOKIE";
+} 
 let xpBoost=parseInt(localStorage.getItem("xpBoost"))||1;
 let turboEnd=parseInt(localStorage.getItem("turboEnd"))||0;
 let autoMinerEnd=parseInt(localStorage.getItem("autoMinerEnd"))||0;
@@ -1041,6 +1051,7 @@ function update(){
   s("profileName",username);
   s("profilePower",minePower);
   s("profileRefs",referrals);
+  const lt=document.getElementById("levelTitle");if(lt)lt.innerText=getLevelTitle(level);
   s("xpText",xp);
   s("xpMaxText",xpMax);
   s("refCount",referrals);
@@ -2338,12 +2349,50 @@ function showRewardPopup(title,amount,emoji){
   setTimeout(()=>{p.style.transform="translate(-50%,-50%) scale(.6)";setTimeout(()=>{p.style.display="none";},250);},2500);
 }
 function chestPopEffect(text){
-  const el=document.createElement("div");el.innerText=text;
-  el.style.cssText="position:fixed;left:50%;top:45%;transform:translate(-50%,-50%) scale(.3);font-size:36px;font-weight:900;color:#fff;text-shadow:0 0 15px var(--cyan);z-index:999999;opacity:0;pointer-events:none;transition:.4s;";
-  document.body.appendChild(el);
-  setTimeout(()=>{el.style.opacity="1";el.style.transform="translate(-50%,-60%) scale(1.1)";},50);
-  setTimeout(()=>{el.style.opacity="0";},1000);
-  setTimeout(()=>el.remove(),1400);
+  const overlay=document.createElement("div");
+  overlay.style.cssText="position:fixed;inset:0;z-index:999998;pointer-events:none;";
+  // Particle burst
+  for(let i=0;i<18;i++){
+    const p=document.createElement("div");
+    const colors=["#ffd54a","#00ffff","#8a2eff","#00ff99","#ff00cc"];
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    const angle=Math.random()*360;
+    const dist=80+Math.random()*120;
+    p.style.cssText=`position:absolute;left:50%;top:50%;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};transform:translate(-50%,-50%);transition:all .8s ease-out;opacity:1;`;
+    overlay.appendChild(p);
+    setTimeout(()=>{
+      p.style.transform=`translate(calc(-50% + ${Math.cos(angle)*dist}px),calc(-50% + ${Math.sin(angle)*dist}px))`;
+      p.style.opacity="0";
+    },50);
+  }
+  document.body.appendChild(overlay);
+
+  // Main reward card
+  const card=document.createElement("div");
+  const isCoins=text.includes("COIN");
+  const isCrate=text.includes("CRATE");
+  const isTurbo=text.includes("TURBO");
+  const isXP=text.includes("XP");
+  const isSpin=text.includes("SPIN");
+  let bg="linear-gradient(135deg,rgba(0,255,255,.15),rgba(138,46,255,.15))";
+  let border="rgba(0,255,255,.5)";
+  let glow="rgba(0,255,255,.4)";
+  if(isCoins){bg="linear-gradient(135deg,rgba(255,213,74,.2),rgba(255,152,0,.15))";border="rgba(255,213,74,.7)";glow="rgba(255,213,74,.5)";}
+  if(isCrate){bg="linear-gradient(135deg,rgba(160,0,255,.2),rgba(200,0,255,.15))";border="rgba(160,0,255,.7)";glow="rgba(160,0,255,.5)";}
+  if(isTurbo){bg="linear-gradient(135deg,rgba(255,0,150,.2),rgba(255,100,0,.15))";border="rgba(255,0,150,.7)";glow="rgba(255,0,150,.5)";}
+  if(isXP){bg="linear-gradient(135deg,rgba(0,255,100,.2),rgba(0,200,100,.15))";border="rgba(0,255,100,.7)";glow="rgba(0,255,100,.5)";}
+
+  card.style.cssText=`position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.3);z-index:999999;background:${bg};border:2px solid ${border};border-radius:24px;padding:24px 36px;text-align:center;pointer-events:none;box-shadow:0 0 40px ${glow},0 0 80px ${glow};transition:transform .35s cubic-bezier(.17,.67,.35,1.4),opacity .3s;opacity:0;backdrop-filter:blur(20px);min-width:220px;`;
+  card.innerHTML=`
+    <div style="font-size:42px;margin-bottom:8px;">${isCoins?"💰":isCrate?"📦":isTurbo?"🚀":isXP?"🔥":isSpin?"🎟":"🎁"}</div>
+    <div style="font-size:13px;letter-spacing:3px;opacity:.7;color:white;margin-bottom:6px;">REWARD</div>
+    <div style="font-size:26px;font-weight:900;background:linear-gradient(90deg,#fff,${border});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px;">${text}</div>
+    <div style="margin-top:10px;height:2px;background:linear-gradient(90deg,transparent,${border},transparent);border-radius:2px;"></div>
+  `;
+  document.body.appendChild(card);
+  setTimeout(()=>{card.style.transform="translate(-50%,-50%) scale(1)";card.style.opacity="1";},50);
+  setTimeout(()=>{card.style.transform="translate(-50%,-60%) scale(.85)";card.style.opacity="0";},2000);
+  setTimeout(()=>{card.remove();overlay.remove();},2400);
 }
 function showToast(text){
   const t=document.getElementById("toast");t.innerText=text;t.style.display="block";
