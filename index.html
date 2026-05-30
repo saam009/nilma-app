@@ -188,8 +188,8 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 /* NOTIF PANEL */
 .notifPanel{position:fixed;top:0;right:0;width:300px;max-width:95vw;height:100vh;background:linear-gradient(180deg,rgba(5,5,18,.98),rgba(2,2,10,.98));border-left:1px solid rgba(255,255,255,.08);z-index:999999;transform:translateX(100%);transition:.3s;padding:20px;overflow-y:auto;}
 .notifPanel.open{transform:translateX(0);}
-.notifItem{background:rgba(255,255,255,.04);border-radius:12px;padding:12px;margin-bottom:10px;border-left:3px solid var(--cyan);}
-.notifItem.unread{border-left-color:var(--gold);background:rgba(255,213,74,.05);}
+.notifItem{background:rgba(255,255,255,.02);border-radius:12px;padding:12px;margin-bottom:10px;border-left:3px solid rgba(0,255,255,.3);opacity:.5;filter:brightness(.7);}
+.notifItem.unread{border-left-color:var(--gold);background:rgba(255,213,74,.05);opacity:1;filter:brightness(1);}
 .notifItem .notifTime{font-size:10px;opacity:.45;margin-top:4px;}
 .notifClear{width:100%;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:#aaa;cursor:pointer;margin-top:8px;}
 
@@ -2264,6 +2264,7 @@ function exitPuzzle(){clearInterval(puzzleTimerInt);puzzleActive=false;showScree
 // ===== NOTIFICATIONS =====
 let notifications=JSON.parse(localStorage.getItem("notifications")||"[]");
 let unreadNotifs=parseInt(localStorage.getItem("unreadNotifs")||"0");
+let lastSettingsNotif=parseInt(localStorage.getItem("lastSettingsNotif")||"0");
 function addNotification(title,body,icon="🔔"){
   const notif={id:Date.now(),title,body,icon,time:new Date().toLocaleTimeString(),read:false};
   notifications.unshift(notif);if(notifications.length>30)notifications=notifications.slice(0,30);
@@ -2284,7 +2285,14 @@ function renderNotifList(){
   if(notifications.length===0){list.innerHTML="<div style='text-align:center;opacity:.4;font-size:13px;margin-top:30px;'>No notifications yet</div>";return;}
   list.innerHTML=notifications.map(n=>`<div class="notifItem ${n.read?"":"unread"}"><div style="font-size:15px;">${n.icon} <strong>${n.title}</strong></div><div style="font-size:12px;opacity:.75;margin-top:3px;">${n.body}</div><div class="notifTime">${n.time}</div></div>`).join("");
 }
-function clearNotifs(){notifications=[];localStorage.setItem("notifications","[]");renderNotifList();showToast("Cleared");}
+function clearNotifs(){
+  notifications=[];
+  localStorage.setItem("notifications","[]");
+  localStorage.removeItem("lastSettingsNotif");
+  lastSettingsNotif=0;
+  renderNotifList();
+  showToast("Cleared — will re-notify weekly");
+}
 function requestNotifPermission(){
   if(!("Notification" in window)){showToast("Not supported");return;}
   Notification.requestPermission().then(p=>{
@@ -2508,9 +2516,10 @@ setTimeout(checkOfflineMining,2500);
 // Startup notifications
 setTimeout(()=>{
   if(freeSpinUsed==="no")addNotification("Free Chest Ready!","Open your free daily chest 📦","📦");
-  const settingsNotifKey="settingsNotifShown_v1";
-  if(!localStorage.getItem(settingsNotifKey)){
-    localStorage.setItem(settingsNotifKey,"yes");
+  const oneWeek=7*24*60*60*1000;
+  if(Date.now()-lastSettingsNotif>oneWeek){
+    lastSettingsNotif=Date.now();
+    localStorage.setItem("lastSettingsNotif",lastSettingsNotif);
     addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins, Bind Wallet & more! Check Settings for details 🚀","🚀");
   }
 },3000);
