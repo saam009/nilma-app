@@ -759,6 +759,31 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
     </div>
     <div style="margin-top:12px;font-size:11px;color:var(--gold);opacity:.7;">Hold your coins — rewards incoming 🔥</div>
   </div>
+  <div style="background:linear-gradient(135deg,rgba(0,255,255,.06),rgba(138,46,255,.06));border:1px solid rgba(0,255,255,.15);border-radius:18px;padding:16px;margin:14px 0;">
+    <div style="font-size:11px;letter-spacing:3px;color:var(--cyan);opacity:.8;margin-bottom:14px;">🚀 COMING SOON</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+        <div style="font-size:24px;">🧩</div>
+        <div><div style="font-size:13px;font-weight:700;">More Mini Games</div><div style="font-size:11px;opacity:.5;margin-top:2px;">New puzzle types & arcade games</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(0,255,255,.1);color:var(--cyan);font-weight:700;border:1px solid rgba(0,255,255,.2);">SOON</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+        <div style="font-size:24px;">📋</div>
+        <div><div style="font-size:13px;font-weight:700;">More New Tasks</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Daily & weekly special tasks</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(138,46,255,.1);color:#c060ff;font-weight:700;border:1px solid rgba(138,46,255,.2);">SOON</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+        <div style="font-size:24px;">💱</div>
+        <div><div style="font-size:13px;font-weight:700;">Convert Coins</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Swap coins to real crypto tokens</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(255,213,74,.1);color:var(--gold);font-weight:700;border:1px solid rgba(255,213,74,.2);">SOON</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+        <div style="font-size:24px;">👛</div>
+        <div><div style="font-size:13px;font-weight:700;">Bind Wallet</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Connect TON wallet for airdrop</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(0,255,153,.1);color:var(--green);font-weight:700;border:1px solid rgba(0,255,153,.2);">SOON</div>
+      </div>
+    </div>
+  </div>
   <div class="settingRow">
     <div><div class="settingLabel">📱 App Version</div><div class="settingDesc">Nilma Coin v4.0 — Fixed Edition</div></div>
     <div style="font-size:12px;color:var(--cyan);opacity:.7;">v4.0</div>
@@ -2481,7 +2506,10 @@ update();renderAll();showScreen("homeScreen");
 updateChestLabel();syncToggles();
 setTimeout(checkOfflineMining,2500);
 // Startup notifications
-setTimeout(()=>{if(freeSpinUsed==="no")addNotification("Free Chest Ready!","Open your free daily chest 📦","📦");},3000);
+setTimeout(()=>{
+  if(freeSpinUsed==="no")addNotification("Free Chest Ready!","Open your free daily chest 📦","📦");
+  addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins, Bind Wallet & more! Check Settings for details 🚀","🚀");
+},3000);
 let energyNotifSent=false;
 setInterval(()=>{
   if(energy>=maxEnergy&&!energyNotifSent){energyNotifSent=true;addNotification("Energy Full ⚡","Go mine!","⚡");}
