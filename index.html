@@ -2264,7 +2264,7 @@ function exitPuzzle(){clearInterval(puzzleTimerInt);puzzleActive=false;showScree
 // ===== NOTIFICATIONS =====
 let notifications=JSON.parse(localStorage.getItem("notifications")||"[]");
 let unreadNotifs=parseInt(localStorage.getItem("unreadNotifs")||"0");
-let lastSettingsNotif=parseInt(localStorage.getItem("lastSettingsNotif")||"0");
+let lastSettingsNotif=parseInt(localStorage.getItem("lastSettingsNotif_v3")||"0");
 if(!localStorage.getItem("lastSettingsNotif"))lastSettingsNotif=0;
 function addNotification(title,body,icon="🔔"){
   const notif={id:Date.now(),title,body,icon,time:new Date().toLocaleTimeString(),read:false};
@@ -2289,7 +2289,7 @@ function renderNotifList(){
 function clearNotifs(){
   notifications=[];
   localStorage.setItem("notifications","[]");
-  localStorage.removeItem("lastSettingsNotif");
+  localStorage.removeItem("lastSettingsNotif_v3");
   lastSettingsNotif=0;
   renderNotifList();
   showToast("Cleared — will re-notify weekly");
@@ -2520,7 +2520,7 @@ setTimeout(()=>{
   const oneWeek=7*24*60*60*1000;
   if(Date.now()-lastSettingsNotif>oneWeek){
     lastSettingsNotif=Date.now();
-    localStorage.setItem("lastSettingsNotif",lastSettingsNotif);
+    localStorage.setItem("lastSettingsNotif_v3",lastSettingsNotif);
     addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins, Bind Wallet & more! Check Settings for details 🚀","🚀");
   }
 },3000);
