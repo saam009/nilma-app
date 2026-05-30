@@ -2508,7 +2508,11 @@ setTimeout(checkOfflineMining,2500);
 // Startup notifications
 setTimeout(()=>{
   if(freeSpinUsed==="no")addNotification("Free Chest Ready!","Open your free daily chest 📦","📦");
-  addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins, Bind Wallet & more! Check Settings for details 🚀","🚀");
+  const settingsNotifKey="settingsNotifShown_v1";
+  if(!localStorage.getItem(settingsNotifKey)){
+    localStorage.setItem(settingsNotifKey,"yes");
+    addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins, Bind Wallet & more! Check Settings for details 🚀","🚀");
+  }
 },3000);
 let energyNotifSent=false;
 setInterval(()=>{
