@@ -2265,6 +2265,7 @@ function exitPuzzle(){clearInterval(puzzleTimerInt);puzzleActive=false;showScree
 let notifications=JSON.parse(localStorage.getItem("notifications")||"[]");
 let unreadNotifs=parseInt(localStorage.getItem("unreadNotifs")||"0");
 let lastSettingsNotif=parseInt(localStorage.getItem("lastSettingsNotif")||"0");
+if(!localStorage.getItem("lastSettingsNotif"))lastSettingsNotif=0;
 function addNotification(title,body,icon="🔔"){
   const notif={id:Date.now(),title,body,icon,time:new Date().toLocaleTimeString(),read:false};
   notifications.unshift(notif);if(notifications.length>30)notifications=notifications.slice(0,30);
