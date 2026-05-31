@@ -297,7 +297,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 </div>
 
 <!-- REACTOR -->
-<div style="margin:15px;background:linear-gradient(135deg,rgba(0,255,255,.06),rgba(138,46,255,.06));border:1px solid rgba(0,255,255,.18);border-radius:22px;padding:16px;text-align:center;">
+<div style="margin:15px 15px 6px 15px;background:linear-gradient(135deg,rgba(0,255,255,.06),rgba(138,46,255,.06));border:1px solid rgba(0,255,255,.18);border-radius:22px;padding:16px;text-align:center;">
   <div style="font-size:9px;letter-spacing:3px;color:var(--cyan);opacity:.6;margin-bottom:12px;">⚡ CYBER REACTOR</div>
   <div id="reactorWrap">
     <div style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--cyan);animation:spin 3s linear infinite;"></div>
@@ -308,7 +308,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 </div>
     </div>
   </div>
-  <div style="font-size:10px;color:var(--cyan);letter-spacing:2px;opacity:.8;margin-bottom:12px;">👆 TAP TO MINE</div>
+  <div id="tapToMine" style="font-size:10px;color:var(--cyan);letter-spacing:2px;opacity:.8;margin-bottom:6px;">👆 TAP TO MINE</div>
   <div style="display:flex;gap:8px;justify-content:center;">
     <div style="background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.1);border-radius:8px;padding:6px 12px;"><div style="font-size:13px;font-weight:900;color:var(--cyan);" id="reactorPower">1x</div><div style="font-size:8px;opacity:.5;">POWER</div></div>
     <div style="background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.1);border-radius:8px;padding:6px 12px;"><div style="font-size:13px;font-weight:900;color:var(--cyan);" id="reactorMachine">LV1</div><div style="font-size:8px;opacity:.5;">MACHINE</div></div>
@@ -1376,6 +1376,9 @@ async function verifyPayment(){
 // ===== MINE =====
 function mine(e){
   if(energy<=0){showToast("⚡ No energy!");return;}
+ const ttm=document.getElementById("tapToMine");
+if(ttm)ttm.style.display="none";
+localStorage.setItem("tapToMineSeen","yes");
   unlockAudio();playClick();doHaptic("light");
   let crit=Math.random()<0.1;
   let earned=crit?minePower*5:minePower;
@@ -2565,6 +2568,10 @@ window.onerror=(msg,src,ln)=>{console.log("ERR:",msg,"L:",ln);};
 if(db)loadPlayerData();
 update();renderAll();showScreen("homeScreen");
 updateChestLabel();syncToggles();
+ if(localStorage.getItem("tapToMineSeen")==="yes"){
+  const ttm=document.getElementById("tapToMine");
+  if(ttm)ttm.style.display="none";
+}
 setTimeout(checkOfflineMining,2500);
 // Startup notifications
 setTimeout(()=>{
