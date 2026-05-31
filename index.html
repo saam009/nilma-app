@@ -308,12 +308,18 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 </div>
     </div>
   </div>
-  <div id="tapToMine" style="font-size:10px;color:var(--cyan);letter-spacing:2px;opacity:.8;margin-bottom:6px;">👆 TAP TO MINE</div>
-  <div style="display:flex;gap:8px;justify-content:center;">
-    <div style="background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.1);border-radius:8px;padding:6px 12px;"><div style="font-size:13px;font-weight:900;color:var(--cyan);" id="reactorPower">1x</div><div style="font-size:8px;opacity:.5;">POWER</div></div>
-    <div style="background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.1);border-radius:8px;padding:6px 12px;"><div style="font-size:13px;font-weight:900;color:var(--cyan);" id="reactorMachine">LV1</div><div style="font-size:8px;opacity:.5;">MACHINE</div></div>
-    <div style="background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.1);border-radius:8px;padding:6px 12px;"><div style="font-size:13px;font-weight:900;color:var(--cyan);" id="reactorOutput">+1/tap</div><div style="font-size:8px;opacity:.5;">OUTPUT</div></div>
-  </div>
+ <div id="tapToMine" style="font-size:10px;color:var(--cyan);letter-spacing:2px;opacity:.8;margin-bottom:8px;">👆 TAP TO MINE</div>
+  <!-- HEAT BAR -->
+  <div style="margin-top:8px;padding:10px;background:rgba(255,50,0,.06);border:1px solid rgba(255,80,0,.2);border-radius:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="font-size:9px;letter-spacing:2px;color:#ff6600;opacity:.8;">🌡 REACTOR HEAT</div>
+      <div style="font-size:10px;font-weight:900;color:#ff6600;" id="heatPct">0%</div>
+    </div>
+    <div style="height:8px;background:rgba(255,255,255,.07);border-radius:20px;overflow:hidden;">
+      <div id="heatBar" style="height:100%;width:0%;border-radius:20px;background:linear-gradient(90deg,#00ff99,#ff9800,#ff4444);transition:.3s;"></div>
+    </div>
+    <div id="heatWarning" style="display:none;margin-top:6px;font-size:10px;color:#ff4444;font-weight:700;text-align:center;animation:pulse 1s infinite;">⚠️ OVERHEATING! Slow down!</div>
+  </div> 
 </div>
 
 <!-- MINING MACHINES -->
@@ -1374,8 +1380,29 @@ async function verifyPayment(){
 }
 
 // ===== MINE =====
+let heatLevel=0;
+let heatTimer=null;
+function updateHeat(){
+  const bar=document.getElementById("heatBar");
+  const pct=document.getElementById("heatPct");
+  const warn=document.getElementById("heatWarning");
+  if(bar)bar.style.width=heatLevel+"%";
+  if(pct)pct.innerText=Math.round(heatLevel)+"%";
+  if(warn)warn.style.display=heatLevel>=80?"block":"none";
+  clearTimeout(heatTimer);
+  heatTimer=setTimeout(()=>{
+    heatLevel=Math.max(0,heatLevel-5);
+    updateHeat();
+  },500);
+}
 function mine(e){
   if(energy<=0){showToast("⚡ No energy!");return;}
+  if(heatLevel>=100){showToast("🌡 Reactor overheated! Wait a moment!");return;}
+  heatLevel=Math.min(100,heatLevel+12);
+  updateHeat();
+  const ttm=document.getElementById("tapToMine");
+  if(ttm)ttm.style.display="none";
+  localStorage.setItem("tapToMineSeen","yes");
  const ttm=document.getElementById("tapToMine");
 if(ttm)ttm.style.display="none";
 localStorage.setItem("tapToMineSeen","yes");
