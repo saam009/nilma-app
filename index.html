@@ -1119,15 +1119,22 @@ function update(){
 
 // ===== SCREEN NAV =====
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".screen").forEach(s=>{
+    s.classList.remove("active");
+    s.style.display="none";
+  });
   const el=document.getElementById(id);
-  if(el)el.classList.add("active");
+  if(el){
+    el.classList.add("active");
+    el.style.display="block";
+  }
+  if(id==="spinScreen")document.getElementById(id).style.display="flex";
   document.querySelectorAll(".navItem").forEach(n=>n.classList.remove("active"));
- const navMap={
-  homeScreen:0, spinScreen:1, stakingScreen:2, clanScreen:3, leaderboardScreen:4,
-  shopScreen:0, taskScreen:0, missionScreen:0, streakScreen:0,
-  puzzleScreen:0, referralScreen:0
-}; 
+  const navMap={
+    homeScreen:0,spinScreen:1,stakingScreen:2,clanScreen:3,leaderboardScreen:4,
+    shopScreen:0,taskScreen:0,missionScreen:0,streakScreen:0,
+    puzzleScreen:0,referralScreen:0
+  };
   const idx=navMap[id];
   if(idx!==undefined){const items=document.querySelectorAll(".navItem");if(items[idx])items[idx].classList.add("active");}
   if(id==="leaderboardScreen")loadLeaderboard();
