@@ -1238,9 +1238,10 @@ function renderMachineGrid(){
     <div style="position:absolute;bottom:6px;left:8px;right:8px;">
       <div style="font-size:10px;font-weight:900;color:white;line-height:1.2;letter-spacing:.3px;">${m.name}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-        <span style="font-size:10px;color:#ffd54a;font-weight:700;">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</span>
-        <span style="font-size:9px;color:#80cbc4;">${owned>0?"LV"+owned+"/5":"Locked"}</span>
-      </div>
+  <span style="font-size:10px;color:#ffd54a;font-weight:700;">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</span>
+  <span style="font-size:9px;color:#80cbc4;">${owned>0?"LV"+owned+"/5":"Locked"}</span>
+</div>
+${owned>0?`<div style="margin-top:4px;height:3px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}99);transition:.4s;"></div></div>`:""}
     </div>
   </div>
   <div style="padding:7px 8px;">${btnHtml}</div>`;
