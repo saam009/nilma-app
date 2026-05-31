@@ -1381,19 +1381,6 @@ async function verifyPayment(){
   closePayModal();
 }
 
-// ===== MINE =====
-  const bar=document.getElementById("heatBar");
-  const pct=document.getElementById("heatPct");
-  const warn=document.getElementById("heatWarning");
-  if(bar)bar.style.width=heatLevel+"%";
-  if(pct)pct.innerText=Math.round(heatLevel)+"%";
-  if(warn)warn.style.display=heatLevel>=80?"block":"none";
-  clearTimeout(heatTimer);
-  heatTimer=setTimeout(()=>{
-    heatLevel=Math.max(0,heatLevel-5);
-    updateHeat();
-  },500);
-}
  function updateHeat(){
   const bar=document.getElementById("heatBar");
   const pct=document.getElementById("heatPct");
@@ -1412,9 +1399,6 @@ function mine(e){
   if(heatLevel>=100){showToast("🌡 Reactor overheated! Wait a moment!");return;}
   heatLevel=Math.min(100,heatLevel+12);
   updateHeat();
-  const ttm=document.getElementById("tapToMine");
-  if(ttm)ttm.style.display="none";
-  localStorage.setItem("tapToMineSeen","yes");
  const ttm=document.getElementById("tapToMine");
 if(ttm)ttm.style.display="none";
 localStorage.setItem("tapToMineSeen","yes");
