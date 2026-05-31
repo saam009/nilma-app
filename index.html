@@ -1230,16 +1230,20 @@ function renderMachineGrid(){
       btnHtml=`<div style="display:flex;gap:3px;">${acts}<button class="machineBtn" style="background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;flex:1;" onclick="showMachinePurchaseSheet(${i},${owned+1})">⬆ LV${owned+1}</button></div>`;
     }
     card.innerHTML=`
-      <div class="activeTag" style="display:${isActive?"block":"none"}">✅ ACTIVE</div>
-      <div class="rarityTag" style="background:rgba(0,0,0,.5);color:${m.rarityColor};border:1px solid ${m.rarityColor}40;">${m.rarity}</div>
-      <img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="width:100%;height:90px;object-fit:cover;display:block;overflow:hidden;${m.imgStyle||''}">
-      <div class="machineInfo">
-        <div class="mName">${m.name}</div>
-        <div class="mPower">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</div>
-        <div style="font-size:9px;color:${owned>0?"var(--green)":"var(--gold)"};">${owned>0?"LV "+owned+"/5":"Locked"}</div>
-        ${owned>0?`<div style="margin-top:4px;height:4px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}99);transition:.4s;"></div></div>`:""}
-        ${btnHtml}
-      </div>`;
+  <div class="activeTag" style="display:${isActive?"block":"none"}">✅ ACTIVE</div>
+  <div class="rarityTag" style="background:rgba(0,0,0,.6);color:${m.rarityColor};border:1px solid ${m.rarityColor}40;z-index:3;">${m.rarity}</div>
+  <div style="position:relative;">
+    <img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="width:100%;height:110px;object-fit:cover;display:block;${m.imgStyle||''}">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%);"></div>
+    <div style="position:absolute;bottom:6px;left:8px;right:8px;">
+      <div style="font-size:10px;font-weight:900;color:white;line-height:1.2;letter-spacing:.3px;">${m.name}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
+        <span style="font-size:10px;color:#ffd54a;font-weight:700;">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</span>
+        <span style="font-size:9px;color:#80cbc4;">${owned>0?"LV"+owned+"/5":"Locked"}</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:7px 8px;">${btnHtml}</div>`;
     grid.appendChild(card);
   });
 }
