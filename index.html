@@ -1463,14 +1463,20 @@ async function verifyPayment(){
   if(warn)warn.style.display=heatLevel>=80?"block":"none";
   clearTimeout(heatTimer);
   heatTimer=setTimeout(()=>{
-    heatLevel=Math.max(0,heatLevel-5);
+    heatLevel=Math.max(0,heatLevel-8);
     updateHeat();
-  },500);
+  },300);
 }
 function mine(e){
   if(energy<=0){showToast("⚡ No energy!");return;}
   if(heatLevel>=100){showToast("🌡 Reactor overheated! Wait a moment!");return;}
-  heatLevel=Math.min(100,heatLevel+12);
+  const now2=Date.now();
+  const timeSinceLast=now2-(window._lastTapTime||0);
+  window._lastTapTime=now2;
+  if(timeSinceLast<400){
+    const heatAdd=Math.max(1, 100/(maxEnergy*0.6) );
+    heatLevel=Math.min(100,heatLevel+heatAdd);
+  }
   updateHeat();
  const ttm=document.getElementById("tapToMine");
 if(ttm)ttm.style.display="none";
