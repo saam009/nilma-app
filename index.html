@@ -1234,6 +1234,7 @@ function renderMachineGrid(){
         <div class="mName">${m.name}</div>
         <div class="mPower">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</div>
         <div style="font-size:9px;color:${owned>0?"var(--green)":"var(--gold)"};">${owned>0?"LV "+owned+"/5":"Locked"}</div>
+        ${owned>0?`<div style="margin-top:4px;height:4px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}99);transition:.4s;"></div></div>`:""}
         ${btnHtml}
       </div>`;
     grid.appendChild(card);
@@ -1338,7 +1339,8 @@ function renderShopMachines(){
         <img src="${m.img}" style="width:55px;height:55px;border-radius:10px;object-fit:cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'">
         <div><h3 style="font-size:15px;margin:0;">${m.name}</h3>
           <p style="margin:4px 0;">Power: <strong style="color:var(--gold);">${ownedLv?ownedLv.power:m.levels[0].power}/tap</strong></p>
-          <p>Status: <strong style="color:var(--green);">${owned>0?"LV"+owned:"Not Owned"}</strong>${isActive?" ✅":""}</p>
+      <p>Status: <strong style="color:var(--green);">${owned>0?"LV"+owned:"Not Owned"}</strong>${isActive?" ✅":""}</p>
+          ${owned>0?`<div style="margin-top:6px;height:5px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}88);transition:.4s;"></div></div><div style="font-size:9px;opacity:.5;margin-top:3px;">${owned}/5 levels</div>`:""}
         </div>
       </div>
       <div style="font-size:11px;opacity:.5;margin-bottom:6px;">LEVEL UPGRADES</div>${levelsHtml}
