@@ -592,7 +592,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 </div>
 <div style="padding:16px;">
   <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:14px;">🎁 THIS WEEK'S REWARDS</div>
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;" id="streakWeekGrid"></div>
+  <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;" id="streakWeekGrid"></div>
   <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;margin-bottom:16px;">
     <div style="font-size:11px;opacity:.5;letter-spacing:2px;margin-bottom:12px;">🏆 MILESTONE BONUSES</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="streakMilestones"></div>
@@ -1695,6 +1695,7 @@ function renderStreak(){
       const isActive=dayNum===weekPos;
       const div=document.createElement("div");
       div.className="streakDayCard"+(isPast?" past":isActive?" active":" locked");
+     div.style.cssText="min-width:72px;flex-shrink:0;";
       div.innerHTML=`<div style="font-size:8px;opacity:.5;margin-bottom:3px;">D${dayNum}</div><div style="font-size:20px;">${d.icon}</div><div style="font-size:8px;margin-top:3px;color:var(--gold);font-weight:700;">${d.label}</div>${isPast?'<div style="font-size:10px;color:var(--green);">✅</div>':''}`;
       grid.appendChild(div);
     });
