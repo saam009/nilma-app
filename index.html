@@ -595,7 +595,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
   <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;" id="streakWeekGrid"></div>
   <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;margin-bottom:16px;">
     <div style="font-size:11px;opacity:.5;letter-spacing:2px;margin-bottom:12px;">🏆 MILESTONE BONUSES</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="streakMilestones"></div>
+    <div style="display:flex;flex-direction:column;gap:0px;" id="streakMilestones"></div>
   </div>
   <div style="text-align:center;">
     <button id="streakClaimBtn" onclick="claimStreak()" style="padding:16px 40px;border:none;border-radius:16px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 0 20px rgba(255,152,0,.4);">🔥 CLAIM TODAY'S STREAK</button>
@@ -1705,13 +1705,34 @@ function renderStreak(){
   if(mGrid){
     mGrid.innerHTML="";
     STREAK_MILESTONES.forEach(ms=>{
-      const claimed=localStorage.getItem("ms_"+ms.days)==="yes";
-      const reached=streakDay>=ms.days;
-      const div=document.createElement("div");
-      div.style.cssText=`border-radius:12px;padding:12px;background:${reached&&!claimed?"rgba(0,255,153,.08)":"rgba(255,255,255,.03)"};border:1px solid ${reached&&!claimed?"rgba(0,255,153,.4)":claimed?"rgba(0,255,153,.2)":"rgba(255,255,255,.07)"};`;
-      div.innerHTML=`<div style="font-size:20px;">${ms.icon}</div><div style="font-size:12px;font-weight:900;margin-top:3px;">${ms.label}</div><div style="font-size:10px;opacity:.6;">${ms.reward}</div><div style="font-size:10px;color:var(--gold);margin-top:2px;">${ms.days} days</div>${reached&&!claimed?`<button onclick="claimMilestone(${ms.days})" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:8px;background:linear-gradient(90deg,var(--green),#00c853);color:white;font-weight:900;font-size:11px;cursor:pointer;">CLAIM</button>`:claimed?`<div style="margin-top:4px;font-size:11px;color:var(--green);">✅ Claimed</div>`:""}`;
-      mGrid.appendChild(div);
-    });
+  const claimed=localStorage.getItem("ms_"+ms.days)==="yes";
+  const reached=streakDay>=ms.days;
+  const pct=Math.min(100,Math.floor((streakDay/ms.days)*100));
+  const daysLeft=Math.max(0,ms.days-streakDay);
+  const div=document.createElement("div");
+  div.style.cssText=`border-radius:12px;padding:12px;background:${claimed?"rgba(0,255,153,.05)":reached?"rgba(0,255,153,.08)":"rgba(255,255,255,.03)"};border:1px solid ${claimed?"rgba(0,255,153,.2)":reached?"rgba(0,255,153,.4)":"rgba(255,255,255,.07)"};margin-bottom:10px;opacity:${claimed||reached?1:streakDay>0?0.7:0.4};`;
+  div.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:22px;">${ms.icon}</span>
+        <div>
+          <div style="font-size:13px;font-weight:900;color:white;">${ms.label} — Day ${ms.days}</div>
+          <div style="font-size:11px;color:var(--gold);margin-top:1px;">${ms.reward}</div>
+        </div>
+      </div>
+      <div style="text-align:right;font-size:11px;font-weight:900;color:${reached?"var(--green)":claimed?"var(--green)":"#888"};">
+        ${claimed?"✅ Done":reached?"READY!":"Day "+streakDay+"/"+ms.days}
+      </div>
+    </div>
+    <div style="height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;">
+      <div style="height:100%;width:${pct}%;border-radius:10px;background:${claimed?"linear-gradient(90deg,var(--green),#00c853)":reached?"linear-gradient(90deg,var(--gold),#ff9800)":"linear-gradient(90deg,#00e5ff,#8a2eff)"};transition:.4s;"></div>
+    </div>
+    ${!claimed&&!reached?`<div style="font-size:10px;color:#888;margin-top:4px;">${daysLeft} more day${daysLeft!==1?"s":""} to unlock</div>`:""}
+    ${reached&&!claimed?`<button onclick="claimMilestone(${ms.days})" style="margin-top:8px;width:100%;padding:8px;border:none;border-radius:8px;background:linear-gradient(90deg,var(--green),#00c853);color:white;font-weight:900;font-size:12px;cursor:pointer;">🎁 CLAIM REWARD</button>`:""}
+    ${claimed?`<div style="font-size:11px;color:var(--green);margin-top:6px;text-align:center;">🎉 Reward claimed!</div>`:""}
+  `;
+  mGrid.appendChild(div);
+});
   }
   // Timer
   const now=Date.now();const rem=86400000-(now-lastStreakClaim);
