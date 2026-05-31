@@ -359,10 +359,39 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 <div class="section">
   <div class="sectionTitle">🎮 Mini Games</div>
   <div class="grid">
-    <div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/99.jpeg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'"><div class="gameInfo"><div class="gameTitle">📋 Tasks</div><button class="playBtn" onclick="showScreen('taskScreen')">OPEN</button></div></div>
-    <div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/77.jpeg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'"><div class="gameInfo"><div class="gameTitle">🎯 Missions</div><button class="playBtn" onclick="showScreen('missionScreen')">OPEN</button></div></div>
-    <div class="gameCard"><img src="https://raw.githubusercontent.com/saam009/nilma-app/main/x1.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="object-position:center top;"><div class="gameInfo"><div class="gameTitle">👥 Referral</div><button class="playBtn" onclick="showScreen('referralScreen')">INVITE</button></div></div>
+  <div class="gameCard" style="border:1px solid rgba(0,255,255,.2);">
+    <div style="position:relative;">
+      <img src="https://raw.githubusercontent.com/saam009/nilma-app/main/99.jpeg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="width:100%;height:110px;object-fit:cover;display:block;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%);"></div>
+      <div style="position:absolute;bottom:6px;left:8px;right:8px;">
+        <div style="font-size:11px;font-weight:900;color:white;">📋 TASKS</div>
+      </div>
+    </div>
+    <div style="padding:7px 8px;"><button class="playBtn" onclick="showScreen('taskScreen')">OPEN</button></div>
   </div>
+
+  <div class="gameCard" style="border:1px solid rgba(138,46,255,.2);">
+    <div style="position:relative;">
+      <img src="https://raw.githubusercontent.com/saam009/nilma-app/main/77.jpeg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="width:100%;height:110px;object-fit:cover;display:block;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%);"></div>
+      <div style="position:absolute;bottom:6px;left:8px;right:8px;">
+        <div style="font-size:11px;font-weight:900;color:white;">🎯 MISSIONS</div>
+      </div>
+    </div>
+    <div style="padding:7px 8px;"><button class="playBtn" onclick="showScreen('missionScreen')">OPEN</button></div>
+  </div>
+
+  <div class="gameCard" style="border:1px solid rgba(0,255,153,.2);">
+    <div style="position:relative;">
+      <img src="https://raw.githubusercontent.com/saam009/nilma-app/main/x1.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="width:100%;height:110px;object-fit:cover;object-position:center top;display:block;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%);"></div>
+      <div style="position:absolute;bottom:6px;left:8px;right:8px;">
+        <div style="font-size:11px;font-weight:900;color:white;">👥 REFERRAL</div>
+      </div>
+    </div>
+    <div style="padding:7px 8px;"><button class="playBtn" onclick="showScreen('referralScreen')">INVITE</button></div>
+  </div>
+</div>
 </div>
 
 <!-- DAILY STREAK & EXTRA FEATURES (Shop + VIP moved here) -->
