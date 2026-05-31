@@ -343,6 +343,9 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
         <div style="font-weight:900;color:#ffd54a;margin-top:2px;" id="passiveHourly">~0</div>
       </div>
     </div>
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;" id="passiveBoosterStatus">
+      <div style="font-size:10px;opacity:.35;text-align:center;padding:4px;">No active boosters</div>
+    </div>
   </div>
 
 </div>
@@ -1290,19 +1293,47 @@ function showMachinePurchaseSheet(machineId,lvNum){
   panel.addEventListener("click",function(e){if(e.target===this)this.remove();});
 }
 function updatePassiveDisplay(){
-  const autoActive=Date.now()<autoMinerEnd;
-  const turboActive=Date.now()<turboEnd;
+  const now=Date.now();
+  const autoActive=now<autoMinerEnd;
+  const turboActive=now<turboEnd;
+  const xpActive=now<xpEnd;
   const bgIncome=Math.floor(level/3)||0;
   const autoRate=autoActive?Math.max(1,bgIncome*3):0;
   const bgPerMin=bgIncome*4;
   const autoPerMin=autoActive?autoRate*4:0;
   const totalPassive=autoPerMin+bgPerMin;
   const hourly=totalPassive*60;
+  const fmt=ms=>{const sc=Math.floor(ms/1000);const h=Math.floor(sc/3600);const m=Math.floor((sc%3600)/60);return h>0?h+"h "+m+"m":m+"m "+(sc%60)+"s";};
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.innerText=v;};
+
   s("passiveTapPower","+"+minePower+"/tap"+(turboActive?" ⚡":""));
   s("passiveAutoRate",autoActive?"+"+autoRate+"/15s":"OFF");
   s("passiveRateLabel",totalPassive>0?"+"+totalPassive+"/min":"tap to earn");
   s("passiveHourly","~"+hourly.toLocaleString());
+
+  // Booster status rows
+  const box=document.getElementById("passiveBoosterStatus");
+  if(!box)return;
+  let html="";
+  if(turboActive){
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:rgba(255,80,0,.08);border-radius:8px;border:1px solid rgba(255,80,0,.25);">
+      <span style="font-size:10px;color:#ff9800;font-weight:700;">⚡ Turbo Miner</span>
+      <span style="font-size:10px;color:#ff9800;font-family:monospace;">${fmt(turboEnd-now)}</span>
+    </div>`;
+  }
+  if(autoActive){
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:rgba(138,46,255,.08);border-radius:8px;border:1px solid rgba(138,46,255,.25);">
+      <span style="font-size:10px;color:#ce93d8;font-weight:700;">🤖 Energy Core</span>
+      <span style="font-size:10px;color:#ce93d8;font-family:monospace;">${fmt(autoMinerEnd-now)}</span>
+    </div>`;
+  }
+  if(xpActive){
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:rgba(0,255,100,.08);border-radius:8px;border:1px solid rgba(0,255,100,.25);">
+      <span style="font-size:10px;color:#00ff99;font-weight:700;">💎 XP Booster</span>
+      <span style="font-size:10px;color:#00ff99;font-family:monospace;">${fmt(xpEnd-now)}</span>
+    </div>`;
+  }
+  box.innerHTML=html||`<div style="font-size:10px;opacity:.35;text-align:center;padding:4px;">No active boosters</div>`;
 }
 // ===== REACTOR =====
 function updateReactor(){
