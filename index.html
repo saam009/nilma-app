@@ -21,8 +21,15 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 @keyframes chestBoom{0%{transform:scale(1);}50%{transform:scale(1.2);filter:brightness(2);}100%{transform:scale(1);filter:brightness(1);}}
 @keyframes burst{0%{opacity:0;transform:scale(.2);}40%{opacity:1;}100%{opacity:0;transform:scale(2);}}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-
-.screen{display:none;padding-bottom:90px;min-height:100vh;}
+@keyframes critFlash{0%{opacity:1;}100%{opacity:0;}}
+@keyframes critPop{0%{transform:translateX(-50%) scale(0) rotate(-8deg);}50%{transform:translateX(-50%) scale(1.3) rotate(4deg);}70%{transform:translateX(-50%) scale(0.9) rotate(-2deg);}85%{transform:translateX(-50%) scale(1.05);}100%{transform:translateX(-50%) scale(1);opacity:0;}}
+ @keyframes shockwave{0%{transform:translate(-50%,-50%) scale(1);opacity:1;}100%{transform:translate(-50%,-50%) scale(12);opacity:0;}}
+ @keyframes shimmerSweep{0%{left:-100%;}30%{left:150%;}100%{left:150%;}}
+ @keyframes screenSlideIn{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+ @keyframes navBounce{0%{transform:translateY(0) scale(1);}25%{transform:translateY(-6px) scale(1.2);}50%{transform:translateY(0) scale(.95);}75%{transform:translateY(-3px) scale(1.05);}100%{transform:translateY(0) scale(1);}}
+@keyframes overheatPulse{0%,100%{filter:drop-shadow(0 0 15px rgba(255,50,0,.8));}50%{filter:drop-shadow(0 0 35px rgba(255,50,0,1));}}
+@keyframes overheatBlink{0%,100%{opacity:1;}50%{opacity:0.4;}}
+ .screen{display:none;padding-bottom:90px;min-height:100vh;}
 .screen.active{display:block!important;}
 #spinScreen.active{display:flex!important;flex-direction:column;}
 
@@ -33,6 +40,10 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 .balanceBox:active{transform:scale(.96);}
 .balanceBox .balanceTitle{font-size:8px;opacity:.75;letter-spacing:1px;text-transform:uppercase;position:relative;z-index:1;}
 .balanceBox .balanceValue{font-size:15px;font-weight:900;position:relative;z-index:1;margin-top:1px;}
+.balanceBox::after{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);animation:shimmerSweep 4s infinite;}
+.balCoins::after{animation-delay:0s;}
+.balEnergy::after{animation-delay:1.3s;}
+.balLevel::after{animation-delay:2.6s;}
 .balCoins{background:linear-gradient(135deg,rgba(0,100,255,.18),rgba(0,200,255,.08));border:1px solid rgba(0,150,255,.35);}
 .balCoins .balanceValue{color:#4fc3f7;}
 .balCoins .balanceTitle{color:#81d4fa;}
@@ -115,7 +126,8 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 .bottomNav{position:fixed;bottom:0;left:0;width:100%;height:65px;background:rgba(0,0,0,.95);border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-around;align-items:center;backdrop-filter:blur(20px);z-index:999;}
 .navItem{text-align:center;font-size:10px;color:#888;flex:1;cursor:pointer;padding:6px 0;transition:.2s;}
 .navItem.active{color:var(--gold);}
-.navIcon{font-size:20px;margin-bottom:2px;}
+.navItem.active .navIcon{animation:navBounce .35s cubic-bezier(.36,.07,.19,.97) forwards;}
+.navIcon{font-size:20px;margin-bottom:2px;display:inline-block;}
 
 /* REACTOR */
 #reactorWrap{position:relative;width:160px;height:160px;margin:0 auto 12px;cursor:pointer;}
@@ -1207,14 +1219,17 @@ function update(){
 
 // ===== SCREEN NAV =====
 function showScreen(id){
+  const current=document.querySelector(".screen.active");
   document.querySelectorAll(".screen").forEach(s=>{
     s.classList.remove("active");
     s.style.display="none";
+    s.style.animation="";
   });
   const el=document.getElementById(id);
   if(el){
     el.classList.add("active");
     el.style.display="block";
+    el.style.animation="screenSlideIn .22s cubic-bezier(.25,.46,.45,.94) forwards";
   }
   if(id==="spinScreen")document.getElementById(id).style.display="flex";
   document.querySelectorAll(".navItem").forEach(n=>n.classList.remove("active"));
@@ -1493,22 +1508,77 @@ async function verifyPayment(){
   closePayModal();
 }
 
- function updateHeat(){
+ let overheatActive=false;
+let overheatTimeout=null;
+
+function updateHeat(){
   const bar=document.getElementById("heatBar");
   const pct=document.getElementById("heatPct");
   const warn=document.getElementById("heatWarning");
   if(bar)bar.style.width=heatLevel+"%";
   if(pct)pct.innerText=Math.round(heatLevel)+"%";
   if(warn)warn.style.display=heatLevel>=80?"block":"none";
+  // Red glow on reactor when hot
+  const rw=document.getElementById("reactorWrap");
+  if(rw){
+    if(heatLevel>=80)rw.style.filter=`drop-shadow(0 0 ${Math.floor(heatLevel/10)}px rgba(255,50,0,.7))`;
+    else rw.style.filter="none";
+  }
   clearTimeout(heatTimer);
   heatTimer=setTimeout(()=>{
-    heatLevel=Math.max(0,heatLevel-8);
+    if(!overheatActive)heatLevel=Math.max(0,heatLevel-8);
     updateHeat();
   },300);
 }
+
+function triggerOverheat(){
+  if(overheatActive)return;
+  overheatActive=true;
+  heatLevel=100;
+  // Shake reactor
+  const rw=document.getElementById("reactorWrap");
+  if(rw)rw.style.animation="chestShake .4s,overheatPulse 5s .4s forwards";
+  // Overlay warning
+  const ow=document.createElement("div");
+  ow.id="overheatOverlay";
+  ow.style.cssText="position:fixed;inset:0;background:rgba(255,30,0,.08);z-index:999996;pointer-events:none;animation:overheatBlink 5s forwards;";
+  document.body.appendChild(ow);
+  // Big warning text
+  const wt=document.createElement("div");
+  wt.id="overheatText";
+  wt.innerHTML="🌡️ OVERHEATED!<br><span style='font-size:14px;opacity:.8;'>Cooling down 5s...</span>";
+  wt.style.cssText="position:fixed;left:50%;top:35%;transform:translateX(-50%);z-index:999999;font-size:28px;font-weight:900;color:#ff4444;text-shadow:0 0 20px #ff0000;text-align:center;pointer-events:none;animation:critPop .4s forwards;";
+  document.body.appendChild(wt);
+  // Countdown
+  let secs=5;
+  const countInt=setInterval(()=>{
+    secs--;
+    const el=document.getElementById("overheatText");
+    if(el)el.innerHTML=`🌡️ OVERHEATED!<br><span style='font-size:14px;opacity:.8;'>Cooling down ${secs}s...</span>`;
+    if(secs<=0)clearInterval(countInt);
+  },1000);
+  // Sound
+  _t(100,'sawtooth',0.3,0.3,60);
+  doHaptic("heavy");
+  // Cooldown 5 seconds
+  clearTimeout(overheatTimeout);
+  overheatTimeout=setTimeout(()=>{
+    overheatActive=false;
+    heatLevel=0;
+    updateHeat();
+    const ow2=document.getElementById("overheatOverlay");if(ow2)ow2.remove();
+    const wt2=document.getElementById("overheatText");if(wt2)wt2.remove();
+    if(rw)rw.style.animation="";
+    showToast("✅ Reactor cooled! Back to mining!");
+  },5000);
+}
 function mine(e){
   if(energy<=0){showToast("⚡ No energy!");return;}
-  if(heatLevel>=100){showToast("🌡 Reactor overheated! Wait a moment!");return;}
+ if(heatLevel>=100){
+  showToast("🌡 Reactor overheated! Wait a moment!");
+  triggerOverheat();
+  return;
+} 
   const now2=Date.now();
   const timeSinceLast=now2-(window._lastTapTime||0);
   window._lastTapTime=now2;
@@ -1522,11 +1592,44 @@ if(ttm)ttm.style.display="none";
 localStorage.setItem("tapToMineSeen","yes");
   unlockAudio();playClick();doHaptic("light");
   let crit=Math.random()<0.1;
-  let earned=crit?minePower*5:minePower;
+let earned=crit?minePower*5:minePower;
+if(crit){
+  // Screen flash
+  const flash=document.createElement("div");
+  flash.style.cssText="position:fixed;inset:0;background:rgba(255,50,0,.18);z-index:999997;pointer-events:none;border-radius:0;animation:critFlash .5s forwards;";
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),500);
+  // CRITICAL text
+  const critText=document.createElement("div");
+  critText.innerText="⚡ CRITICAL!";
+  critText.style.cssText="position:fixed;left:50%;top:38%;transform:translateX(-50%) scale(0);z-index:999999;font-size:32px;font-weight:900;color:#ff4444;text-shadow:0 0 20px #ff0000,0 0 40px #ff6600;pointer-events:none;animation:critPop .6s forwards;white-space:nowrap;";
+  document.body.appendChild(critText);
+  setTimeout(()=>critText.remove(),700);
+  // Special sound
+  _t(80,'sawtooth',0.08,0.3);
+  _t(440,'square',0.15,0.25,880,0.05);
+  _t(880,'sine',0.2,0.2,1760,0.12);
+  doHaptic("heavy");
+}
   coins+=earned;lifetimeCoins+=earned;weeklyEarned+=earned;lifetimeMines++;dailyMines++;dailyCoins+=earned;
   xp+=2*xpBoost;energy-=1;
   const rw=document.getElementById("reactorWrap");
-  if(rw){rw.style.transform="scale(.93)";setTimeout(()=>{rw.style.transform="scale(1)";},100);}
+if(rw){
+  rw.style.transform="scale(.93)";
+  setTimeout(()=>{rw.style.transform="scale(1)";},100);
+  // Shockwave ring
+  const rect=rw.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;
+  const cy=rect.top+rect.height/2;
+  for(let i=0;i<2;i++){
+    setTimeout(()=>{
+      const ring=document.createElement("div");
+      ring.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;width:10px;height:10px;border-radius:50%;border:2px solid ${crit?"#ff4444":"rgba(0,255,255,.8)"};transform:translate(-50%,-50%) scale(1);pointer-events:none;z-index:999996;animation:shockwave .6s forwards;`;
+      document.body.appendChild(ring);
+      setTimeout(()=>ring.remove(),620);
+    },i*120);
+  }
+}
   checkLevelUp();save();update();
   showCoin(e?.clientX||window.innerWidth/2,e?.clientY||200,earned);
 }
@@ -1538,6 +1641,40 @@ function checkLevelUp(){
     playLevelUp();
     showRewardPopup("LEVEL "+level+" UNLOCKED!",level*100,"⭐");
     addNotification("Level Up! 🎉","You reached Level "+level+"!","⭐");
+    spawnLevelUpConfetti();
+  }
+}
+
+function spawnLevelUpConfetti(){
+  // Full screen flash
+  const flash=document.createElement("div");
+  flash.style.cssText="position:fixed;inset:0;background:radial-gradient(circle,rgba(255,215,0,.25),transparent 70%);z-index:999997;pointer-events:none;animation:critFlash .8s forwards;";
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),800);
+  // Level up text
+  const txt=document.createElement("div");
+  txt.innerHTML="⭐ LEVEL UP! ⭐";
+  txt.style.cssText="position:fixed;left:50%;top:32%;transform:translateX(-50%) scale(0);z-index:999999;font-size:36px;font-weight:900;color:#ffd54a;text-shadow:0 0 30px #ffd54a,0 0 60px #ff9800;pointer-events:none;animation:critPop .7s forwards;white-space:nowrap;";
+  document.body.appendChild(txt);
+  setTimeout(()=>txt.remove(),2000);
+  // Confetti particles
+  const colors=["#ffd54a","#00ffff","#8a2eff","#00ff99","#ff00cc","#ff4444","#ffffff"];
+  for(let i=0;i<40;i++){
+    setTimeout(()=>{
+      const p=document.createElement("div");
+      const color=colors[Math.floor(Math.random()*colors.length)];
+      const startX=Math.random()*window.innerWidth;
+      const size=4+Math.random()*8;
+      const duration=1200+Math.random()*1000;
+      const drift=(Math.random()-0.5)*200;
+      p.style.cssText=`position:fixed;left:${startX}px;top:-10px;width:${size}px;height:${size}px;background:${color};border-radius:${Math.random()>0.5?"50%":"2px"};pointer-events:none;z-index:999998;box-shadow:0 0 6px ${color};transition:none;`;
+      document.body.appendChild(p);
+      const anim=p.animate([
+        {transform:`translate(0,0) rotate(0deg)`,opacity:1},
+        {transform:`translate(${drift}px,${window.innerHeight+20}px) rotate(${360+Math.random()*360}deg)`,opacity:0}
+      ],{duration,easing:"cubic-bezier(.25,.46,.45,.94)",fill:"forwards"});
+      anim.onfinish=()=>p.remove();
+    },i*40);
   }
 }
 function showCoin(x,y,amt){
