@@ -235,6 +235,13 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 .clanMember:last-child{border-bottom:none;}
 .clanBadge{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(138,46,255,.2);color:#c060ff;border:1px solid rgba(138,46,255,.3);}
 .clanInput{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(138,46,255,.3);background:rgba(255,255,255,.05);color:white;font-size:14px;margin:8px 0;outline:none;}
+.clanChatBox{height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:10px;background:rgba(0,0,0,.3);border-radius:14px;border:1px solid rgba(138,46,255,.2);margin-bottom:10px;scroll-behavior:smooth;}
+.clanChatMsg{padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:12px;}
+.clanChatMsg.me{background:rgba(138,46,255,.12);border-color:rgba(138,46,255,.3);}
+.clanChatMsg .msgName{font-size:10px;color:var(--purple);font-weight:700;margin-bottom:3px;}
+.clanChatMsg.activity{background:rgba(0,255,153,.04);border-color:rgba(0,255,153,.15);}
+.clanChatMsg.activity .msgName{color:var(--green);}
+.clanChatTime{font-size:9px;opacity:.4;margin-top:3px;} 
 
 /* STREAK */
 .streakDayCard{border-radius:16px;padding:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);text-align:center;transition:.3s;}
@@ -2524,7 +2531,11 @@ function renderClan(){
   const content=document.getElementById("clanContent");
   const header=document.getElementById("clanHeaderInfo");
   if(!content)return;
-  if(myClan){header.innerText="⚔️ "+myClan.name;renderClanDashboard(content);}
+  if(myClan){
+    header.innerText="⚔️ "+myClan.name;
+    renderClanDashboard(content);
+    setTimeout(()=>loadClanChat(),300);
+  }
   else{header.innerText="No clan yet";renderClanJoin(content);}
 }
 
@@ -2584,6 +2595,16 @@ function renderClanDashboard(content){
         ?`<button onclick="disbandClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-weight:900;font-size:12px;cursor:pointer;">DISBAND</button>`
         :`<button onclick="leaveClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-weight:900;font-size:12px;cursor:pointer;">LEAVE</button>`}
     </div>
+  </div>
+  <div class="clanCard" style="margin-top:14px;">
+    <div style="font-size:11px;letter-spacing:2px;color:var(--purple);opacity:.8;margin-bottom:12px;">💬 CLAN CHAT & ACTIVITY</div>
+    <div class="clanChatBox" id="clanChatBox">
+      <div style="text-align:center;opacity:.4;font-size:12px;padding:20px;">Loading messages...</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <input id="clanChatInput" class="clanInput" placeholder="Type a message..." maxlength="100" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')sendClanMessage()">
+      <button onclick="sendClanMessage()" style="padding:12px 16px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--purple),#c060ff);color:white;font-weight:900;font-size:13px;cursor:pointer;">SEND</button>
+    </div>
   </div>`;
   loadClanMembers();
 }
@@ -2620,10 +2641,11 @@ function joinClanByCode(){
     clan.members.push({id:playerId,name:username,power:minePower,role:"Member"});
     clan.totalPower=(clan.totalPower||0)+minePower;
     db.collection("clans").doc(doc.id).update({members:clan.members,totalPower:clan.totalPower}).then(()=>{
-      myClan=clan;localStorage.setItem("myClan",JSON.stringify(myClan));
+     myClan=clan;localStorage.setItem("myClan",JSON.stringify(myClan));
       db.collection("players").doc(playerId).update({clanId:doc.id,clanName:clan.name}).catch(()=>{});
+      addClanActivity("⚔️ "+username+" joined the clan!");
       renderClan();showToast("✅ Joined: "+clan.name);
-      addNotification("Joined Clan ⚔️","You joined '"+clan.name+"'!","⚔️");
+      addNotification("Joined Clan ⚔️","You joined '"+clan.name+"'!","⚔️"); 
     }).catch(e=>showToast("Error: "+e.message));
   }).catch(e=>showToast("Error: "+e.message));
 }
@@ -2718,10 +2740,68 @@ function confirmDonate(){
   if(myClan){
     myClan.treasury=(myClan.treasury||0)+amt;
     localStorage.setItem("myClan",JSON.stringify(myClan));
-    if(db)db.collection("clans").doc(myClan.id).update({treasury:firebase.firestore.FieldValue.increment(amt)}).catch(()=>{});
+    if(db){
+      db.collection("clans").doc(myClan.id).update({treasury:firebase.firestore.FieldValue.increment(amt)}).catch(()=>{});
+      addClanActivity("💰 "+username+" donated "+amt.toLocaleString()+" coins!");
+    }
   }
   document.getElementById("donatePanel")?.remove();
   save();update();showToast("💰 Donated "+amt.toLocaleString()+" coins to clan!");
+}
+ // ===== CLAN CHAT & ACTIVITY =====
+let _chatListener=null;
+
+function addClanActivity(text){
+  if(!myClan||!db)return;
+  db.collection("clans").doc(myClan.id).collection("chat").add({
+    type:"activity",
+    text,
+    time:Date.now()
+  }).catch(()=>{});
+}
+
+function sendClanMessage(){
+  const input=document.getElementById("clanChatInput");
+  if(!input)return;
+  const text=input.value.trim();
+  if(!text||text.length<1){showToast("Type a message first");return;}
+  if(text.length>100){showToast("Max 100 characters");return;}
+  if(!myClan||!db){showToast("Not in a clan");return;}
+  input.value="";
+  db.collection("clans").doc(myClan.id).collection("chat").add({
+    type:"message",
+    text,
+    playerId,
+    name:username,
+    time:Date.now()
+  }).catch(e=>showToast("Failed to send"));
+}
+
+function loadClanChat(){
+  const box=document.getElementById("clanChatBox");if(!box||!myClan||!db)return;
+  if(_chatListener){try{_chatListener();}catch(e){}_chatListener=null;}
+  _chatListener=db.collection("clans").doc(myClan.id).collection("chat")
+    .orderBy("time","asc").limitToLast(40)
+    .onSnapshot(snap=>{
+      if(!box)return;
+      box.innerHTML="";
+      snap.forEach(doc=>{
+        const d=doc.data();
+        const div=document.createElement("div");
+        const isMe=d.playerId===playerId;
+        const isActivity=d.type==="activity";
+        div.className="clanChatMsg"+(isMe?" me":isActivity?" activity":"");
+        const time=new Date(d.time).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+        if(isActivity){
+          div.innerHTML=`<div class="msgName">⚡ Activity</div><div>${d.text}</div><div class="clanChatTime">${time}</div>`;
+        }else{
+          div.innerHTML=`<div class="msgName">${isMe?"You":d.name||"Member"}</div><div>${d.text}</div><div class="clanChatTime">${time}</div>`;
+        }
+        box.appendChild(div);
+      });
+      // Auto scroll to bottom
+      box.scrollTop=box.scrollHeight;
+    },err=>console.log("Chat error:",err));
 }
 function kickMember(memberId,memberName){
   showConfirmSheet("Kick "+memberName+"?","This member will be removed from your clan.","KICK",()=>{
