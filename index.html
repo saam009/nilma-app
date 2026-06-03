@@ -335,6 +335,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
     </div>
   </div>
  <div id="tapToMine" style="font-size:10px;color:var(--cyan);letter-spacing:2px;opacity:.8;margin-bottom:8px;">👆 TAP TO MINE</div>
+ <div id="clanPerkBanner" style="display:none;margin-bottom:8px;padding:6px 12px;background:rgba(138,46,255,.1);border:1px solid rgba(138,46,255,.3);border-radius:10px;font-size:11px;color:#c060ff;font-weight:700;text-align:center;"></div>
   <!-- HEAT BAR -->
   <div style="margin-top:8px;padding:10px;background:rgba(255,50,0,.06);border:1px solid rgba(255,80,0,.2);border-radius:14px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -1120,7 +1121,6 @@ function getNextClanLevel(treasury){
   const nextIdx=CLAN_LEVELS.findIndex(l=>l.lv===current.lv+1);
   return nextIdx>=0?CLAN_LEVELS[nextIdx]:null;
 }
-
 function applyClanPerks(){
   if(!myClan)return;
   const cl=getClanLevel(myClan.treasury||0);
@@ -1128,6 +1128,19 @@ function applyClanPerks(){
   const basePower=machineData[currentMachine].levels[Math.max(0,(machineOwned[currentMachine]||1)-1)].power;
   const bonus=Math.floor(basePower*cl.powerBonus);
   minePower=basePower+bonus;
+  // Update banner
+  const banner=document.getElementById("clanPerkBanner");
+  if(banner){
+    if(cl.powerBonus>0||cl.chestBonus>0){
+      banner.style.display="block";
+      let txt=`⚔️ ${cl.icon} ${myClan.name} — LV${cl.lv} Perk: `;
+      if(cl.powerBonus>0)txt+=`+${Math.floor(cl.powerBonus*100)}% power`;
+      if(cl.chestBonus>0)txt+=` · +${cl.chestBonus} free chest${cl.chestBonus>1?"s":""}`;
+      banner.innerText=txt;
+    }else{
+      banner.style.display="none";
+    }
+  }
   // Free chests bonus
   if(cl.chestBonus>0&&freeSpinUsed==="yes"){
     const clanChestKey="clanChest_"+new Date().toDateString()+"_"+myClan.id;
@@ -1137,6 +1150,11 @@ function applyClanPerks(){
       localStorage.setItem("freeSpins",freeSpins);
       addNotification("Clan Chest Bonus! 🎁","Your clan gave you "+cl.chestBonus+" free chest(s)!","🎁");
     }
+  }
+  // Toast on login
+  if(!localStorage.getItem("clanPerkToast_"+new Date().toDateString())&&cl.powerBonus>0){
+    localStorage.setItem("clanPerkToast_"+new Date().toDateString(),"shown");
+    setTimeout(()=>showToast("⚔️ Clan perk active: +"+bonus+" power boost!"),3500);
   }
 }
 // ===== STAKING =====
@@ -2646,7 +2664,25 @@ function renderClanDashboard(content){
     </div>
     <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:10px;">👥 MEMBERS</div>
     <div id="clanMemberList"></div>
-    <div style="display:flex;gap:8px;margin-top:14px;">
+    ${(()=>{
+      const pending=parseInt(localStorage.getItem("pendingClanBonus")||"0");
+      const bonusKey="clanWeeklyBonus_"+(myClan.id||"")+"_"+currentWeekStart;
+      const claimed=localStorage.getItem(bonusKey);
+      const weekEnd=currentWeekStart+7*24*60*60*1000;
+      const diff=Math.max(0,weekEnd-Date.now());
+      const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000);
+      return `<div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:14px;padding:12px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:900;color:var(--gold);">🏆 Weekly Clan Bonus</div>
+            <div style="font-size:11px;opacity:.6;margin-top:2px;">5% of treasury shared among members</div>
+            <div style="font-size:11px;color:var(--cyan);margin-top:2px;">${claimed?"✅ Claimed this week":pending>0?"💰 +"+pending.toLocaleString()+" coins ready!":"⏳ Resets in "+d+"d "+h+"h"}</div>
+          </div>
+          <button onclick="claimClanWeeklyBonus()" ${pending>0&&!claimed?"":"disabled"} style="padding:10px 14px;border:none;border-radius:10px;background:${pending>0&&!claimed?"linear-gradient(90deg,var(--gold),#ff9800)":"rgba(255,255,255,.08)"};color:${pending>0&&!claimed?"black":"#555"};font-weight:900;font-size:12px;cursor:pointer;">${claimed?"DONE":pending>0?"CLAIM":"WAIT"}</button>
+        </div>
+      </div>`;
+    })()}
+    <div style="display:flex;gap:8px;margin-top:4px;">
       <button onclick="donateToClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-weight:900;font-size:12px;cursor:pointer;">💰 DONATE</button>
       ${isLeader?`<button onclick="distributeTreasury()" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--green),#00c853);color:white;font-weight:900;font-size:12px;cursor:pointer;">💸 SEND</button>`:""}
       ${isLeader
@@ -2860,29 +2896,46 @@ function checkClanWeeklyBonus(){
   if(!myClan||!db)return;
   const bonusKey="clanWeeklyBonus_"+myClan.id+"_"+currentWeekStart;
   if(localStorage.getItem(bonusKey))return;
+  // Just calculate and store — don't auto-claim
   db.collection("clans").doc(myClan.id).get().then(doc=>{
     if(!doc.exists)return;
     const data=doc.data();
     const treasury=data.treasury||0;
     if(treasury<=0)return;
-    const cl=getClanLevel(treasury);
     const members=data.members||[];
-    const interest=Math.floor(treasury*0.05); // 5% weekly interest
+    const interest=Math.floor(treasury*0.05);
     const share=Math.floor(interest/members.length);
     if(share<=0)return;
-    // Give share to this player
-    coins+=share;lifetimeCoins+=share;
-    localStorage.setItem(bonusKey,"claimed");
-    save();update();
-    showToast("🏆 Weekly clan bonus: +"+share.toLocaleString()+" coins!");
-    addNotification("Weekly Clan Bonus! 🏆","Your clan earned you +"+share.toLocaleString()+" coins this week!","🏆");
-    addClanActivity("🏆 Weekly bonus distributed! Each member got "+share.toLocaleString()+" coins!");
-    // Deduct from treasury
-    db.collection("clans").doc(myClan.id).update({
-      treasury:firebase.firestore.FieldValue.increment(-interest)
-    }).catch(()=>{});
+    // Store pending bonus
+    localStorage.setItem("pendingClanBonus",share);
+    localStorage.setItem("pendingClanBonusId",myClan.id);
+    addNotification("Weekly Clan Bonus Ready! 🏆","Claim +"+share.toLocaleString()+" coins in your clan!","🏆");
+    // Refresh clan screen if open
+    if(document.getElementById("clanScreen")?.classList.contains("active"))renderClan();
   }).catch(()=>{});
 }
+
+function claimClanWeeklyBonus(){
+  const share=parseInt(localStorage.getItem("pendingClanBonus")||"0");
+  const clanId=localStorage.getItem("pendingClanBonusId");
+  if(!share||share<=0){showToast("No bonus available!");return;}
+  if(!myClan||myClan.id!==clanId){showToast("Bonus is for a different clan!");return;}
+  const bonusKey="clanWeeklyBonus_"+myClan.id+"_"+currentWeekStart;
+  if(localStorage.getItem(bonusKey)){showToast("Already claimed this week!");return;}
+  const interest=share*(myClan.members||[]).length;
+  coins+=share;lifetimeCoins+=share;
+  localStorage.setItem(bonusKey,"claimed");
+  localStorage.removeItem("pendingClanBonus");
+  localStorage.removeItem("pendingClanBonusId");
+  save();update();
+  if(db)db.collection("clans").doc(myClan.id).update({
+    treasury:firebase.firestore.FieldValue.increment(-interest)
+  }).catch(()=>{});
+  addClanActivity("🏆 "+username+" claimed weekly bonus: +"+share.toLocaleString()+" coins!");
+  showRewardPopup("WEEKLY CLAN BONUS!",share,"🏆");
+  renderClan();
+}
+    
  // ===== CLAN CHAT & ACTIVITY =====
 let _chatListener=null;
 
