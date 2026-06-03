@@ -91,6 +91,9 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 /* GRID */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .gameCard{position:relative;background:linear-gradient(145deg,rgba(10,10,25,.95),rgba(0,0,0,.95));border-radius:20px;overflow:hidden;border:1px solid rgba(0,255,255,.2);backdrop-filter:blur(14px);transition:.25s;}
+.gameCard:active{border-color:rgba(0,255,255,.8);box-shadow:0 0 18px rgba(0,255,255,.3);}
+.machineCard:active{border-color:rgba(0,255,255,.8) !important;box-shadow:0 0 20px rgba(0,255,255,.25);transform:scale(.97);}
+.shopCard:active{transform:scale(.98);box-shadow:0 0 20px rgba(138,46,255,.3);border-color:rgba(138,46,255,.5) !important;}
 .gameCard img{width:100%;height:130px;object-fit:cover;filter:brightness(.9) saturate(1.2);}
 .gameInfo{padding:10px;}
 .gameTitle{font-size:14px;font-weight:900;margin-bottom:6px;text-transform:uppercase;color:white;}
@@ -101,7 +104,8 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 .spinBtn{padding:14px 30px;border:none;border-radius:14px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-size:17px;font-weight:bold;box-shadow:0 0 20px rgba(255,152,0,.5);}
 
 /* SHOP CARDS */
-.shopCard{position:relative;padding:18px;border-radius:20px;background:rgba(12,12,22,.9);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(14px);transition:.3s;margin-bottom:14px;}
+.shopCard{position:relative;padding:18px;border-radius:20px;background:rgba(12,12,22,.9);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(14px);transition:.3s;margin-bottom:14px;overflow:hidden;}
+.shopCard::after{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transform:skewX(-20deg);animation:shimmerSweep 5s infinite;}
 .shopCard h3{margin:8px 0;font-size:18px;}
 .shopCard p{opacity:.75;font-size:13px;}
 .price{margin-top:8px;color:var(--gold);font-weight:bold;font-size:15px;}
@@ -1184,7 +1188,7 @@ updated: Date.now()
 // ===== UPDATE UI =====
 function update(){
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.innerText=v;};
-  s("balance",coins.toLocaleString());
+  animateCount(document.getElementById("balance"), coins);
   s("energy",energy);
   s("levelBadge",level);
   s("profileName",username);
@@ -2991,6 +2995,23 @@ if(_mc){
       _drops[i]++;
     });
   },50);
+}
+ // Smooth number count-up
+function animateCount(el, newVal){
+  if(!el) return;
+  const oldVal = parseInt(el.innerText.replace(/,/g,""))||0;
+  if(oldVal === newVal) return;
+  const diff = newVal - oldVal;
+  const steps = 18;
+  const stepVal = diff / steps;
+  let current = oldVal;
+  let i = 0;
+  const interval = setInterval(()=>{
+    i++;
+    current += stepVal;
+    el.innerText = Math.round(current).toLocaleString();
+    if(i >= steps){ el.innerText = newVal.toLocaleString(); clearInterval(interval); }
+  }, 30);
 }
 console.log("✅ Nilma Coin v4.0 — Fixed Edition Loaded");
 </script>
