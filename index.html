@@ -1192,7 +1192,6 @@ async function loadPlayerData(){
       if(d.lifetimeCoins!=null)lifetimeCoins=d.lifetimeCoins;
       if(d.lifetimeMines!=null)lifetimeMines=d.lifetimeMines;
       if(d.lifetimeChests!=null)lifetimeChests=d.lifetimeChests;
-      showToast("☁️ Cloud data loaded");
     }else{save();}
     update();renderAll();
   }catch(e){console.log(e);}
