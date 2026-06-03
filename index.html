@@ -1808,7 +1808,7 @@ function renderTasks(){
   allTasks.forEach(task=>{
     const claimed=tasksClaimed[task.id];
     const div=document.createElement("div");div.className="taskCard";
-    const vt=taskVisited[task.id];const waited=vt&&(Date.now()-vt>=8000);
+    const vt=taskVisited[task.id];const waited=vt&&(Date.now()-vt>=30000);
     if(!claimed&&!vt){
       div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;">
         <div><div class="taskTitle">${task.icon} ${task.title}</div><div class="taskReward">+${task.reward} coins</div><div class="taskProgress">Tap OPEN first</div></div>
@@ -1818,11 +1818,12 @@ function renderTasks(){
         </div>
       </div>`;
     }else if(!claimed&&vt&&!waited){
+      const secsLeft=Math.ceil((30000-(Date.now()-vt))/1000);
       div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;">
-        <div><div class="taskTitle">${task.icon} ${task.title}</div><div class="taskReward">+${task.reward} coins</div><div class="taskProgress">⏳ Verifying...</div></div>
+        <div><div class="taskTitle">${task.icon} ${task.title}</div><div class="taskReward">+${task.reward} coins</div><div class="taskProgress">⏳ ${secsLeft}s remaining...</div></div>
         <div style="display:flex;gap:8px;">
           <button class="taskBtn" onclick="visitTask('${task.id}','${task.link}')">OPEN</button>
-          <button class="taskBtn" disabled style="opacity:.4;">WAIT</button>
+          <button class="taskBtn" data-task-timer="${task.id}" disabled style="opacity:.4;">⏳ ${secsLeft}s</button>
         </div>
       </div>`;
     }else{
@@ -1885,21 +1886,74 @@ function renderTasks(){
 }
     
 function visitTask(id,link){
-  window.open(link);taskVisited[id]=Date.now();
-  showToast("✅ Page opened — wait 8s then CLAIM");
-  setTimeout(()=>renderTasks(),8500);renderTasks();
+  window.open(link);
+  taskVisited[id]=Date.now();
+  showToast("⏳ Please wait 30 seconds then CLAIM");
+  // countdown timer on button
+  let secs=30;
+  const countDown=setInterval(()=>{
+    secs--;
+    const btns=document.querySelectorAll(`[data-task-timer="${id}"]`);
+    btns.forEach(b=>b.innerText=`⏳ ${secs}s`);
+    if(secs<=0){
+      clearInterval(countDown);
+      btns.forEach(b=>{b.innerText="CLAIM";b.disabled=false;b.style.opacity="1";});
+      showToast("✅ Ready to claim!");
+    }
+  },1000);
+  renderTasks();
 }
 function claimTask(id){
   if(tasksClaimed[id]){playError();showToast("Already claimed!");return;}
   const task=allTasks.find(t=>t.id===id);if(!task)return;
   if(task.type==="social"){
-    const vt=taskVisited[id];if(!vt){playError();showToast("Open the page first!");return;}
-    if(Date.now()-vt<8000){playError();showToast("Wait a few more seconds...");return;}
+    const vt=taskVisited[id];
+    if(!vt){playError();showToast("Open the page first!");return;}
+    if(Date.now()-vt<30000){
+      const rem=Math.ceil((30000-(Date.now()-vt))/1000);
+      playError();showToast("⏳ Wait "+rem+" more seconds!");return;
+    }
   }
-  if(task.type==="auto"&&task.check&&!task.check()){playError();showToast("Not completed yet!");return;}
-  coins+=task.reward;lifetimeCoins+=task.reward;tasksClaimed[id]=true;
-  localStorage.setItem("tasksClaimed",JSON.stringify(tasksClaimed));
-  save();update();renderTasks();playClaim();showRewardPopup("TASK COMPLETE!",task.reward,"✅");
+  // Check Firebase if already claimed on another device
+  if(db){
+    db.collection("claimedTasks").doc(playerId+"_"+id).get().then(doc=>{
+      if(doc.exists){
+        tasksClaimed[id]=true;
+        localStorage.setItem("tasksClaimed",JSON.stringify(tasksClaimed));
+        playError();showToast("❌ Already claimed on another device!");
+        renderTasks();return;
+      }
+      // Not claimed anywhere — proceed
+      db.collection("claimedTasks").doc(playerId+"_"+id).set({
+        playerId,taskId:id,username,claimedAt:Date.now()
+      }).then(()=>{
+        coins+=task.reward;lifetimeCoins+=task.reward;
+        tasksClaimed[id]=true;
+        localStorage.setItem("tasksClaimed",JSON.stringify(tasksClaimed));
+        save();update();renderTasks();playClaim();
+        showRewardPopup("TASK COMPLETE!",task.reward,"✅");
+      }).catch(()=>{
+        // Firebase failed — still allow but save locally
+        coins+=task.reward;lifetimeCoins+=task.reward;
+        tasksClaimed[id]=true;
+        localStorage.setItem("tasksClaimed",JSON.stringify(tasksClaimed));
+        save();update();renderTasks();playClaim();
+        showRewardPopup("TASK COMPLETE!",task.reward,"✅");
+      });
+    }).catch(()=>{
+      coins+=task.reward;lifetimeCoins+=task.reward;
+      tasksClaimed[id]=true;
+      localStorage.setItem("tasksClaimed",JSON.stringify(tasksClaimed));
+      save();update();renderTasks();playClaim();
+      showRewardPopup("TASK COMPLETE!",task.reward,"✅");
+    });
+  } else {
+    coins+=task.reward;lifetimeCoins+=task.reward;
+    tasksClaimed[id]=true;
+    localStorage.setItem("tasksClaimed",JSON.stringify(tasksClaimed));
+    save();update();renderTasks();playClaim();
+    showRewardPopup("TASK COMPLETE!",task.reward,"✅");
+  }
 }
  function claimChainTask(chainId,taskId){
   if(tasksClaimed[taskId]){playError();showToast("Already claimed!");return;}
