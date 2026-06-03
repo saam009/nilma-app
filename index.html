@@ -31,6 +31,17 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
  @keyframes navBounce{0%{transform:translateY(0) scale(1);}25%{transform:translateY(-6px) scale(1.2);}50%{transform:translateY(0) scale(.95);}75%{transform:translateY(-3px) scale(1.05);}100%{transform:translateY(0) scale(1);}}
 @keyframes overheatPulse{0%,100%{filter:drop-shadow(0 0 15px rgba(255,50,0,.8));}50%{filter:drop-shadow(0 0 35px rgba(255,50,0,1));}}
 @keyframes overheatBlink{0%,100%{opacity:1;}50%{opacity:0.4;}}
+ @keyframes mach-spin-cw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes mach-spin-ccw{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@keyframes mach-pulse{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.2);opacity:1}}
+@keyframes mach-float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
+@keyframes mach-wave{0%{transform:scale(0.5);opacity:0.8}100%{transform:scale(2.4);opacity:0}}
+@keyframes mach-orbit{from{transform:rotate(0deg) translateX(26px) rotate(0deg)}to{transform:rotate(360deg) translateX(26px) rotate(-360deg)}}
+@keyframes mach-orbit2{from{transform:rotate(120deg) translateX(20px) rotate(-120deg)}to{transform:rotate(480deg) translateX(20px) rotate(-480deg)}}
+@keyframes mach-orbit3{from{transform:rotate(240deg) translateX(30px) rotate(-240deg)}to{transform:rotate(600deg) translateX(30px) rotate(-600deg)}}
+@keyframes mach-scan{0%{top:-10%}100%{top:110%}}
+@keyframes mach-card-glow{0%,100%{box-shadow:0 0 8px rgba(255,0,200,0.5),0 0 20px rgba(255,0,200,0.2)}50%{box-shadow:0 0 22px rgba(255,0,200,0.9),0 0 50px rgba(255,0,200,0.4)}}
+@keyframes mach-dash{from{stroke-dashoffset:80}to{stroke-dashoffset:0}}
  .screen{display:none;padding-bottom:90px;min-height:100vh;}
 .screen.active{display:block!important;}
 #spinScreen.active{display:flex!important;flex-direction:column;}
@@ -971,10 +982,89 @@ const TON_WALLET="UQDTWVSYBC1KozbeO73kZsMyqogTJlC9ptWNIUNthfJ11P3m";
 
 // ===== MACHINE DATA =====
 const machineData=[
-  {id:0,name:"QUANTUM LATTICE",rarity:"RARE",rarityColor:"#00e5ff",img:"https://raw.githubusercontent.com/saam009/nilma-app/main/n2.jpeg",levels:[{lv:1,power:1,coinCost:0,tonCost:0},{lv:2,power:2,coinCost:2000,tonCost:0},{lv:3,power:4,coinCost:5000,tonCost:0},{lv:4,power:7,coinCost:10000,tonCost:0},{lv:5,power:12,coinCost:20000,tonCost:0}]},
-  {id:1,name:"CRYSTAL CUBE",rarity:"EPIC",rarityColor:"#c060ff",img:"https://raw.githubusercontent.com/saam009/nilma-app/main/aa.jpeg",imgStyle:"object-position:center 80%;",levels:[{lv:1,power:15,coinCost:10000,tonCost:1.0},{lv:2,power:25,coinCost:25000,tonCost:1.5},{lv:3,power:40,coinCost:50000,tonCost:2.0},{lv:4,power:60,coinCost:100000,tonCost:3.0},{lv:5,power:90,coinCost:200000,tonCost:5.0}]},
-  {id:2,name:"PLASMA FUSION",rarity:"LEGENDARY",rarityColor:"#ffd54a",img:"https://raw.githubusercontent.com/saam009/nilma-app/main/n3.jpeg",levels:[{lv:1,power:120,coinCost:30000,tonCost:2.0},{lv:2,power:180,coinCost:70000,tonCost:2.5},{lv:3,power:260,coinCost:150000,tonCost:3.5},{lv:4,power:380,coinCost:300000,tonCost:6.0},{lv:5,power:550,coinCost:600000,tonCost:10.0}]},
-  {id:3,name:"MECH SPHERE",rarity:"MYTHIC",rarityColor:"#ff6eb4",img:"https://raw.githubusercontent.com/saam009/nilma-app/main/n4.jpeg",levels:[{lv:1,power:700,coinCost:50000,tonCost:3.0},{lv:2,power:1000,coinCost:120000,tonCost:4.0},{lv:3,power:1500,coinCost:250000,tonCost:7.0},{lv:4,power:2200,coinCost:500000,tonCost:12.0},{lv:5,power:3000,coinCost:1000000,tonCost:20.0}]}
+  {id:0,name:"QUANTUM LATTICE",rarity:"RARE",rarityColor:"#00e5ff",
+   svgCore:`<div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;">
+     <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(0,80,120,0.7),#020d1a);border-radius:0;"></div>
+     <div style="position:absolute;top:0;left:0;width:100%;height:2px;background:rgba(0,229,255,0.25);animation:mach-scan 2.5s linear infinite;z-index:5;"></div>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 4s linear infinite;">
+       <circle cx="45" cy="45" r="40" fill="none" stroke="#00e5ff" stroke-width="1.2" stroke-dasharray="6 4" opacity="0.5"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-ccw 2.5s linear infinite;">
+       <circle cx="45" cy="45" r="30" fill="none" stroke="#0088cc" stroke-width="1" stroke-dasharray="3 8" opacity="0.6"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 8s linear infinite;">
+       <circle cx="45" cy="45" r="20" fill="none" stroke="#00e5ff" stroke-width="0.8" stroke-dasharray="12 3" opacity="0.4"/>
+     </svg>
+     <div style="width:22px;height:22px;border-radius:50%;background:#00e5ff;animation:mach-pulse 2s ease-in-out infinite;box-shadow:0 0 14px #00e5ff,0 0 28px rgba(0,229,255,0.5);z-index:2;"></div>
+     <div style="position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;animation:mach-orbit 3s linear infinite;z-index:3;"></div>
+     <div style="position:absolute;width:4px;height:4px;border-radius:50%;background:#00e5ff;animation:mach-orbit2 2s linear infinite;z-index:3;"></div>
+   </div>`,
+   levels:[{lv:1,power:1,coinCost:0,tonCost:0},{lv:2,power:2,coinCost:2000,tonCost:0},{lv:3,power:4,coinCost:5000,tonCost:0},{lv:4,power:7,coinCost:10000,tonCost:0},{lv:5,power:12,coinCost:20000,tonCost:0}]},
+
+  {id:1,name:"CRYSTAL CUBE",rarity:"EPIC",rarityColor:"#c060ff",
+   svgCore:`<div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;animation:mach-float 3s ease-in-out infinite;">
+     <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(60,0,100,0.7),#0d0620);"></div>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 6s linear infinite;">
+       <polygon points="45,5 85,27 85,63 45,85 5,63 5,27" fill="none" stroke="#8a2eff" stroke-width="1.2" opacity="0.7"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-ccw 3s linear infinite;">
+       <polygon points="45,16 74,32 74,58 45,74 16,58 16,32" fill="none" stroke="#c060ff" stroke-width="1" opacity="0.5"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 10s linear infinite;">
+       <polygon points="45,27 63,37 63,53 45,63 27,53 27,37" fill="none" stroke="#c060ff" stroke-width="0.8" opacity="0.35"/>
+     </svg>
+     <div style="width:20px;height:20px;border-radius:4px;background:#8a2eff;animation:mach-pulse 1.8s ease-in-out infinite;box-shadow:0 0 16px #8a2eff,0 0 35px rgba(138,46,255,0.5);transform:rotate(45deg);z-index:2;"></div>
+     <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:#c060ff;animation:mach-orbit3 2.5s linear infinite;z-index:3;"></div>
+     <div style="position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;animation:mach-orbit 4s linear infinite;opacity:0.8;z-index:3;"></div>
+   </div>`,
+   levels:[{lv:1,power:15,coinCost:10000,tonCost:1.0},{lv:2,power:25,coinCost:25000,tonCost:1.5},{lv:3,power:40,coinCost:50000,tonCost:2.0},{lv:4,power:60,coinCost:100000,tonCost:3.0},{lv:5,power:90,coinCost:200000,tonCost:5.0}]},
+
+  {id:2,name:"PLASMA FUSION",rarity:"LEGENDARY",rarityColor:"#ffd54a",
+   svgCore:`<div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;">
+     <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(100,50,0,0.8),#1a1000);"></div>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 3s linear infinite;">
+       <circle cx="45" cy="45" r="40" fill="none" stroke="#ffd54a" stroke-width="1.2" stroke-dasharray="8 5" opacity="0.6"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-ccw 5s linear infinite;">
+       <circle cx="45" cy="45" r="30" fill="none" stroke="#ff9800" stroke-width="1" stroke-dasharray="4 10" opacity="0.55"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;">
+       <circle cx="45" cy="45" r="20" fill="rgba(255,152,0,0.1)" stroke="#ffd54a" stroke-width="1" opacity="0.8"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-wave 2s ease-out infinite;">
+       <circle cx="45" cy="45" r="15" fill="none" stroke="#ffd54a" stroke-width="1.5" opacity="0.7"/>
+     </svg>
+     <div style="width:24px;height:24px;border-radius:50%;background:#ff9800;animation:mach-pulse 1.5s ease-in-out infinite;box-shadow:0 0 18px #ff9800,0 0 45px rgba(255,152,0,0.6);z-index:2;"></div>
+     <div style="position:absolute;width:6px;height:6px;border-radius:50%;background:#ffd54a;animation:mach-orbit 2s linear infinite;z-index:3;"></div>
+     <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:#ff9800;animation:mach-orbit3 3.5s linear infinite;z-index:3;"></div>
+     <div style="position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;animation:mach-orbit2 4s linear infinite;opacity:0.8;z-index:3;"></div>
+   </div>`,
+   levels:[{lv:1,power:120,coinCost:30000,tonCost:2.0},{lv:2,power:180,coinCost:70000,tonCost:2.5},{lv:3,power:260,coinCost:150000,tonCost:3.5},{lv:4,power:380,coinCost:300000,tonCost:6.0},{lv:5,power:550,coinCost:600000,tonCost:10.0}]},
+
+  {id:3,name:"MECH SPHERE",rarity:"MYTHIC",rarityColor:"#ff6eb4",
+   svgCore:`<div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;">
+     <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(100,0,60,0.85),#100010);"></div>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 2s linear infinite;">
+       <circle cx="45" cy="45" r="40" fill="none" stroke="#ff00cc" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.7"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-ccw 1.5s linear infinite;">
+       <circle cx="45" cy="45" r="32" fill="none" stroke="#ff6eb4" stroke-width="1" stroke-dasharray="2 6" opacity="0.6"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-cw 4s linear infinite;">
+       <ellipse cx="45" cy="45" rx="24" ry="9" fill="none" stroke="#ff00cc" stroke-width="1" opacity="0.55"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-spin-ccw 3s linear infinite;">
+       <ellipse cx="45" cy="45" rx="9" ry="24" fill="none" stroke="#ff00cc" stroke-width="1" opacity="0.55"/>
+     </svg>
+     <svg width="90" height="90" style="position:absolute;top:0;left:0;animation:mach-wave 1.5s ease-out infinite;">
+       <circle cx="45" cy="45" r="16" fill="none" stroke="#ff00cc" stroke-width="2" opacity="0.7"/>
+     </svg>
+     <div style="width:26px;height:26px;border-radius:50%;background:#ff00cc;animation:mach-pulse 1.2s ease-in-out infinite;box-shadow:0 0 20px #ff00cc,0 0 55px rgba(255,0,204,0.6);z-index:2;"></div>
+     <div style="position:absolute;width:7px;height:7px;border-radius:50%;background:#ff6eb4;animation:mach-orbit 1.8s linear infinite;z-index:3;"></div>
+     <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;animation:mach-orbit2 2.5s linear infinite;z-index:3;"></div>
+     <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:#ff00cc;animation:mach-orbit3 3s linear infinite;z-index:3;"></div>
+   </div>`,
+   levels:[{lv:1,power:700,coinCost:50000,tonCost:3.0},{lv:2,power:1000,coinCost:120000,tonCost:4.0},{lv:3,power:1500,coinCost:250000,tonCost:7.0},{lv:4,power:2200,coinCost:500000,tonCost:12.0},{lv:5,power:3000,coinCost:1000000,tonCost:20.0}]}
 ];
 
 // ===== TASKS =====
@@ -1398,8 +1488,10 @@ function renderMachineGrid(){
     const nextLv=owned<5?m.levels[owned]:null;
     const card=document.createElement("div");
     card.className="machineCard";
-    card.style.border=`1px solid ${isActive?"rgba(0,255,153,.4)":"rgba(255,255,255,.07)"}`;
+    card.style.border=`1px solid ${isActive?m.rarityColor+"99":"rgba(255,255,255,.07)"}`;
     card.style.opacity=(owned===0&&i!==0)?"0.55":"1";
+    if(i===3&&isActive)card.style.animation="mach-card-glow 2.5s ease-in-out infinite";
+    else card.style.animation="";
     let btnHtml="";
     if(i===0){
       if(isActive&&owned>=5)btnHtml=`<button class="machineBtn" style="background:linear-gradient(90deg,var(--gold),#ff9800);color:black;">✅ MAX</button>`;
@@ -1415,21 +1507,22 @@ function renderMachineGrid(){
       btnHtml=`<div style="display:flex;gap:3px;">${acts}<button class="machineBtn" style="background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;flex:1;" onclick="showMachinePurchaseSheet(${i},${owned+1})">⬆ LV${owned+1}</button></div>`;
     }
     card.innerHTML=`
-  <div class="activeTag" style="display:${isActive?"block":"none"}">✅ ACTIVE</div>
-  <div class="rarityTag" style="background:rgba(0,0,0,.6);color:${m.rarityColor};border:1px solid ${m.rarityColor}40;z-index:3;">${m.rarity}</div>
-  <div style="position:relative;">
-    <img src="${m.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'" style="width:100%;height:110px;object-fit:cover;display:block;${m.imgStyle||''}">
-    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.1) 55%,transparent 100%);"></div>
-    <div style="position:absolute;bottom:6px;left:8px;right:8px;">
-      <div style="font-size:10px;font-weight:900;color:white;line-height:1.2;letter-spacing:.3px;">${m.name}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-  <span style="font-size:10px;color:#ffd54a;font-weight:700;">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</span>
-  <span style="font-size:9px;color:#80cbc4;">${owned>0?"LV"+owned+"/5":"Locked"}</span>
-</div>
-${owned>0?`<div style="margin-top:4px;height:3px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}99);transition:.4s;"></div></div>`:""}
-    </div>
-  </div>
-  <div style="padding:7px 8px;">${btnHtml}</div>`;
+      <div class="activeTag" style="display:${isActive?"block":"none"}">✅ ACTIVE</div>
+      <div class="rarityTag" style="background:rgba(0,0,0,.7);color:${m.rarityColor};border:1px solid ${m.rarityColor}40;z-index:3;">${m.rarity}</div>
+      <div style="position:relative;height:110px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#080818;">
+        ${m.svgCore}
+        ${isActive?`<div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${m.rarityColor},transparent);opacity:0.8;"></div>`:""}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 60%);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:6px;left:8px;right:8px;z-index:4;">
+          <div style="font-size:10px;font-weight:900;color:white;line-height:1.2;letter-spacing:.3px;text-shadow:0 1px 4px rgba(0,0,0,.8);">${m.name}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
+            <span style="font-size:10px;color:${m.rarityColor};font-weight:700;">⚡ +${owned>0?lv.power:m.levels[0].power}/tap</span>
+            <span style="font-size:9px;color:#80cbc4;">${owned>0?"LV"+owned+"/5":"Locked"}</span>
+          </div>
+          ${owned>0?`<div style="margin-top:4px;height:3px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}99);transition:.4s;"></div></div>`:""}
+        </div>
+      </div>
+      <div style="padding:7px 8px;">${btnHtml}</div>`;
     grid.appendChild(card);
   });
 }
@@ -1544,7 +1637,9 @@ function renderShopMachines(){
   machineData.forEach((m,i)=>{
     const owned=machineOwned[i]||0;const isActive=currentMachine===i;
     const div=document.createElement("div");
-    div.className="shopCard";div.style.borderColor=m.rarityColor+"55";
+    div.className="shopCard";
+    div.style.borderColor=m.rarityColor+"55";
+    if(i===3)div.style.animation="mach-card-glow 2.5s ease-in-out infinite";
     let levelsHtml=`<div class="upgradeLevels">`;
     m.levels.forEach((lv,li)=>{
       const lvNum=li+1;let cls="locked";
@@ -1555,16 +1650,25 @@ function renderShopMachines(){
     });
     levelsHtml+=`</div>`;
     const ownedLv=owned>0?m.levels[owned-1]:null;
-    div.innerHTML=`<div class="badge" style="color:${m.rarityColor};">${m.rarity}</div>
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
-        <img src="${m.img}" style="width:55px;height:55px;border-radius:10px;object-fit:cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/825/825508.png'">
-        <div><h3 style="font-size:15px;margin:0;">${m.name}</h3>
-          <p style="margin:4px 0;">Power: <strong style="color:var(--gold);">${ownedLv?ownedLv.power:m.levels[0].power}/tap</strong></p>
-      <p>Status: <strong style="color:var(--green);">${owned>0?"LV"+owned:"Not Owned"}</strong>${isActive?" ✅":""}</p>
-          ${owned>0?`<div style="margin-top:6px;height:5px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;"><div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}88);transition:.4s;"></div></div><div style="font-size:9px;opacity:.5;margin-top:3px;">${owned}/5 levels</div>`:""}
+    div.innerHTML=`
+      <div class="badge" style="color:${m.rarityColor};">${m.rarity}</div>
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px;">
+        <div style="width:72px;height:72px;border-radius:14px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#080818;border:1px solid ${m.rarityColor}33;position:relative;">
+          ${m.svgCore}
+        </div>
+        <div style="flex:1;">
+          <h3 style="font-size:15px;margin:0;color:white;">${m.name}</h3>
+          <p style="margin:4px 0;font-size:12px;">Power: <strong style="color:${m.rarityColor};">${ownedLv?ownedLv.power:m.levels[0].power}/tap</strong></p>
+          <p style="font-size:12px;">Status: <strong style="color:var(--green);">${owned>0?"LV"+owned:"Not Owned"}</strong>${isActive?" ✅":""}</p>
+          ${owned>0?`
+            <div style="margin-top:6px;height:5px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;">
+              <div style="height:100%;width:${(owned/5)*100}%;border-radius:10px;background:linear-gradient(90deg,${m.rarityColor},${m.rarityColor}88);transition:.4s;"></div>
+            </div>
+            <div style="font-size:9px;opacity:.5;margin-top:3px;">${owned}/5 levels</div>`:""}
         </div>
       </div>
-      <div style="font-size:11px;opacity:.5;margin-bottom:6px;">LEVEL UPGRADES</div>${levelsHtml}
+      <div style="font-size:11px;opacity:.5;margin-bottom:6px;">LEVEL UPGRADES</div>
+      ${levelsHtml}
       ${owned>0&&!isActive?`<button class="shopBtn" style="margin-top:10px;" onclick="activateMachine(${i})">ACTIVATE</button>`:""}`;
     el.appendChild(div);
   });
