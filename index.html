@@ -1097,7 +1097,48 @@ if(refLinkEl)refLinkEl.value=`https://t.me/NilmaCoinBot?start=${playerId}`;
 let vipEnd=parseInt(localStorage.getItem("vipEnd")||"0");
 let vipPlanSelected=1;
 let isVip=Date.now()<vipEnd;
+// ===== CLAN LEVEL SYSTEM =====
+const CLAN_LEVELS=[
+  {lv:1,name:"Rookie Squad",icon:"🪨",treasury:0,perk:"No perks yet",powerBonus:0,chestBonus:0},
+  {lv:2,name:"Bronze Guild",icon:"🥉",treasury:5000,perk:"+5% mine power",powerBonus:0.05,chestBonus:0},
+  {lv:3,name:"Silver Order",icon:"🥈",treasury:20000,perk:"+10% mine power",powerBonus:0.10,chestBonus:0},
+  {lv:4,name:"Gold Alliance",icon:"🥇",treasury:60000,perk:"+15% mine power + free daily chest",powerBonus:0.15,chestBonus:1},
+  {lv:5,name:"Diamond Legion",icon:"💎",treasury:150000,perk:"+25% mine power + 2 free chests",powerBonus:0.25,chestBonus:2},
+  {lv:6,name:"Cyber Empire",icon:"👑",treasury:500000,perk:"+40% mine power + 3 free chests",powerBonus:0.40,chestBonus:3},
+];
 
+function getClanLevel(treasury){
+  let cl=CLAN_LEVELS[0];
+  for(let i=CLAN_LEVELS.length-1;i>=0;i--){
+    if((treasury||0)>=CLAN_LEVELS[i].treasury){cl=CLAN_LEVELS[i];break;}
+  }
+  return cl;
+}
+
+function getNextClanLevel(treasury){
+  const current=getClanLevel(treasury);
+  const nextIdx=CLAN_LEVELS.findIndex(l=>l.lv===current.lv+1);
+  return nextIdx>=0?CLAN_LEVELS[nextIdx]:null;
+}
+
+function applyClanPerks(){
+  if(!myClan)return;
+  const cl=getClanLevel(myClan.treasury||0);
+  // Apply power bonus on top of base mine power
+  const basePower=machineData[currentMachine].levels[Math.max(0,(machineOwned[currentMachine]||1)-1)].power;
+  const bonus=Math.floor(basePower*cl.powerBonus);
+  minePower=basePower+bonus;
+  // Free chests bonus
+  if(cl.chestBonus>0&&freeSpinUsed==="yes"){
+    const clanChestKey="clanChest_"+new Date().toDateString()+"_"+myClan.id;
+    if(!localStorage.getItem(clanChestKey)){
+      freeSpins+=cl.chestBonus;
+      localStorage.setItem(clanChestKey,"used");
+      localStorage.setItem("freeSpins",freeSpins);
+      addNotification("Clan Chest Bonus! 🎁","Your clan gave you "+cl.chestBonus+" free chest(s)!","🎁");
+    }
+  }
+}
 // ===== STAKING =====
 const STAKE_POOLS=[
   {id:"bronze",icon:"🥉",name:"Bronze Pool",apy:8,minStake:500,lockDays:7,color:"#cd7f32",desc:"Low risk — 8% APY over 7 days"},
@@ -2578,6 +2619,22 @@ function renderClanDashboard(content){
         <div style="font-size:12px;opacity:.6;margin-top:2px;">Members: ${(clan.members||[]).length}/20</div>
         <div style="font-size:12px;color:var(--gold);margin-top:2px;">⚡ Total Power: <span id="clanTotalPower">${(clan.totalPower||0).toLocaleString()}</span></div>
         <div style="font-size:12px;color:var(--green);margin-top:2px;">💰 Treasury: <span id="clanTreasury">${(clan.treasury||0).toLocaleString()}</span> coins</div>
+        ${(()=>{
+          const cl=getClanLevel(clan.treasury||0);
+          const next=getNextClanLevel(clan.treasury||0);
+          const pct=next?Math.min(100,Math.floor(((clan.treasury||0)-cl.treasury)/(next.treasury-cl.treasury)*100)):100;
+          return `<div style="margin-top:8px;padding:8px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.07);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="font-size:13px;font-weight:900;">${cl.icon} ${cl.name} <span style="font-size:10px;color:var(--gold);">LV${cl.lv}</span></div>
+              <div style="font-size:10px;color:var(--cyan);">${next?"Next: LV"+(cl.lv+1):"MAX LEVEL 👑"}</div>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold),#ff9800);border-radius:10px;transition:.4s;"></div>
+            </div>
+            <div style="font-size:10px;opacity:.6;margin-top:4px;">Perk: ${cl.perk}</div>
+            ${next?`<div style="font-size:10px;color:var(--gold);margin-top:2px;">Next unlock at ${next.treasury.toLocaleString()} treasury</div>`:""}
+          </div>`;
+        })()}
       </div>
     </div>
     <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px;margin-bottom:12px;">
@@ -2591,6 +2648,7 @@ function renderClanDashboard(content){
     <div id="clanMemberList"></div>
     <div style="display:flex;gap:8px;margin-top:14px;">
       <button onclick="donateToClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-weight:900;font-size:12px;cursor:pointer;">💰 DONATE</button>
+      ${isLeader?`<button onclick="distributeTreasury()" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--green),#00c853);color:white;font-weight:900;font-size:12px;cursor:pointer;">💸 SEND</button>`:""}
       ${isLeader
         ?`<button onclick="disbandClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-weight:900;font-size:12px;cursor:pointer;">DISBAND</button>`
         :`<button onclick="leaveClan()" style="flex:1;padding:10px;border:none;border-radius:10px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-weight:900;font-size:12px;cursor:pointer;">LEAVE</button>`}
@@ -2713,7 +2771,56 @@ function joinClanByCode2(code){
   const el=document.getElementById("joinClanCode");if(el)el.value=code;
   joinClanByCode();
 }
+function distributeTreasury(){
+  if(!myClan||myClan.leaderId!==playerId){showToast("Only leader can distribute!");return;}
+  const ex=document.getElementById("distributePanel");if(ex)ex.remove();
+  const members=(myClan.members||[]).filter(m=>m.id!==playerId);
+  if(members.length===0){showToast("No other members to distribute to!");return;}
+  const panel=document.createElement("div");panel.id="distributePanel";
+  panel.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:999999;display:flex;justify-content:center;align-items:flex-end;";
+  panel.innerHTML=`<div style="background:linear-gradient(180deg,rgba(10,8,2,.98),rgba(5,4,1,.98));border:1px solid rgba(255,213,74,.2);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease;max-height:80vh;overflow-y:auto;">
+    <div style="font-size:18px;font-weight:900;color:var(--gold);margin-bottom:4px;">💰 Distribute Treasury</div>
+    <div style="font-size:12px;opacity:.6;margin-bottom:6px;">Treasury: ${(myClan.treasury||0).toLocaleString()} coins</div>
+    <div style="font-size:12px;opacity:.6;margin-bottom:16px;">Select member and amount to send</div>
+    <select id="distributeTarget" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,213,74,.3);background:rgba(30,25,5,.9);color:white;font-size:14px;margin-bottom:10px;outline:none;">
+      ${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join("")}
+    </select>
+    <input id="distributeAmount" type="number" placeholder="Amount to send"
+      style="width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,213,74,.3);background:rgba(255,255,255,.05);color:white;font-size:16px;margin-bottom:14px;outline:none;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="confirmDistribute()" style="flex:1;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--gold),#ff9800);color:black;font-weight:900;font-size:15px;cursor:pointer;">SEND</button>
+      <button onclick="document.getElementById('distributePanel').remove()" style="padding:13px 20px;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:#aaa;cursor:pointer;">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(panel);
+  panel.addEventListener("click",function(e){if(e.target===this)this.remove();});
+}
 
+function confirmDistribute(){
+  const targetId=document.getElementById("distributeTarget")?.value;
+  const amt=parseInt(document.getElementById("distributeAmount")?.value);
+  if(!amt||isNaN(amt)||amt<=0){showToast("Enter a valid amount");return;}
+  if((myClan.treasury||0)<amt){showToast("Not enough in treasury!");return;}
+  const target=(myClan.members||[]).find(m=>m.id===targetId);
+  if(!target){showToast("Member not found");return;}
+  if(!db){showToast("Firebase required");return;}
+  // Deduct from treasury
+  db.collection("clans").doc(myClan.id).update({
+    treasury:firebase.firestore.FieldValue.increment(-amt)
+  }).then(()=>{
+    // Give coins to target player
+    db.collection("players").doc(targetId).update({
+      coins:firebase.firestore.FieldValue.increment(amt)
+    }).then(()=>{
+      myClan.treasury=(myClan.treasury||0)-amt;
+      localStorage.setItem("myClan",JSON.stringify(myClan));
+      document.getElementById("distributePanel")?.remove();
+      addClanActivity("💸 Leader sent "+amt.toLocaleString()+" coins to "+target.name+"!");
+      showToast("✅ Sent "+amt.toLocaleString()+" coins to "+target.name+"!");
+      renderClan();
+    }).catch(e=>showToast("Error: "+e.message));
+  }).catch(e=>showToast("Error: "+e.message));
+}
 function donateToClan(){
   const ex=document.getElementById("donatePanel");if(ex)ex.remove();
   const panel=document.createElement("div");panel.id="donatePanel";
@@ -2747,6 +2854,34 @@ function confirmDonate(){
   }
   document.getElementById("donatePanel")?.remove();
   save();update();showToast("💰 Donated "+amt.toLocaleString()+" coins to clan!");
+}
+ // ===== CLAN WEEKLY BONUS =====
+function checkClanWeeklyBonus(){
+  if(!myClan||!db)return;
+  const bonusKey="clanWeeklyBonus_"+myClan.id+"_"+currentWeekStart;
+  if(localStorage.getItem(bonusKey))return;
+  db.collection("clans").doc(myClan.id).get().then(doc=>{
+    if(!doc.exists)return;
+    const data=doc.data();
+    const treasury=data.treasury||0;
+    if(treasury<=0)return;
+    const cl=getClanLevel(treasury);
+    const members=data.members||[];
+    const interest=Math.floor(treasury*0.05); // 5% weekly interest
+    const share=Math.floor(interest/members.length);
+    if(share<=0)return;
+    // Give share to this player
+    coins+=share;lifetimeCoins+=share;
+    localStorage.setItem(bonusKey,"claimed");
+    save();update();
+    showToast("🏆 Weekly clan bonus: +"+share.toLocaleString()+" coins!");
+    addNotification("Weekly Clan Bonus! 🏆","Your clan earned you +"+share.toLocaleString()+" coins this week!","🏆");
+    addClanActivity("🏆 Weekly bonus distributed! Each member got "+share.toLocaleString()+" coins!");
+    // Deduct from treasury
+    db.collection("clans").doc(myClan.id).update({
+      treasury:firebase.firestore.FieldValue.increment(-interest)
+    }).catch(()=>{});
+  }).catch(()=>{});
 }
  // ===== CLAN CHAT & ACTIVITY =====
 let _chatListener=null;
@@ -3191,6 +3326,7 @@ updateChestLabel();syncToggles();
   if(ttm)ttm.style.display="none";
 }
 setTimeout(checkOfflineMining,2500);
+ setTimeout(()=>{applyClanPerks();checkClanWeeklyBonus();},3000);
 // Startup notifications
 setTimeout(()=>{
   if(freeSpinUsed==="no")addNotification("Free Chest Ready!","Open your free daily chest 📦","📦");
