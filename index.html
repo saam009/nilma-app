@@ -1162,6 +1162,14 @@ function save(){
   localStorage.setItem("streakDay",streakDay);
   localStorage.setItem("bestStreak",bestStreak);
 localStorage.setItem("weeklyEarned",weeklyEarned);
+// Sync power to clan
+  if(myClan&&db){
+    const members=(myClan.members||[]).map(m=>m.id===playerId?{...m,power:minePower}:m);
+    const totalPower=members.reduce((a,m)=>a+(m.power||1),0);
+    db.collection("clans").doc(myClan.id).update({members,totalPower}).catch(()=>{});
+    myClan.members=members;myClan.totalPower=totalPower;
+    localStorage.setItem("myClan",JSON.stringify(myClan));
+  } 
   // Anti-cheat cap
   const cap=(level*10000)+100000;
   if(coins>cap)coins=cap;
@@ -2557,7 +2565,8 @@ function renderClanDashboard(content){
       <div>
         <div style="font-size:20px;font-weight:900;">${clan.name} <span style="font-size:12px;color:var(--purple);">[${clan.tag||"?"}]</span></div>
         <div style="font-size:12px;opacity:.6;margin-top:2px;">Members: ${(clan.members||[]).length}/20</div>
-        <div style="font-size:12px;color:var(--gold);margin-top:2px;">⚡ Total Power: ${(clan.totalPower||0).toLocaleString()}</div>
+        <div style="font-size:12px;color:var(--gold);margin-top:2px;">⚡ Total Power: <span id="clanTotalPower">${(clan.totalPower||0).toLocaleString()}</span></div>
+        <div style="font-size:12px;color:var(--green);margin-top:2px;">💰 Treasury: <span id="clanTreasury">${(clan.treasury||0).toLocaleString()}</span> coins</div>
       </div>
     </div>
     <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px;margin-bottom:12px;">
@@ -2619,15 +2628,42 @@ function joinClanByCode(){
   }).catch(e=>showToast("Error: "+e.message));
 }
 
+let _clanListener=null;
 function loadClanMembers(){
   const list=document.getElementById("clanMemberList");if(!list||!myClan)return;
-  list.innerHTML=(myClan.members||[]).map(m=>`<div class="clanMember">
-    <div style="font-size:22px;">${m.role==="Leader"?"👑":"⚔️"}</div>
-    <div style="flex:1;"><div style="font-weight:700;font-size:13px;">${m.name}${m.id===playerId?" <span style='color:var(--cyan);font-size:10px;'>(you)</span>":""}</div><div style="font-size:11px;opacity:.6;">⚡ ${m.power||1}/tap</div></div>
-    <span class="clanBadge">${m.role}</span>
-  </div>`).join("");
+  if(!db){renderClanMemberList(myClan.members||[]);return;}
+  // Unsubscribe previous
+  if(_clanListener){try{_clanListener();}catch(e){}_clanListener=null;}
+  // Real-time listener
+  _clanListener=db.collection("clans").doc(myClan.id).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const data=snap.data();
+    myClan={...myClan,...data};
+    localStorage.setItem("myClan",JSON.stringify(myClan));
+    renderClanMemberList(data.members||[]);
+    // Update treasury display
+    const tr=document.getElementById("clanTreasury");
+    if(tr)tr.innerText=(data.treasury||0).toLocaleString();
+    // Update total power
+    const tp=document.getElementById("clanTotalPower");
+    if(tp)tp.innerText=(data.totalPower||0).toLocaleString();
+  },err=>console.log("Clan listener error:",err));
 }
 
+function renderClanMemberList(members){
+  const list=document.getElementById("clanMemberList");if(!list)return;
+  const isLeader=myClan.leaderId===playerId;
+  list.innerHTML=members.map(m=>`
+    <div class="clanMember">
+      <div style="font-size:22px;">${m.role==="Leader"?"👑":"⚔️"}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">${m.name}${m.id===playerId?` <span style='color:var(--cyan);font-size:10px;'>(you)</span>`:""}
+        </div>
+        <div style="font-size:11px;opacity:.6;">⚡ ${m.power||1}/tap · ${m.role}</div>
+      </div>
+      ${isLeader&&m.id!==playerId?`<button onclick="kickMember('${m.id}','${m.name}')" style="padding:4px 10px;border:none;border-radius:8px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-size:10px;cursor:pointer;">KICK</button>`:`<span class="clanBadge">${m.role}</span>`}
+    </div>`).join("");
+}
 function loadTopClans(){
   const list=document.getElementById("topClanList");if(!list||!db)return;
   db.collection("clans").orderBy("totalPower","desc").limit(5).get().then(snap=>{
@@ -2687,7 +2723,19 @@ function confirmDonate(){
   document.getElementById("donatePanel")?.remove();
   save();update();showToast("💰 Donated "+amt.toLocaleString()+" coins to clan!");
 }
-
+function kickMember(memberId,memberName){
+  showConfirmSheet("Kick "+memberName+"?","This member will be removed from your clan.","KICK",()=>{
+    if(!myClan||!db)return;
+    const updated=(myClan.members||[]).filter(m=>m.id!==memberId);
+    const totalPower=updated.reduce((a,m)=>a+(m.power||1),0);
+    db.collection("clans").doc(myClan.id).update({members:updated,totalPower}).then(()=>{
+      myClan.members=updated;myClan.totalPower=totalPower;
+      localStorage.setItem("myClan",JSON.stringify(myClan));
+      showToast("✅ "+memberName+" kicked from clan");
+      addClanActivity("👢 "+memberName+" was kicked by leader");
+    }).catch(e=>showToast("Error: "+e.message));
+  });
+}
 function leaveClan(){
   showConfirmSheet("Leave your clan?","You will lose clan membership.","LEAVE",()=>{
     if(myClan&&db){
