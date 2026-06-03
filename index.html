@@ -1526,7 +1526,12 @@ function updateHeat(){
   const bar=document.getElementById("heatBar");
   const pct=document.getElementById("heatPct");
   const warn=document.getElementById("heatWarning");
-  if(bar)bar.style.width=heatLevel+"%";
+  if(bar){
+    bar.style.width=heatLevel+"%";
+    if(heatLevel<50)bar.style.background="linear-gradient(90deg,#00ff99,#00e5ff)";
+    else if(heatLevel<75)bar.style.background="linear-gradient(90deg,#00e5ff,#ff9800)";
+    else bar.style.background="linear-gradient(90deg,#ff9800,#ff4444)";
+  }
   if(pct)pct.innerText=Math.round(heatLevel)+"%";
   if(warn)warn.style.display=heatLevel>=80?"block":"none";
   // Red glow on reactor when hot
@@ -1625,22 +1630,23 @@ if(crit){
   coins+=earned;lifetimeCoins+=earned;weeklyEarned+=earned;lifetimeMines++;dailyMines++;dailyCoins+=earned;
   xp+=2*xpBoost;energy-=1;
   const rw=document.getElementById("reactorWrap");
-if(rw){
-  rw.style.transform="scale(.93)";
-  setTimeout(()=>{rw.style.transform="scale(1)";},100);
-  // Shockwave ring
-  const rect=rw.getBoundingClientRect();
-  const cx=rect.left+rect.width/2;
-  const cy=rect.top+rect.height/2;
-  for(let i=0;i<2;i++){
-    setTimeout(()=>{
-      const ring=document.createElement("div");
-      ring.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;width:10px;height:10px;border-radius:50%;border:2px solid ${crit?"#ff4444":"rgba(0,255,255,.8)"};transform:translate(-50%,-50%) scale(1);pointer-events:none;z-index:999996;animation:shockwave .6s forwards;`;
-      document.body.appendChild(ring);
-      setTimeout(()=>ring.remove(),620);
-    },i*120);
+  if(rw){
+    rw.style.transform="scale(.93)";
+    setTimeout(()=>{rw.style.transform="scale(1)";},100);
+    const rect=rw.getBoundingClientRect();
+    const tapX=e?.clientX||rect.left+rect.width/2;
+    const tapY=e?.clientY||rect.top+rect.height/2;
+    // ripple from exact tap point
+    for(let i=0;i<3;i++){
+      setTimeout(()=>{
+        const ring=document.createElement("div");
+        const color=crit?"#ff4444":i===0?"rgba(0,255,255,.9)":i===1?"rgba(138,46,255,.7)":"rgba(0,255,153,.5)";
+        ring.style.cssText=`position:fixed;left:${tapX}px;top:${tapY}px;width:8px;height:8px;border-radius:50%;border:2px solid ${color};transform:translate(-50%,-50%) scale(1);pointer-events:none;z-index:999996;animation:shockwave ${0.5+i*0.1}s forwards;`;
+        document.body.appendChild(ring);
+        setTimeout(()=>ring.remove(),700);
+      },i*80);
+    }
   }
-}
   checkLevelUp();save();update();
   showCoin(e?.clientX||window.innerWidth/2,e?.clientY||200,earned);
 }
@@ -1689,9 +1695,18 @@ function spawnLevelUpConfetti(){
   }
 }
 function showCoin(x,y,amt){
-  const c=document.createElement("div");c.className="coin";c.innerText="+"+amt;
-  c.style.left=x+"px";c.style.top=y+"px";
-  document.body.appendChild(c);setTimeout(()=>c.remove(),1000);
+  const c=document.createElement("div");
+  c.className="coin";
+  c.innerText="+"+amt;
+  const drift=(Math.random()-0.5)*60;
+  const rotate=(Math.random()-0.5)*30;
+  c.style.cssText=`left:${x}px;top:${y}px;position:fixed;color:var(--gold);font-size:${amt>10?"30px":"22px"};font-weight:900;pointer-events:none;z-index:999999;text-shadow:0 0 10px #ff9800;animation:none;transform:translate(-50%,-50%);transition:all .9s cubic-bezier(.25,.46,.45,.94);opacity:1;`;
+  document.body.appendChild(c);
+  setTimeout(()=>{
+    c.style.transform=`translate(calc(-50% + ${drift}px),-90px) rotate(${rotate}deg)`;
+    c.style.opacity="0";
+  },30);
+  setTimeout(()=>c.remove(),950);
 }
 
 // ===== CHEST =====
