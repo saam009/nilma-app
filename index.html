@@ -1540,11 +1540,21 @@ function updateHeat(){
     if(heatLevel>=80)rw.style.filter=`drop-shadow(0 0 ${Math.floor(heatLevel/10)}px rgba(255,50,0,.7))`;
     else rw.style.filter="none";
   }
-  clearTimeout(heatTimer);
+ clearTimeout(heatTimer);
   heatTimer=setTimeout(()=>{
-    if(!overheatActive)heatLevel=Math.max(0,heatLevel-8);
-    updateHeat();
-  },300);
+    if(!overheatActive){
+      heatLevel=Math.max(0,heatLevel-0.8);
+      if(heatLevel>0)updateHeat();
+      else{
+        heatLevel=0;
+        if(bar)bar.style.width="0%";
+        if(pct)pct.innerText="0%";
+        if(warn)warn.style.display="none";
+        const rw=document.getElementById("reactorWrap");
+        if(rw)rw.style.filter="none";
+      }
+    }
+  },60); 
 }
 
 function triggerOverheat(){
