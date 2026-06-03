@@ -340,8 +340,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
     <div style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--cyan);animation:spin 3s linear infinite;"></div>
     <div style="position:absolute;inset:10px;border-radius:50%;border:2px solid transparent;border-top-color:var(--purple);border-left-color:var(--purple);animation:spin 2s linear infinite reverse;"></div>
     <div style="position:absolute;inset:20px;border-radius:50%;border:2px solid transparent;border-top-color:rgba(0,255,255,.5);animation:spin 5s linear infinite;"></div>
-    <div style="position:absolute;inset:30px;border-radius:50%;overflow:hidden;border:2px solid rgba(0,255,255,.5);">
-  <img id="reactorCoreImg" src="https://raw.githubusercontent.com/saam009/nilma-app/main/aa.jpeg" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;animation:corePulse 3s infinite;position:absolute;top:0;left:0;border-radius:50%;">
+    <div style="position:absolute;inset:30px;border-radius:50%;overflow:hidden;border:2px solid rgba(0,255,255,.5);display:flex;align-items:center;justify-content:center;" id="reactorCoreWrap">
 </div>
     </div>
   </div>
@@ -1623,7 +1622,12 @@ function updateReactor(){
   const m=machineData[currentMachine];
   const owned=machineOwned[currentMachine]||1;
   const lv=m.levels[Math.max(0,owned-1)];
-  const img=document.getElementById("reactorCoreImg");if(img)img.src=m.img;
+  const wrap=document.getElementById("reactorCoreWrap");
+  if(wrap){
+    wrap.style.borderColor=m.rarityColor;
+    wrap.style.boxShadow=`0 0 20px ${m.rarityColor}66`;
+    wrap.innerHTML=`<div style="transform:scale(0.6);transform-origin:center;">${m.svgCore}</div>`;
+  }
   const rp=document.getElementById("reactorPower");if(rp)rp.innerText=lv.power+"x";
   const rm=document.getElementById("reactorMachine");if(rm)rm.innerText="LV"+owned;
   const ro=document.getElementById("reactorOutput");if(ro)ro.innerText="+"+lv.power+"/tap";
