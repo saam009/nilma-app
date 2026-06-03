@@ -23,6 +23,7 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 @keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 @keyframes critFlash{0%{opacity:1;}100%{opacity:0;}}
 @keyframes critPop{0%{transform:translateX(-50%) scale(0) rotate(-8deg);}50%{transform:translateX(-50%) scale(1.3) rotate(4deg);}70%{transform:translateX(-50%) scale(0.9) rotate(-2deg);}85%{transform:translateX(-50%) scale(1.05);}100%{transform:translateX(-50%) scale(1);opacity:0;}}
+ @keyframes rewardBounceIn{0%{transform:translate(-50%,-50%) scale(0) rotate(-5deg);opacity:0;}55%{transform:translate(-50%,-50%) scale(1.15) rotate(2deg);opacity:1;}75%{transform:translate(-50%,-50%) scale(0.95) rotate(-1deg);}90%{transform:translate(-50%,-50%) scale(1.03);}100%{transform:translate(-50%,-50%) scale(1);opacity:1;}}
  @keyframes shockwave{0%{transform:translate(-50%,-50%) scale(1);opacity:1;}100%{transform:translate(-50%,-50%) scale(12);opacity:0;}}
  @keyframes shimmerSweep{0%{left:-100%;}30%{left:150%;}100%{left:150%;}}
  @keyframes screenSlideIn{from{opacity:0;transform:translateY(10px);filter:blur(3px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
@@ -1716,7 +1717,16 @@ function openChest(){
   else if(r<0.94){epicCrates++;dailyEpicCrates++;rewardText="💜 EPIC CRATE";rewardEmoji="💜";}
   else if(r<0.98){xpBoost+=2;rewardText="🔥 XP BOOST +2";rewardEmoji="🔥";}
   else{minePower+=1;rewardText="🚀 TURBO POWER +1";rewardEmoji="🚀";}
-  setTimeout(()=>{chestPopEffect(rewardText);playWin();updateChestLabel();save();update();},1800);
+  setTimeout(()=>{
+    // freeze frame pause before reveal
+    document.getElementById("megaChest").style.transform="scale(1.08)";
+    document.getElementById("megaChest").style.filter="brightness(2)";
+    setTimeout(()=>{
+      document.getElementById("megaChest").style.transform="";
+      document.getElementById("megaChest").style.filter="";
+      chestPopEffect(rewardText);playWin();updateChestLabel();save();update();
+    },150);
+  },1800);
 }
 function updateChestLabel(){
   const el=document.getElementById("chestCostLabel");if(!el)return;
@@ -2825,16 +2835,18 @@ function chestPopEffect(text){
   const overlay=document.createElement("div");
   overlay.style.cssText="position:fixed;inset:0;z-index:999998;pointer-events:none;";
   // Particle burst
-  for(let i=0;i<18;i++){
+  for(let i=0;i<35;i++){
     const p=document.createElement("div");
-    const colors=["#ffd54a","#00ffff","#8a2eff","#00ff99","#ff00cc"];
+    const colors=["#ffd54a","#00ffff","#8a2eff","#00ff99","#ff00cc","#ff4444","#ffffff","#ff9800"];
     const color=colors[Math.floor(Math.random()*colors.length)];
-    const angle=Math.random()*360;
-    const dist=80+Math.random()*120;
-    p.style.cssText=`position:absolute;left:50%;top:50%;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};transform:translate(-50%,-50%);transition:all .8s ease-out;opacity:1;`;
+    const angle=(i/35)*Math.PI*2;
+    const dist=120+Math.random()*160;
+    const size=3+Math.random()*10;
+    const isSquare=Math.random()>0.6;
+    p.style.cssText=`position:absolute;left:50%;top:50%;width:${size}px;height:${size}px;border-radius:${isSquare?"3px":"50%"};background:${color};box-shadow:0 0 10px ${color},0 0 20px ${color};transform:translate(-50%,-50%);transition:all ${0.7+Math.random()*0.5}s cubic-bezier(.25,.46,.45,.94);opacity:1;`;
     overlay.appendChild(p);
     setTimeout(()=>{
-      p.style.transform=`translate(calc(-50% + ${Math.cos(angle)*dist}px),calc(-50% + ${Math.sin(angle)*dist}px))`;
+      p.style.transform=`translate(calc(-50% + ${Math.cos(angle)*dist}px),calc(-50% + ${Math.sin(angle)*dist}px)) rotate(${Math.random()*360}deg)`;
       p.style.opacity="0";
     },50);
   }
@@ -2855,7 +2867,7 @@ function chestPopEffect(text){
   if(isTurbo){bg="linear-gradient(135deg,rgba(255,0,150,.2),rgba(255,100,0,.15))";border="rgba(255,0,150,.7)";glow="rgba(255,0,150,.5)";}
   if(isXP){bg="linear-gradient(135deg,rgba(0,255,100,.2),rgba(0,200,100,.15))";border="rgba(0,255,100,.7)";glow="rgba(0,255,100,.5)";}
 
-  card.style.cssText=`position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.3);z-index:999999;background:${bg};border:2px solid ${border};border-radius:24px;padding:24px 36px;text-align:center;pointer-events:none;box-shadow:0 0 40px ${glow},0 0 80px ${glow};transition:transform .35s cubic-bezier(.17,.67,.35,1.4),opacity .3s;opacity:0;backdrop-filter:blur(20px);min-width:220px;`;
+  card.style.cssText=`position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(0);z-index:999999;background:${bg};border:2px solid ${border};border-radius:24px;padding:24px 36px;text-align:center;pointer-events:none;box-shadow:0 0 40px ${glow},0 0 80px ${glow};animation:rewardBounceIn .5s cubic-bezier(.17,.67,.35,1.4) forwards;backdrop-filter:blur(20px);min-width:220px;`;
   card.innerHTML=`
     <div style="font-size:42px;margin-bottom:8px;">${isCoins?"💰":isCrate?"📦":isTurbo?"🚀":isXP?"🔥":isSpin?"🎟":"🎁"}</div>
     <div style="font-size:13px;letter-spacing:3px;opacity:.7;color:white;margin-bottom:6px;">REWARD</div>
@@ -2863,7 +2875,7 @@ function chestPopEffect(text){
     <div style="margin-top:10px;height:2px;background:linear-gradient(90deg,transparent,${border},transparent);border-radius:2px;"></div>
   `;
   document.body.appendChild(card);
-  setTimeout(()=>{card.style.transform="translate(-50%,-50%) scale(1)";card.style.opacity="1";},50);
+  
   setTimeout(()=>{card.style.transform="translate(-50%,-60%) scale(.85)";card.style.opacity="0";},2000);
   setTimeout(()=>{card.remove();overlay.remove();},2400);
 }
