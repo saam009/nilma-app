@@ -3440,22 +3440,72 @@ function showToast(text){
 
 // ===== OFFLINE MINING =====
 function checkOfflineMining(){
-  const now=Date.now();const offTime=now-lastOnline;
+  const now=Date.now();
+  const offTime=now-lastOnline;
   if(now<offlineCooldown||offTime<60000)return;
-  const maxMs=now<autoMinerEnd?10800000:now<turboEnd?7200000:3600000;
-  const reward=Math.floor((Math.min(offTime,maxMs)/1000)*(minePower/15));
+
+  // Offline rates per machine per level [machineId][level-1]
+  const offlineRates=[
+    [0.5,1,1.5,2,2.5],      // Quantum RARE
+    [2,3,5,7,10],             // Crystal EPIC
+    [8,12,16,22,30],          // Plasma LEGENDARY
+    [20,28,38,50,65],         // Mech MYTHIC
+  ];
+
+  // Max 2 hours offline
+  const maxMs=7200000;
+  const effectiveMs=Math.min(offTime,maxMs);
+  const effectiveMins=effectiveMs/60000;
+
+  // Get current machine level
+  const machId=currentMachine;
+  const owned=Math.max(1,machineOwned[machId]||1);
+  const lvIndex=Math.min(owned-1,4);
+  const baseRate=offlineRates[machId][lvIndex];
+
+  // Calculate base reward
+  let reward=Math.floor(baseRate*effectiveMins);
+
+  // Auto miner bonus +50%
+  if(now<autoMinerEnd)reward=Math.floor(reward*1.5);
+
+  // VIP bonus +25%
+  isVip=Date.now()<vipEnd;
+  if(isVip)reward=Math.floor(reward*1.25);
+
   if(reward<=0)return;
+
+  // How long were they offline
+  const hrs=Math.floor(effectiveMins/60);
+  const mins=Math.floor(effectiveMins%60);
+  const timeStr=hrs>0?hrs+"h "+mins+"m":mins+"m";
+
   window.offlineReward=reward;
+  window.offlineTimeStr=timeStr;
+
   const pop=document.getElementById("offlinePopup");
   document.getElementById("offlineCoins").innerText="+"+reward.toLocaleString()+" Coins";
-  pop.style.display="block";setTimeout(()=>{pop.style.transform="translate(-50%,-50%) scale(1)";},50);
+
+  // Update offline popup text to show time and machine
+  const machNames=["Quantum","Crystal","Plasma","Mech"];
+  const subEl=pop.querySelector("div[style*='opacity:.7']");
+  if(subEl)subEl.innerText="⛏ "+machNames[machId]+" LV"+owned+" mined for "+timeStr;
+
+  pop.style.display="block";
+  setTimeout(()=>{pop.style.transform="translate(-50%,-50%) scale(1)";},50);
 }
 function claimOfflineReward(){
-  const r=window.offlineReward||0;coins+=r;lifetimeCoins+=r;save();update();
-  const pop=document.getElementById("offlinePopup");pop.style.transform="translate(-50%,-50%) scale(.7)";
+  const r=window.offlineReward||0;
+  const t=window.offlineTimeStr||"";
+  coins+=r;lifetimeCoins+=r;
+  weeklyEarned+=r;
+  save();update();
+  const pop=document.getElementById("offlinePopup");
+  pop.style.transform="translate(-50%,-50%) scale(.7)";
   setTimeout(()=>{pop.style.display="none";},250);
-  offlineCooldown=Date.now()+1800000;localStorage.setItem("offlineCooldown",offlineCooldown);
-  showToast("⚡ +"+r.toLocaleString()+" offline coins!");
+  offlineCooldown=Date.now()+1800000;
+  localStorage.setItem("offlineCooldown",offlineCooldown);
+  showToast("⚡ +"+r.toLocaleString()+" coins earned in "+t+"!");
 }
 window.addEventListener("beforeunload",()=>{
   localStorage.setItem("lastOnline", Date.now());
