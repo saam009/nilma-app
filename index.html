@@ -270,10 +270,10 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 .featureCardIcon{font-size:36px;flex-shrink:0;}
 .featureCardBtn{margin-left:auto;padding:9px 18px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:12px;cursor:pointer;flex-shrink:0;}
 #homeScreen{overflow:hidden;}
-#spinScreen,#taskScreen,#leaderboardScreen,#referralScreen,#shopScreen,#missionScreen,#streakScreen,#puzzleScreen,#stakingScreen,#clanScreen{position:fixed!important;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.92)),url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200') center/cover fixed!important;z-index:500;display:none!important;padding-bottom:75px;}
-#spinScreen.active,#taskScreen.active,#leaderboardScreen.active,#referralScreen.active,#shopScreen.active,#missionScreen.active,#streakScreen.active,#puzzleScreen.active,#stakingScreen.active,#clanScreen.active{display:flex!important;flex-direction:column;}
+#spinScreen,#taskScreen,#leaderboardScreen,#referralScreen,#shopScreen,#missionScreen,#streakScreen,#puzzleScreen,#stakingScreen,#clanScreen,#petScreen{position:fixed!important;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.92)),url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200') center/cover fixed!important;z-index:500;display:none!important;padding-bottom:75px;}
+#spinScreen.active,#taskScreen.active,#leaderboardScreen.active,#referralScreen.active,#shopScreen.active,#missionScreen.active,#streakScreen.active,#puzzleScreen.active,#stakingScreen.active,#clanScreen.active,#petScreen.active{display:flex!important;flex-direction:column;}
  #homeScreen { overflow: hidden; }
-#spinScreen, #taskScreen, #leaderboardScreen, #referralScreen, #shopScreen, #missionScreen, #streakScreen, #puzzleScreen, #stakingScreen, #clanScreen {
+#spinScreen, #taskScreen, #leaderboardScreen, #referralScreen, #shopScreen, #missionScreen, #streakScreen, #puzzleScreen, #stakingScreen, #clanScreen, #petScreen {
   position: fixed !important;
   top: 0; left: 0; width: 100%; height: 100%;
   overflow-y: auto;
@@ -281,7 +281,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
   z-index: 500;
   display: none !important;
 }
-#spinScreen.active, #taskScreen.active, #leaderboardScreen.active, #referralScreen.active, #shopScreen.active, #missionScreen.active, #streakScreen.active, #puzzleScreen.active, #stakingScreen.active, #clanScreen.active {
+#spinScreen.active, #taskScreen.active, #leaderboardScreen.active, #referralScreen.active, #shopScreen.active, #missionScreen.active, #streakScreen.active, #puzzleScreen.active, #stakingScreen.active, #clanScreen.active, #petScreen.active {
   display: flex !important;
   flex-direction: column;
 } 
@@ -345,6 +345,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
     </div>
   </div>
  <div id="tapToMine" style="font-size:10px;color:var(--cyan);letter-spacing:2px;opacity:.8;margin-bottom:8px;">👆 TAP TO MINE</div>
+<div id="petPerkBanner" style="display:none;margin-bottom:8px;padding:6px 12px;background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3);border-radius:10px;font-size:11px;color:#ff9800;font-weight:700;text-align:center;"></div>
  <div id="clanPerkBanner" style="display:none;margin-bottom:8px;padding:6px 12px;background:rgba(138,46,255,.1);border:1px solid rgba(138,46,255,.3);border-radius:10px;font-size:11px;color:#c060ff;font-weight:700;text-align:center;"></div>
   <!-- HEAT BAR -->
   <div style="margin-top:8px;padding:10px;background:rgba(255,50,0,.06);border:1px solid rgba(255,80,0,.2);border-radius:14px;">
@@ -791,7 +792,29 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
   <div id="myStakeList"><div style="text-align:center;opacity:.4;font-size:13px;padding:20px;">No active stakes yet</div></div>
 </div>
 </div>
-
+<!-- ===== PET SCREEN ===== -->
+<div id="petScreen" class="screen">
+<button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
+<div class="heroCard" style="text-align:center;">
+  <h2>🐾 Pet Companions</h2>
+  <p style="opacity:.7;margin-top:4px;">Collect pets — earn permanent perks & airdrop boosts</p>
+  <div style="display:flex;justify-content:center;gap:20px;margin-top:12px;">
+    <div>
+      <div style="font-size:20px;font-weight:900;color:var(--gold);" id="petOwnedCount">0</div>
+      <div style="font-size:9px;opacity:.6;">OWNED</div>
+    </div>
+    <div>
+      <div style="font-size:20px;font-weight:900;color:var(--green);" id="petActiveDisplay">None</div>
+      <div style="font-size:9px;opacity:.6;">ACTIVE</div>
+    </div>
+    <div>
+      <div style="font-size:20px;font-weight:900;color:var(--cyan);">4</div>
+      <div style="font-size:9px;opacity:.6;">TOTAL PETS</div>
+    </div>
+  </div>
+</div>
+<div style="padding:16px;" id="petScreenContent"></div>
+</div>
 <!-- ===== CLAN SCREEN ===== -->
 <div id="clanScreen" class="screen">
 <button class="backBtn" onclick="showScreen('homeScreen')">⬅ Back</button>
@@ -1283,6 +1306,184 @@ function applyClanPerks(){
     setTimeout(()=>showToast("⚔️ Clan perk active: +"+bonus+" power boost!"),3500);
   }
 }
+// ===== PET SYSTEM =====
+const PET_DATA=[
+  {id:"dog",icon:"🐶",name:"DOG",rarity:"COMMON",rarityColor:"#ff9800",
+   desc:"Loyal miner companion",
+   perk:"+15% tap power",perkDesc:"Permanently boosts every tap by 15%",
+   coinCost:250000,tonCost:2,
+   airdropStars:"⭐",airdropMult:"1.5×",
+   apply:(p)=>{p.tapBonus=0.15;}},
+  {id:"cat",icon:"🐱",name:"CAT",rarity:"RARE",rarityColor:"#00e5ff",
+   desc:"Sneaky chest hunter",
+   perk:"+2 free chests daily",perkDesc:"Grants 2 extra free chests every day",
+   coinCost:375000,tonCost:3.5,
+   airdropStars:"⭐⭐",airdropMult:"2×",
+   apply:(p)=>{p.chestBonus=2;}},
+  {id:"horse",icon:"🐴",name:"HORSE",rarity:"EPIC",rarityColor:"#c060ff",
+   desc:"Offline mining beast",
+   perk:"+40% offline earning",perkDesc:"Your miners work 40% harder while away",
+   coinCost:500000,tonCost:5,
+   airdropStars:"⭐⭐⭐",airdropMult:"3×",
+   apply:(p)=>{p.offlineBonus=0.40;}},
+  {id:"bear",icon:"🐻",name:"BEAR",rarity:"MYTHIC",rarityColor:"#ff6eb4",
+   desc:"Ultimate staking beast",
+   perk:"+75% staking rewards",perkDesc:"Massively boosts all staking pool returns",
+   coinCost:800000,tonCost:8,
+   airdropStars:"⭐⭐⭐⭐",airdropMult:"5×",
+   apply:(p)=>{p.stakingBonus=0.75;}},
+];
+
+let ownedPets=JSON.parse(localStorage.getItem("ownedPets")||"[]");
+let activePetId=localStorage.getItem("activePetId")||null;
+let petPerks={tapBonus:0,chestBonus:0,offlineBonus:0,stakingBonus:0};
+
+function applyActivePet(){
+  petPerks={tapBonus:0,chestBonus:0,offlineBonus:0,stakingBonus:0};
+  if(!activePetId)return;
+  const pet=PET_DATA.find(p=>p.id===activePetId);
+  if(pet)pet.apply(petPerks);
+  // Apply tap bonus to minePower
+  const base=machineData[currentMachine].levels[Math.max(0,(machineOwned[currentMachine]||1)-1)].power;
+  const bonus=Math.floor(base*petPerks.tapBonus);
+  if(bonus>0){
+    minePower=base+bonus;
+    const banner=document.getElementById("petPerkBanner");
+    if(banner){
+      banner.style.display="block";
+      banner.innerText=`${pet.icon} ${pet.name} active — ${pet.perk}`;
+    }
+  }else{
+    const banner=document.getElementById("petPerkBanner");
+    if(banner)banner.style.display="none";
+  }
+}
+
+function savePets(){
+  localStorage.setItem("ownedPets",JSON.stringify(ownedPets));
+  localStorage.setItem("activePetId",activePetId||"");
+}
+
+function buyPet(petId){
+  const pet=PET_DATA.find(p=>p.id===petId);
+  if(!pet)return;
+  if(ownedPets.includes(petId)){showToast("Already own this pet!");return;}
+  if(coins<pet.coinCost){showToast("Need "+pet.coinCost.toLocaleString()+" coins!");return;}
+  coins-=pet.coinCost;lifetimeCoins+=0;
+  ownedPets.push(petId);
+  if(!activePetId){activePetId=petId;}
+  savePets();save();update();
+  applyActivePet();
+  renderPetScreen();
+  showRewardPopup(pet.name+" ACQUIRED!",0,pet.icon);
+  playWin();
+  addNotification("Pet Acquired! "+pet.icon,"You own "+pet.name+"! "+pet.perk,"🐾");
+  showToast(pet.icon+" "+pet.name+" added to backpack!");
+}
+
+function buyPetTon(petId){
+  const pet=PET_DATA.find(p=>p.id===petId);
+  if(!pet)return;
+  if(ownedPets.includes(petId)){showToast("Already own this pet!");return;}
+  pendingPayment={type:"pet",petId,tonAmount:pet.tonCost,petName:pet.name};
+  document.getElementById("payTitle").innerText="Buy "+pet.icon+" "+pet.name;
+  document.getElementById("payDesc").innerText="Send EXACTLY "+pet.tonCost+" TON. Enter TX hash to unlock.";
+  document.getElementById("payAmount").innerText=pet.tonCost+" TON";
+  document.getElementById("payTxHash").value="";
+  document.getElementById("payModal").classList.add("open");
+}
+
+function switchPet(petId){
+  if(!ownedPets.includes(petId)){showToast("You don't own this pet!");return;}
+  activePetId=petId;
+  savePets();
+  applyActivePet();
+  renderPetScreen();
+  const pet=PET_DATA.find(p=>p.id===petId);
+  showToast(pet.icon+" "+pet.name+" is now active!");
+  playClick();
+}
+
+function renderPetScreen(){
+  const el=document.getElementById("petScreenContent");
+  if(!el)return;
+  const activePet=PET_DATA.find(p=>p.id===activePetId);
+  let html="";
+
+  // Airdrop announcement banner
+  html+=`<div style="background:linear-gradient(135deg,rgba(255,213,74,.12),rgba(255,100,0,.08));border:1px solid rgba(255,213,74,.35);border-radius:18px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transform:skewX(-20deg);animation:shimmerSweep 4s infinite;"></div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.8;margin-bottom:8px;">🚀 AIRDROP ANNOUNCEMENT</div>
+    <div style="font-size:15px;font-weight:900;color:white;margin-bottom:6px;">Pet Owners = High Value Holders</div>
+    <div style="font-size:12px;opacity:.7;line-height:1.6;margin-bottom:10px;">Pet owners will be recognized as <strong style="color:var(--gold);">HIGH VALUE</strong> holders in the Nilma Coin airdrop. The rarer your pet, the bigger your airdrop multiplier!</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${PET_DATA.map(p=>`<div style="padding:5px 10px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid ${p.rarityColor}44;font-size:10px;font-weight:700;color:${p.rarityColor};">${p.icon} ${p.airdropStars} ${p.airdropMult} airdrop</div>`).join("")}
+    </div>
+  </div>`;
+
+  // Active pet display
+  if(activePet){
+    html+=`<div style="background:linear-gradient(135deg,rgba(0,255,153,.07),rgba(0,200,100,.04));border:2px solid ${activePet.rarityColor}66;border-radius:18px;padding:16px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:9px;letter-spacing:3px;color:var(--green);opacity:.8;margin-bottom:8px;">✅ ACTIVE PET</div>
+      <div style="font-size:60px;animation:floatY 3s ease-in-out infinite;">${activePet.icon}</div>
+      <div style="font-size:18px;font-weight:900;color:white;margin-top:8px;">${activePet.name}</div>
+      <div style="font-size:12px;color:${activePet.rarityColor};margin-top:4px;font-weight:700;">${activePet.perk}</div>
+      <div style="font-size:11px;opacity:.6;margin-top:4px;">${activePet.perkDesc}</div>
+      <div style="margin-top:10px;display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(255,213,74,.1);border:1px solid rgba(255,213,74,.3);font-size:11px;color:var(--gold);">🚀 Airdrop: ${activePet.airdropStars} ${activePet.airdropMult} multiplier</div>
+    </div>`;
+  }else{
+    html+=`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:40px;margin-bottom:8px;">🐾</div>
+      <div style="font-size:14px;font-weight:700;color:#888;">No active pet</div>
+      <div style="font-size:12px;opacity:.5;margin-top:4px;">Buy a pet below to get started</div>
+    </div>`;
+  }
+
+  // Backpack
+  if(ownedPets.length>0){
+    html+=`<div style="font-size:10px;letter-spacing:2px;color:#555;margin-bottom:10px;">🎒 YOUR BACKPACK (${ownedPets.length} pet${ownedPets.length>1?"s":""})</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">`;
+    ownedPets.forEach(pid=>{
+      const p=PET_DATA.find(x=>x.id===pid);if(!p)return;
+      const isActive=activePetId===pid;
+      html+=`<div onclick="${isActive?"":"switchPet('"+pid+"')"}" style="padding:10px 14px;border-radius:14px;background:${isActive?"rgba(0,255,153,.1)":"rgba(255,255,255,.04)"};border:1px solid ${isActive?p.rarityColor:"rgba(255,255,255,.08)"};cursor:${isActive?"default":"pointer"};text-align:center;transition:.2s;">
+        <div style="font-size:28px;">${p.icon}</div>
+        <div style="font-size:9px;font-weight:700;color:${isActive?"var(--green)":p.rarityColor};margin-top:4px;">${isActive?"ACTIVE":"SWITCH"}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // Shop
+  html+=`<div style="font-size:10px;letter-spacing:2px;color:#555;margin-bottom:10px;">🛒 PET SHOP</div>`;
+  PET_DATA.forEach(pet=>{
+    const owned=ownedPets.includes(pet.id);
+    const isActive=activePetId===pet.id;
+    html+=`<div style="background:rgba(12,12,22,.9);border-radius:18px;padding:16px;margin-bottom:12px;border:1px solid ${pet.rarityColor}33;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:8px;right:10px;font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.4);color:${pet.rarityColor};border:1px solid ${pet.rarityColor}44;">${pet.rarity}</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <div style="font-size:48px;animation:floatY 3s ease-in-out infinite;">${pet.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:900;color:white;">${pet.name}</div>
+          <div style="font-size:11px;opacity:.6;margin-top:2px;">${pet.desc}</div>
+          <div style="font-size:12px;color:${pet.rarityColor};font-weight:700;margin-top:4px;">${pet.perk}</div>
+          <div style="font-size:10px;opacity:.5;margin-top:2px;">${pet.perkDesc}</div>
+          <div style="margin-top:6px;font-size:10px;color:var(--gold);">🚀 Airdrop: ${pet.airdropStars} ${pet.airdropMult} multiplier</div>
+        </div>
+      </div>
+      ${owned
+        ?`<div style="display:flex;gap:8px;align-items:center;">
+            <div style="flex:1;padding:10px;border-radius:10px;background:rgba(0,255,153,.08);border:1px solid rgba(0,255,153,.2);text-align:center;font-size:12px;font-weight:900;color:var(--green);">✅ OWNED</div>
+            ${!isActive?`<button onclick="switchPet('${pet.id}')" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:12px;cursor:pointer;">🔄 SWITCH</button>`:`<div style="flex:1;padding:10px;border-radius:10px;background:rgba(0,255,153,.08);border:1px solid rgba(0,255,153,.2);text-align:center;font-size:12px;font-weight:900;color:var(--green);">⚡ ACTIVE</div>`}
+          </div>`
+        :`<div style="display:flex;gap:8px;">
+            <button onclick="buyPet('${pet.id}')" style="flex:1;padding:11px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:11px;cursor:pointer;">💰 ${(pet.coinCost/1000).toFixed(0)}k Coins</button>
+            <button onclick="buyPetTon('${pet.id}')" style="flex:1;padding:11px;border:none;border-radius:10px;background:linear-gradient(90deg,#0088cc,#00b4ff);color:white;font-weight:900;font-size:11px;cursor:pointer;">💎 ${pet.tonCost} TON</button>
+          </div>`}
+    </div>`;
+  });
+  el.innerHTML=html;
+} 
 // ===== STAKING =====
 const STAKE_POOLS=[
   {id:"bronze",icon:"🥉",name:"Bronze Pool",apy:8,minStake:500,lockDays:7,color:"#cd7f32",desc:"Low risk — 8% APY over 7 days"},
