@@ -468,7 +468,22 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 
   </div>
 </div>
-
+<div class="gameCard" style="border:1px solid rgba(255,152,0,.2);">
+    <div style="position:relative;height:110px;background:linear-gradient(135deg,#1a0d00,#1f1000);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+      <div style="position:absolute;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,152,0,.18),transparent 70%);"></div>
+      <svg width="66" height="56" viewBox="0 0 66 56" fill="none">
+        <text x="4" y="38" font-size="32" opacity="0.9">🐶</text>
+        <text x="30" y="22" font-size="20" opacity="0.7">🐱</text>
+        <text x="42" y="44" font-size="18" opacity="0.6">🐴</text>
+        <text x="18" y="52" font-size="14" opacity="0.5">🐻</text>
+      </svg>
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 55%);"></div>
+      <div style="position:absolute;bottom:6px;left:8px;right:8px;">
+        <div style="font-size:11px;font-weight:900;color:white;text-shadow:0 0 10px rgba(255,152,0,.9);">🐾 PETS</div>
+      </div>
+    </div>
+    <div style="padding:7px 8px;"><button class="playBtn" style="background:linear-gradient(90deg,#ff9800,#ffd54a);color:black;" onclick="showScreen('petScreen')">OPEN</button></div>
+  </div>
 <!-- DAILY STREAK & EXTRA FEATURES (Shop + VIP moved here) -->
 <div class="section">
   <div class="sectionTitle">🔥 Daily & Features</div>
@@ -1403,7 +1418,12 @@ function switchPet(petId){
   showToast(pet.icon+" "+pet.name+" is now active!");
   playClick();
 }
-
+function updatePetHeader(){
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.innerText=v;};
+  s("petOwnedCount",ownedPets.length);
+  const ap=PET_DATA.find(p=>p.id===activePetId);
+  s("petActiveDisplay",ap?ap.icon+ap.name:"None");
+}
 function renderPetScreen(){
   const el=document.getElementById("petScreenContent");
   if(!el)return;
@@ -1498,10 +1518,9 @@ let totalStakeEarned=parseInt(localStorage.getItem("totalStakeEarned")||"0");
 let myClan=JSON.parse(localStorage.getItem("myClan")||"null");
 
 // ===== BOOST PRICES =====
-let turboPrice2=parseInt(localStorage.getItem("turboPrice"))||200;
-let autoMinerPrice2=parseInt(localStorage.getItem("autoMinerPrice"))||300;
-let xpPrice2=parseInt(localStorage.getItem("xpPrice"))||400;
-
+let turboPrice2=parseInt(localStorage.getItem("turboPrice"))||500;
+let autoMinerPrice2=parseInt(localStorage.getItem("autoMinerPrice"))||800;
+let xpPrice2=parseInt(localStorage.getItem("xpPrice"))||1000;
 // ===== FIREBASE LOAD =====
 async function loadPlayerData(){
   if(!db)return;
@@ -1662,7 +1681,7 @@ function showScreen(id){
   const navMap={
     homeScreen:0,spinScreen:1,stakingScreen:2,clanScreen:3,leaderboardScreen:4,
     shopScreen:0,taskScreen:0,missionScreen:0,streakScreen:0,
-    puzzleScreen:0,referralScreen:0
+    puzzleScreen:0,referralScreen:0,petScreen:0
   };
   const idx=navMap[id];
   if(idx!==undefined){const items=document.querySelectorAll(".navItem");if(items[idx])items[idx].classList.add("active");}
@@ -1673,6 +1692,7 @@ function showScreen(id){
   if(id==="missionScreen")renderMissions();
   if(id==="streakScreen")renderStreak();
   if(id==="shopScreen")renderShopMachines();
+  if(id==="petScreen"){renderPetScreen();updatePetHeader();}
   window.scrollTo(0,0);
 }
 
@@ -1816,6 +1836,14 @@ function updatePassiveDisplay(){
       <span style="font-size:10px;color:#00ff99;font-family:monospace;">${fmt(xpEnd-now)}</span>
     </div>`;
   }
+  // Pet perk row
+  if(activePetId){
+    const ap=PET_DATA.find(p=>p.id===activePetId);
+    if(ap)html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:rgba(255,152,0,.08);border-radius:8px;border:1px solid rgba(255,152,0,.25);">
+      <span style="font-size:10px;color:#ff9800;font-weight:700;">${ap.icon} ${ap.name}</span>
+      <span style="font-size:10px;color:#ff9800;">${ap.perk}</span>
+    </div>`;
+  }
   box.innerHTML=html||`<div style="font-size:10px;opacity:.35;text-align:center;padding:4px;">No active boosters</div>`;
 }
 // ===== REACTOR =====
@@ -1940,6 +1968,24 @@ async function verifyPayment(){
     freeSpins+=50;localStorage.setItem("freeSpins",freeSpins);
     save();update();closePayModal();
     showToast("✅ 50 Chest Packs unlocked!");
+    return;
+  }
+ if(pendingPayment?.type==="pet"){
+    const petId=pendingPayment.petId;
+    if(!ownedPets.includes(petId)){
+      ownedPets.push(petId);
+      if(!activePetId)activePetId=petId;
+      savePets();applyActivePet();
+      closePayModal();
+      const pet=PET_DATA.find(p=>p.id===petId);
+      showRewardPopup(pet.name+" ACQUIRED!",0,pet.icon);
+      showToast("✅ "+pet.icon+" "+pet.name+" added to backpack!");
+      addNotification("Pet Acquired! "+pet.icon,"You own "+pet.name+"! "+pet.perk,"🐾");
+      renderPetScreen();updatePetHeader();
+    }else{
+      closePayModal();
+      showToast("Already own this pet!");
+    }
     return;
   }
   const{machineId,lvNum}=pendingPayment||{};
@@ -2098,7 +2144,9 @@ function checkLevelUp(){
   while(xp>=xpMax){
     xp-=xpMax;level++;
     coins+=level*100;lifetimeCoins+=level*100;
-    xpMax=Math.floor(500*Math.pow(2.1,level-1));
+    xpMax=level<=10
+  ?Math.floor(500*Math.pow(2.1,level-1))
+  :Math.floor(500*Math.pow(3.5,level-1));
     playLevelUp();
     showRewardPopup("LEVEL "+level+" UNLOCKED!",level*100,"⭐");
     addNotification("Level Up! 🎉","You reached Level "+level+"!","⭐");
@@ -2714,21 +2762,21 @@ function buyTurbo(){
   if(Date.now()<turboEnd){showToast("Already active!");return;}
   if(coins<turboPrice2){showToast("Need "+turboPrice2+" coins");return;}
   coins-=turboPrice2;minePower+=2;
-  turboEnd=Date.now()+7200000;turboPrice2+=150;
+  turboEnd=Date.now()+7200000;turboPrice2+=300;
   localStorage.setItem("turboPrice",turboPrice2);localStorage.setItem("turboEnd",turboEnd);
   save();update();showToast("⚡ Turbo Activated!");
 }
 function buyEnergy(){
   if(Date.now()<autoMinerEnd){showToast("Already active!");return;}
   if(coins<autoMinerPrice2){showToast("Need "+autoMinerPrice2+" coins");return;}
-  coins-=autoMinerPrice2;autoMinerEnd=Date.now()+7200000;autoMinerPrice2+=200;
+  coins-=autoMinerPrice2;autoMinerEnd=Date.now()+7200000;autoMinerPrice2+=400;
   localStorage.setItem("autoMinerPrice",autoMinerPrice2);localStorage.setItem("autoMinerEnd",autoMinerEnd);
   save();update();showToast("🤖 Auto Miner Active!");
 }
 function buyXP(){
   if(Date.now()<xpEnd){showToast("Already active!");return;}
   if(coins<xpPrice2){showToast("Need "+xpPrice2+" coins");return;}
-  coins-=xpPrice2;xpBoost=3;xpEnd=Date.now()+14400000;xpPrice2+=250;
+  coins-=xpPrice2;xpBoost=3;xpEnd=Date.now()+14400000;xpPrice2+=500;
   localStorage.setItem("xpPrice",xpPrice2);localStorage.setItem("xpEnd",xpEnd);
   save();update();showToast("💎 XP Boost Active!");
 }
@@ -2805,7 +2853,8 @@ function renderStaking(){
   if(!poolList)return;
   poolList.innerHTML="";
   STAKE_POOLS.forEach(pool=>{
-    const effectiveApy=isVip?Math.floor(pool.apy*1.5):pool.apy;
+    const hasBear=activePetId==="bear";
+  const effectiveApy=isVip&&hasBear?Math.floor(pool.apy*1.5*1.75):isVip?Math.floor(pool.apy*1.5):hasBear?Math.floor(pool.apy*1.75):pool.apy;
     const div=document.createElement("div");div.className="stakePool";
     div.style.borderColor=pool.color+"44";
     div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;">
@@ -2854,7 +2903,8 @@ function renderStaking(){
 function openStakeModal(poolId){
   const pool=STAKE_POOLS.find(p=>p.id===poolId);if(!pool)return;
   isVip=Date.now()<vipEnd;
-  const effectiveApy=isVip?Math.floor(pool.apy*1.5):pool.apy;
+  const hasBear=activePetId==="bear";
+  const effectiveApy=isVip&&hasBear?Math.floor(pool.apy*1.5*1.75):isVip?Math.floor(pool.apy*1.5):hasBear?Math.floor(pool.apy*1.75):pool.apy;
   const ex=document.getElementById("stakeInputPanel");if(ex)ex.remove();
   const panel=document.createElement("div");panel.id="stakeInputPanel";
   panel.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:999999;display:flex;justify-content:center;align-items:flex-end;";
@@ -3533,7 +3583,8 @@ let selectedAvatar=localStorage.getItem("selectedAvatar")||"🧑";
 function openProfileModal(){
   playClick();document.getElementById("profileModal").classList.add("open");
   document.getElementById("profileBigAvatar").innerText=selectedAvatar;
-  document.getElementById("profileModalName").innerText=username;
+  const ap=PET_DATA.find(p=>p.id===activePetId);
+  document.getElementById("profileModalName").innerText=username+(ap?" "+ap.icon:"");
   document.getElementById("profileModalId").innerText=playerId;
   document.getElementById("statLifetimeCoins").innerText=lifetimeCoins.toLocaleString();
   document.getElementById("statMines").innerText=lifetimeMines.toLocaleString();
@@ -3674,6 +3725,8 @@ function checkOfflineMining(){
   isVip=Date.now()<vipEnd;
   if(isVip)reward=Math.floor(reward*1.25);
 
+  // Horse pet bonus +40%
+  if(activePetId==="horse")reward=Math.floor(reward*1.4);
   if(reward<=0)return;
 
   // How long were they offline
@@ -3740,6 +3793,7 @@ setInterval(()=>{save();localStorage.setItem("lastOnline",Date.now());},15000);
 // ===== RENDER ALL =====
 function renderAll(){
   renderMachineGrid();renderTasks();renderMissions();renderStreak();renderShopMachines();renderStaking();renderClan();
+  applyActivePet();updatePetHeader();
 }
 
 // ===== LOADING SCREEN =====
@@ -3774,7 +3828,23 @@ updateChestLabel();syncToggles();
   if(ttm)ttm.style.display="none";
 }
 setTimeout(checkOfflineMining,2500);
- setTimeout(()=>{applyClanPerks();checkClanWeeklyBonus();},3000);
+ setTimeout(()=>{
+  applyClanPerks();
+  checkClanWeeklyBonus();
+  applyActivePet();
+  // Cat pet — give free chests daily
+  if(activePetId==="cat"){
+    const catKey="catChest_"+new Date().toDateString();
+    if(!localStorage.getItem(catKey)){
+      freeSpins+=2;
+      localStorage.setItem("freeSpins",freeSpins);
+      localStorage.setItem(catKey,"given");
+      showToast("🐱 Cat gave you 2 free chests!");
+      addNotification("Cat Bonus! 🐱","Your cat gave you 2 free chests today!","🐱");
+    }
+  }
+  updatePetHeader();
+},3000);
 // Startup notifications
 setTimeout(()=>{
   if(freeSpinUsed==="no")addNotification("Free Chest Ready!","Open your free daily chest 📦","📦");
