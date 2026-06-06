@@ -3975,6 +3975,12 @@ const loadInt=setInterval(()=>{
 
 // ===== INIT =====
 document.getElementById("reactorWrap").addEventListener("click",e=>{mine(e);});
+document.getElementById("reactorWrap").addEventListener("touchstart",e=>{
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(touch=>{
+    mine({clientX:touch.clientX,clientY:touch.clientY});
+  });
+},{passive:false});
 if(db)whenAuthReady(loadPlayerData);
 update();renderAll();showScreen("homeScreen");
 updateChestLabel();syncToggles();
