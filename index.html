@@ -1035,9 +1035,12 @@ button:active, .clickable:active {
   </div>
   <div class="settingRow">
   
-   <div class="settingRow">
-  <div><div class="settingLabel">💾 Export Save Data</div><div class="settingDesc">Backup your progress to a file</div></div>
-  <button onclick="exportSaveData()" style="padding:8px 16px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-size:11px;font-weight:700;cursor:pointer;">EXPORT</button>
+   <div class="settingRow" style="flex-direction:column;align-items:flex-start;gap:10px;">
+  <div>
+    <div class="settingLabel">💾 Export Save Data</div>
+    <div class="settingDesc">Backup your progress to a downloadable file</div>
+  </div>
+  <button onclick="exportSaveData()" style="width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(135deg,rgba(255,213,74,.15),rgba(255,150,0,.1));border:1px solid rgba(255,213,74,.3);color:var(--gold);font-size:13px;font-weight:900;cursor:pointer;letter-spacing:1px;">💾 EXPORT MY SAVE DATA</button>
 </div>
    <div><div class="settingLabel">📱 App Version</div><div class="settingDesc">Nilma Coin v4.0 — Fixed Edition</div></div>
     <div style="font-size:12px;color:var(--cyan);opacity:.7;">v4.0</div>
