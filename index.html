@@ -2168,10 +2168,6 @@ let earned=crit?basePower*5:basePower;
 if(earned>basePower*5)earned=basePower*5;
 if(earned<1)earned=1;
 
-// Rate limit: block faster than 8 taps/second
-const now2=Date.now();
-const gap=now2-(window._lastTapTime||0);
-if(gap<125)return;
 if(crit){
   // Screen flash
   const flash=document.createElement("div");
