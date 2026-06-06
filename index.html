@@ -2822,19 +2822,29 @@ try{
   const startParam=tg?.initDataUnsafe?.start_param;
   if(startParam&&startParam!==playerId&&db){
     const refKey="refUsed_"+startParam;
+    const fbRefKey="referralClaimed_"+playerId; // keyed to THIS player — survives localStorage clears
     if(!localStorage.getItem(refKey)){
-      localStorage.setItem(refKey,"yes");
-      db.collection("players").doc(startParam).get().then(doc=>{
-        if(doc.exists){
-          const newRefs=(doc.data().referrals||0)+1;
-          db.collection("players").doc(startParam).update({referrals:newRefs,coins:firebase.firestore.FieldValue.increment(100)});
-          showToast("🎉 Joined via referral! +50 bonus!");
-          coins+=50;lifetimeCoins+=50;save();update();
-        }
+      db.collection("referralClaims").doc(fbRefKey).get().then(claimDoc=>{
+        if(claimDoc.exists){ localStorage.setItem(refKey,"yes"); return; } // already claimed on Firebase
+        db.collection("players").doc(startParam).get().then(doc=>{
+          if(!doc.exists)return;
+          // Write claim to Firestore FIRST (prevents race condition on multi-device)
+          db.collection("referralClaims").doc(fbRefKey).set({
+            referrerId:startParam, claimedBy:playerId, claimedAt:Date.now()
+          }).then(()=>{
+            localStorage.setItem(refKey,"yes");
+            db.collection("players").doc(startParam).update({
+              referrals:firebase.firestore.FieldValue.increment(1),
+              coins:firebase.firestore.FieldValue.increment(100)
+            });
+            coins+=50; lifetimeCoins+=50; save(); update();
+            showToast("🎉 Joined via referral! +50 bonus!");
+          }).catch(e=>console.log("Ref race blocked:",e));
+        }).catch(e=>console.log(e));
       }).catch(e=>console.log(e));
     }
   }
-}catch(e){}
+}catch(e){} 
 
 // ===== SHOP BOOSTS =====
 function buyTurbo(){
@@ -3921,7 +3931,6 @@ activeIntervals.push(setInterval(()=>{
   p=Math.min(p,maxPassive);
   if(p>0){
     coins+=p;
-    lifetimeCoins+=p;
     weeklyEarned+=p;
     update();
   }
