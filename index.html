@@ -1033,10 +1033,7 @@ button:active, .clickable:active {
     </div>
   </div>
   <div class="settingRow">
-   <div class="settingRow">
-  <div><div class="settingLabel">💾 Export Save Data</div><div class="settingDesc">Backup your progress to a file</div></div>
-  <button onclick="exportSaveData()" style="padding:8px 16px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-size:11px;font-weight:700;cursor:pointer;">EXPORT</button>
-</div>
+  
    <div class="settingRow">
   <div><div class="settingLabel">💾 Export Save Data</div><div class="settingDesc">Backup your progress to a file</div></div>
   <button onclick="exportSaveData()" style="padding:8px 16px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-size:11px;font-weight:700;cursor:pointer;">EXPORT</button>
@@ -1349,16 +1346,12 @@ function getNextClanLevel(treasury){
   const nextIdx=CLAN_LEVELS.findIndex(l=>l.lv===current.lv+1);
   return nextIdx>=0?CLAN_LEVELS[nextIdx]:null;
 }
- function applyClanPerks(){
-  if(!myClan) return;  // ADD THIS LINE
+function applyClanPerks(){
+  if(!myClan) return;
   const cl=getClanLevel(myClan.treasury||0);
-  // ... rest of the function stays the same
-}
-  // Apply power bonus on top of base mine power
   const basePower=machineData[currentMachine].levels[Math.max(0,(machineOwned[currentMachine]||1)-1)].power;
   const bonus=Math.floor(basePower*cl.powerBonus);
   minePower=basePower+bonus;
-  // Update banner
   const banner=document.getElementById("clanPerkBanner");
   if(banner){
     if(cl.powerBonus>0||cl.chestBonus>0){
@@ -1371,7 +1364,6 @@ function getNextClanLevel(treasury){
       banner.style.display="none";
     }
   }
-  // Free chests bonus
   if(cl.chestBonus>0&&freeSpinUsed==="yes"){
     const clanChestKey="clanChest_"+new Date().toDateString()+"_"+myClan.id;
     if(!localStorage.getItem(clanChestKey)){
@@ -1381,7 +1373,6 @@ function getNextClanLevel(treasury){
       addNotification("Clan Chest Bonus! 🎁","Your clan gave you "+cl.chestBonus+" free chest(s)!","🎁");
     }
   }
-  // Toast on login
   if(!localStorage.getItem("clanPerkToast_"+new Date().toDateString())&&cl.powerBonus>0){
     localStorage.setItem("clanPerkToast_"+new Date().toDateString(),"shown");
     setTimeout(()=>showToast("⚔️ Clan perk active: +"+bonus+" power boost!"),3500);
@@ -3872,8 +3863,6 @@ window.addEventListener("beforeunload", () => {
   if(lbListener) { try{ lbListener(); } catch(e){} }
   localStorage.setItem("lastOnline", Date.now());
 });
-// Store all intervals for cleanup
-const activeIntervals = [];
 // ===== INTERVALS =====
 const activeIntervals = [];
 
@@ -3942,19 +3931,6 @@ const loadInt=setInterval(()=>{
 
 // ===== INIT =====
 document.getElementById("reactorWrap").addEventListener("click",e=>{mine(e);});
-window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled rejection:', event.reason);
-  showToast("Something went wrong. Please try again.");
-  event.preventDefault();
-});
-
-window.onerror = function(msg, url, line, col, error) {
-  console.error("Error:", msg, "at line", line);
-  if(msg.includes("Firebase") || msg.includes("network")) {
-    showToast("Network issue, retrying...");
-  }
-  return false;
-};
 if(db)loadPlayerData();
 update();renderAll();showScreen("homeScreen");
 updateChestLabel();syncToggles();
@@ -4051,33 +4027,7 @@ window.onerror = function(msg, url, line, col, error) {
   }
   return false;
 }; 
- async function withLoading(action, message) {
-  const toast = document.getElementById("toast");
-  const originalText = toast.innerText;
-  toast.innerText = message || "Processing...";
-  toast.style.display = "block";
-  toast.style.background = "rgba(0,100,200,.9)";
-  
-  try {
-    const result = await action();
-    toast.innerText = "✅ Done!";
-    setTimeout(() => {
-      if(toast.innerText === "✅ Done!") {
-        toast.style.display = "none";
-        toast.style.background = "";
-      }
-    }, 1500);
-    return result;
-  } catch(e) {
-    toast.innerText = "❌ Failed: " + e.message;
-    toast.style.background = "rgba(200,0,0,.9)";
-    setTimeout(() => {
-      toast.style.display = "none";
-      toast.style.background = "";
-    }, 3000);
-    throw e;
-  }
-}
+ 
 console.log("✅ Nilma Coin v4.0 — Fixed Edition Loaded");
 </script>
 </body>
