@@ -613,6 +613,8 @@ button:active, .clickable:active {
       </svg>
       <div style="font-size:10px;letter-spacing:2px;color:var(--cyan);opacity:.75;">TAP TO OPEN</div>
       <div style="font-size:11px;color:rgba(255,255,255,.45);" id="chestCostLabel">🆓 FREE TODAY</div>
+     <div id="chestCountdown" style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;font-family:monospace;"></div>
+<div id="chestStreakDisplay" style="margin-top:6px;font-size:11px;color:#ff9800;font-weight:700;"></div>
     </div>
   </div>
 
@@ -1280,6 +1282,9 @@ let lifetimeChests=parseInt(localStorage.getItem("lifetimeChests"))||0;
 let lifetimeCoins=parseInt(localStorage.getItem("lifetimeCoins"))||0;
 let claimedStreakToday=localStorage.getItem("claimedStreakToday")==="yes";
 let spinning=false;
+ let chestStreak=parseInt(localStorage.getItem("chestStreak"))||0;
+let lastChestDate=localStorage.getItem("lastChestDate")||"";
+let chestStreakClaimed=JSON.parse(localStorage.getItem("chestStreakClaimed")||"{}");
 let heatLevel=0;
 let heatTimer=null; 
 let weeklyEarned=parseInt(localStorage.getItem("weeklyEarned"))||0;
@@ -1588,10 +1593,11 @@ function renderPetScreen(){
 }
 // ===== STAKING =====
 const STAKE_POOLS=[
-  {id:"bronze",icon:"🥉",name:"Bronze Pool",apy:8,minStake:500,lockDays:7,color:"#cd7f32",desc:"Low risk — 8% APY over 7 days"},
-  {id:"silver",icon:"🥈",name:"Silver Pool",apy:15,minStake:2000,lockDays:14,color:"#b0bec5",desc:"Medium — 15% APY over 14 days"},
-  {id:"gold",icon:"🥇",name:"Gold Pool",apy:25,minStake:5000,lockDays:30,color:"#ffd54a",desc:"High reward — 25% APY over 30 days"},
-  {id:"diamond",icon:"💎",name:"Diamond Pool",apy:50,minStake:20000,lockDays:60,color:"#00e5ff",desc:"Elite pool — 50% APY over 60 days"},
+  {id:"quick",icon:"⚡",name:"Quick Pool",apy:3,minStake:100,lockDays:1,color:"#00ff99",desc:"Instant — 3% APY over 1 day"},
+  {id:"bronze",icon:"🥉",name:"Bronze Pool",apy:8,minStake:500,lockDays:3,color:"#cd7f32",desc:"Low risk — 8% APY over 3 days"},
+  {id:"silver",icon:"🥈",name:"Silver Pool",apy:15,minStake:2000,lockDays:7,color:"#b0bec5",desc:"Medium — 15% APY over 7 days"},
+  {id:"gold",icon:"🥇",name:"Gold Pool",apy:25,minStake:5000,lockDays:14,color:"#ffd54a",desc:"High reward — 25% APY over 14 days"},
+  {id:"diamond",icon:"💎",name:"Diamond Pool",apy:50,minStake:20000,lockDays:30,color:"#00e5ff",desc:"Elite pool — 50% APY over 30 days"},
 ];
 let myStakes=JSON.parse(localStorage.getItem("myStakes")||"[]");
 let totalStakeEarned=parseInt(localStorage.getItem("totalStakeEarned")||"0");
@@ -1620,6 +1626,8 @@ async function loadPlayerData(){
       if(d.lifetimeCoins!=null)lifetimeCoins=d.lifetimeCoins;
       if(d.lifetimeMines!=null)lifetimeMines=d.lifetimeMines;
       if(d.lifetimeChests!=null)lifetimeChests=d.lifetimeChests;
+      if(d.myStakes!=null)myStakes=d.myStakes;
+      if(d.totalStakeEarned!=null)totalStakeEarned=d.totalStakeEarned;
     }else{save();}
     update();renderAll();
   }catch(e){console.log(e);}
@@ -2278,18 +2286,46 @@ function openChest(){
   unlockAudio();doHaptic("medium");
   if(freeSpinUsed==="yes"){
     if(coins<paidChestPrice){showToast("Need "+paidChestPrice+" coins!");return;}
-    coins-=paidChestPrice;paidChestPrice+=10;localStorage.setItem("paidChestPrice",paidChestPrice);
+   coins-=paidChestPrice;
+paidChestPrice=Math.min(paidChestPrice+10,500);
+localStorage.setItem("paidChestPrice",paidChestPrice); 
   }else{
     freeSpinUsed="yes";localStorage.setItem("freeSpinUsed","yes");showToast("🆓 FREE CHEST!");
   }
   lifetimeChests++;dailyChests++;
+// Chest streak logic
+const todayDate=new Date().toDateString();
+if(lastChestDate!==todayDate){
+  if(lastChestDate===new Date(Date.now()-86400000).toDateString()){
+    chestStreak++;
+  }else{
+    chestStreak=1;
+  }
+  lastChestDate=todayDate;
+  localStorage.setItem("chestStreak",chestStreak);
+  localStorage.setItem("lastChestDate",lastChestDate);
+  // Every 7 days reward
+  if(chestStreak>0&&chestStreak%7===0){
+    const milestoneKey="chestStreakMilestone_"+chestStreak;
+    if(!chestStreakClaimed[milestoneKey]){
+      chestStreakClaimed[milestoneKey]=true;
+      localStorage.setItem("chestStreakClaimed",JSON.stringify(chestStreakClaimed));
+      legendaryCrates++;
+      setTimeout(()=>{
+        showRewardPopup("7 DAY CHEST STREAK!",0,"👑");
+        showToast("🔥 "+chestStreak+" day streak! Legendary Crate bonus!");
+        addNotification("Chest Streak Bonus! 🔥",""+chestStreak+" days in a row! You got a Legendary Crate!","👑");
+      },2500);
+    }
+  }
+}
   spinning=true;setTimeout(()=>{spinning=false;},2200);
   const chest=document.getElementById("megaChest");
   chest.classList.add("opening");setTimeout(()=>chest.classList.remove("opening"),1800);
   playChestOpen();
   const r=Math.random();let rewardText,rewardEmoji="📦";
-  if(r<0.40){const c=10;coins+=c;lifetimeCoins+=c;rewardText="💰 +"+c+" COINS";rewardEmoji="💰";}
-  else if(r<0.65){const c=25;coins+=c;lifetimeCoins+=c;rewardText="💰 +"+c+" COINS";rewardEmoji="💰";}
+  if(r<0.40){const c=10*Math.max(1,Math.floor(level/5));coins+=c;lifetimeCoins+=c;rewardText="💰 +"+c+" COINS";rewardEmoji="💰";}
+else if(r<0.65){const c=25*Math.max(1,Math.floor(level/5));coins+=c;lifetimeCoins+=c;rewardText="💰 +"+c+" COINS";rewardEmoji="💰";}
   else if(r<0.80){freeSpins++;rewardText="🎟 FREE SPIN x1";rewardEmoji="🎟";}
   else if(r<0.88){commonCrates++;rewardText="📦 COMMON CRATE";rewardEmoji="📦";}
   else if(r<0.94){epicCrates++;dailyEpicCrates++;rewardText="💜 EPIC CRATE";rewardEmoji="💜";}
@@ -2310,7 +2346,32 @@ function updateChestLabel(){
   const el=document.getElementById("chestCostLabel");if(!el)return;
   if(freeSpinUsed==="no"){el.innerText="🆓 FREE TODAY";el.style.color="var(--green)";}
   else{el.innerText="💰 "+paidChestPrice+" coins";el.style.color="var(--gold)";}
+  // Streak display
+  const sd=document.getElementById("chestStreakDisplay");
+  if(sd){
+    if(chestStreak>0){
+      sd.innerText="🔥 Chest Streak: "+chestStreak+" day"+(chestStreak>1?"s":"")+" — next bonus at day "+(Math.ceil(chestStreak/7)*7);
+    }else{
+      sd.innerText="Open daily for streak bonus!";
+    }
+  }
 }
+
+// Chest countdown timer
+function updateChestCountdown(){
+  const el=document.getElementById("chestCountdown");if(!el)return;
+  if(freeSpinUsed==="no"){el.innerText="";return;}
+  const now=new Date();
+  const midnight=new Date();
+  midnight.setHours(24,0,0,0);
+  const diff=midnight-now;
+  const h=Math.floor(diff/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  const s=Math.floor((diff%60000)/1000);
+  el.innerText="⏳ Free chest in: "+h+"h "+String(m).padStart(2,"0")+"m "+String(s).padStart(2,"0")+"s";
+}
+setInterval(updateChestCountdown,1000);
+updateChestCountdown();
 
 // ===== RARE CRATES =====
 function openRareCrate(type){
@@ -3031,6 +3092,12 @@ function confirmStake(poolId){
   const stake={poolId,amount,reward,startTime:Date.now(),unlockTime:Date.now()+(pool.lockDays*86400000),claimed:false};
   myStakes.push(stake);
   localStorage.setItem("myStakes",JSON.stringify(myStakes));
+  // Sync to Firebase
+  if(db){
+    db.collection("players").doc(playerId).update({
+      myStakes:myStakes
+    }).catch(e=>console.log("Stake sync error:",e));
+  }
   document.getElementById("stakeInputPanel")?.remove();
   save();update();renderStaking();
   showToast("📈 Staked "+amount.toLocaleString()+"! Reward: +"+reward.toLocaleString());
@@ -3046,6 +3113,13 @@ function claimStake(idx){
   stake.claimed=true;
   localStorage.setItem("myStakes",JSON.stringify(myStakes));
   localStorage.setItem("totalStakeEarned",totalStakeEarned);
+  // Sync to Firebase
+  if(db){
+    db.collection("players").doc(playerId).update({
+      myStakes:myStakes,
+      totalStakeEarned:totalStakeEarned
+    }).catch(e=>console.log("Stake claim sync error:",e));
+  }
   save();update();renderStaking();playWin();
   showRewardPopup("STAKE CLAIMED!",total,"📈");
 }
