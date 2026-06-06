@@ -7,6 +7,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;}
 :root{--gold:#ffd54a;--cyan:#00ffff;--purple:#8a2eff;--green:#00ff99;--pink:#ff00cc;}
@@ -1074,7 +1075,19 @@ function doHaptic(type="light"){if(!hapticOn)return;if(window.Telegram?.WebApp)t
 // ===== FIREBASE =====
 const firebaseConfig={apiKey:"AIzaSyCmIuzJc_FvRNr60JOZ6xwVsJMMUG7-_rc",authDomain:"nilma-coin.firebaseapp.com",projectId:"nilma-coin",storageBucket:"nilma-coin.firebasestorage.app",messagingSenderId:"225704570854",appId:"1:225704570854:web:c0389fb2e31a1adb643027"};
 let db=null;
-try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();}catch(e){console.log("FB:",e);}
+let _authReady=false;
+try{
+  firebase.initializeApp(firebaseConfig);
+  db=firebase.firestore();
+  firebase.auth().signInAnonymously().then(()=>{
+    _authReady=true;
+  }).catch(e=>console.log("Auth:",e));
+}catch(e){console.log("FB:",e);}
+
+function whenAuthReady(fn){
+  if(_authReady){fn();return;}
+  firebase.auth().onAuthStateChanged(user=>{if(user)fn();});
+}
 
 const TON_WALLET="UQDTWVSYBC1KozbeO73kZsMyqogTJlC9ptWNIUNthfJ11P3m";
 
@@ -1229,6 +1242,7 @@ const allMissions=[
 
 // ===== STATE =====
 let coins=parseInt(localStorage.getItem("coins"))||0;
+if(!localStorage.getItem("firstJoinTime"))localStorage.setItem("firstJoinTime",Date.now());
 let energy=parseInt(localStorage.getItem("energy"))||100;
 let level=parseInt(localStorage.getItem("level"))||1;
 let xp=parseInt(localStorage.getItem("xp"))||0;
@@ -1637,10 +1651,11 @@ function save() {
   localStorage.setItem("bestStreak", bestStreak);
   localStorage.setItem("weeklyEarned", weeklyEarned);
   
-  // Cap coins to prevent cheating
-  const cap = (level * 50000) + 500000;
-  if(coins > cap) coins = cap;
-  if(coins < 0) coins = 0;
+  const maxPossible=machineData[3].levels[4].power*5*8*3600*720;
+if(coins>maxPossible)coins=Math.floor(maxPossible);
+if(coins<0)coins=0;
+if(energy<0)energy=0;
+if(energy>maxEnergy*2)energy=maxEnergy;
   if(energy < 0) energy = 0;
   
   // Don't save to Firebase too often
@@ -1727,7 +1742,14 @@ function showScreen(id){
   };
   const idx=navMap[id];
   if(idx!==undefined){const items=document.querySelectorAll(".navItem");if(items[idx])items[idx].classList.add("active");}
-  if(id==="leaderboardScreen")loadLeaderboard();
+  if(id==="leaderboardScreen"){
+  loadLeaderboard();
+}else{
+  if(lbListener){
+    try{lbListener();}catch(e){}
+    lbListener=null;
+  }
+}
   if(id==="stakingScreen")renderStaking();
   if(id==="clanScreen")renderClan();
   if(id==="taskScreen")renderTasks();
@@ -2140,9 +2162,16 @@ if(ttm)ttm.style.display="none";
 localStorage.setItem("tapToMineSeen","yes");
   unlockAudio();playClick();doHaptic("light");
   let crit=Math.random()<0.1;
-let earned=crit?minePower*5:minePower;
-// Anti-cheat: hard cap per tap
-if(earned > 50000) earned = 50000;
+const machLevel=Math.max(0,(machineOwned[currentMachine]||1)-1);
+const basePower=machineData[currentMachine].levels[machLevel].power;
+let earned=crit?basePower*5:basePower;
+if(earned>basePower*5)earned=basePower*5;
+if(earned<1)earned=1;
+
+// Rate limit: block faster than 8 taps/second
+const now2=Date.now();
+const gap=now2-(window._lastTapTime||0);
+if(gap<125)return;
 if(crit){
   // Screen flash
   const flash=document.createElement("div");
@@ -2188,9 +2217,15 @@ function checkLevelUp(){
   while(xp>=xpMax){
     xp-=xpMax;level++;
     coins+=level*100;lifetimeCoins+=level*100;
-    xpMax=level<=10
-  ?Math.floor(500*Math.pow(2.1,level-1))
-  :Math.floor(500*Math.pow(3.5,level-1));
+    if(level<=10){
+  xpMax=Math.floor(500*Math.pow(2.1,level-1));
+}else if(level<=30){
+  xpMax=Math.floor(500*Math.pow(2.5,level-1));
+}else if(level<=60){
+  xpMax=Math.floor(500*Math.pow(2.8,level-1));
+}else{
+  xpMax=Math.floor(500*Math.pow(2.8,59)+(level-60)*5000000);
+}
     playLevelUp();
     showRewardPopup("LEVEL "+level+" UNLOCKED!",level*100,"⭐");
     addNotification("Level Up! 🎉","You reached Level "+level+"!","⭐");
@@ -2979,14 +3014,7 @@ function openStakeModal(poolId){
   });
   panel.addEventListener("click",function(e){if(e.target===this)this.remove();});
 }
-// Input validation helper
-function sanitizeNumber(value, min, max, defaultValue) {
-  let num = parseInt(value);
-  if(isNaN(num)) return defaultValue;
-  if(num < min) return min;
-  if(num > max) return max;
-  return num;
-}
+
 function confirmStake(poolId){
   const pool=STAKE_POOLS.find(p=>p.id===poolId);if(!pool)return;
   isVip=Date.now()<vipEnd;
@@ -3525,13 +3553,24 @@ function nextPuzzle(){
 
 function answerPuzzle(chosen,btn){
   if(!puzzleActive)return;
+
+  // Rate limit: min 300ms between answers
+  const now=Date.now();
+  if(now-(window._lastAnswerTime||0)<300)return;
+  window._lastAnswerTime=now;
+
+  // Cap total coins per session
+  if(puzzleSessionScore>=500){endPuzzle();showToast("Max coins reached!");return;}
+
   document.querySelectorAll("#puzzleChoices button").forEach(b=>b.onclick=null);
   const correct=chosen===currentPuzzle.ans;
   btn.style.background=correct?"linear-gradient(90deg,var(--green),#00c853)":"linear-gradient(90deg,#ff4444,#cc0000)";
   if(!correct){document.querySelectorAll("#puzzleChoices button").forEach(b=>{if(b.innerText===currentPuzzle.ans)b.style.background="linear-gradient(90deg,var(--green),#00c853)";});}
   if(correct){
     puzzleSessionStreak++;
-    const reward=10+(puzzleSessionStreak*2);puzzleSessionScore+=reward;
+    const cappedStreak=Math.min(puzzleSessionStreak,20);
+const reward=Math.min(10+(cappedStreak*2),50);
+puzzleSessionScore+=reward;
     dailyPuzzleCorrect++;localStorage.setItem("dailyPuzzleCorrect",dailyPuzzleCorrect);
     coins+=reward;lifetimeCoins+=reward;dailyCoins+=reward;
     document.getElementById("puzzleFeedback").innerHTML=`<span style="color:var(--green)">✅ +${reward} coins!</span>`;
@@ -3873,18 +3912,25 @@ activeIntervals.push(setInterval(() => {
   }
 }, 3000));
 
-activeIntervals.push(setInterval(() => {
-  let p = Math.floor(level / 3);
-  if(Date.now() < autoMinerEnd) p *= 3;
-  if(p > 0) {
-    coins += p;
-    lifetimeCoins += p;
-    save();
+activeIntervals.push(setInterval(()=>{
+  let p=Math.floor(level/3);
+  if(Date.now()<autoMinerEnd)p*=3;
+  const maxPassive=machineData[currentMachine].levels[
+    Math.max(0,(machineOwned[currentMachine]||1)-1)
+  ].power*10;
+  p=Math.min(p,maxPassive);
+  if(p>0){
+    coins+=p;
+    lifetimeCoins+=p;
+    weeklyEarned+=p;
     update();
   }
-}, 15000));
+},15000));
 
-activeIntervals.push(setInterval(updateShopUI, 1000));
+activeIntervals.push(setInterval(()=>{
+  const shopVisible=document.getElementById("shopScreen")?.classList.contains("active");
+  if(shopVisible)updateShopUI();
+},1000));
 
 activeIntervals.push(setInterval(() => {
   const now = Date.now();
@@ -3931,7 +3977,7 @@ const loadInt=setInterval(()=>{
 
 // ===== INIT =====
 document.getElementById("reactorWrap").addEventListener("click",e=>{mine(e);});
-if(db)loadPlayerData();
+if(db)whenAuthReady(loadPlayerData);
 update();renderAll();showScreen("homeScreen");
 updateChestLabel();syncToggles();
  if(localStorage.getItem("tapToMineSeen")==="yes"){
