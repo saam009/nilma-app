@@ -56,7 +56,7 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 .balanceBox{border-radius:14px;padding:8px 10px;flex:1;position:relative;overflow:hidden;transition:.2s;}
 .balanceBox:active{transform:scale(.96);}
 .balanceBox .balanceTitle{font-size:8px;opacity:.75;letter-spacing:1px;text-transform:uppercase;position:relative;z-index:1;}
-.balanceBox .balanceValue{font-size:15px;font-weight:900;position:relative;z-index:1;margin-top:1px;}
+.balanceBox .balanceValue{font-size:clamp(9px,2.8vw,15px);font-weight:900;position:relative;z-index:1;margin-top:1px;text-align:center;word-break:break-all;line-height:1.2;}
 .balanceBox::after{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);animation:shimmerSweep 4s infinite;}
 .balCoins::after{animation-delay:0s;}
 .balEnergy::after{animation-delay:1.3s;}
@@ -347,9 +347,9 @@ button:active, .clickable:active {
 <div id="homeScreen" class="screen active">
 <div class="topHeader">
   <div class="balanceRow">
-    <div class="balanceBox balCoins"><div class="balanceTitle">COINS</div><div class="balanceValue"><span id="balance">0</span></div></div>
-    <div class="balanceBox balEnergy"><div class="balanceTitle">ENERGY</div><div class="balanceValue"><span id="energy">100</span></div></div>
-    <div class="balanceBox balLevel"><div class="balanceTitle">LEVEL</div><div class="balanceValue"><span id="levelBadge">1</span></div></div>
+    <div class="balanceBox balCoins"><div class="balanceTitle">COINS</div><div class="balanceValue"><span id="balance" style="display:block;text-align:center;">0</span></div></div>
+    <div class="balanceBox balEnergy"><div class="balanceTitle">ENERGY</div><div class="balanceValue"><span id="energy" style="display:block;text-align:center;">100</span></div></div>
+    <div class="balanceBox balLevel"><div class="balanceTitle">LEVEL</div><div class="balanceValue"><span id="levelBadge" style="display:block;text-align:center;">1</span></div></div>
     <div class="topIconBtn" style="position:relative;" onclick="openNotifPanel()">🔔<div class="notifDot" id="notifDot" style="position:absolute;"></div></div>
     <div class="topIconBtn" onclick="openSettings()">⚙️</div>
   </div>
