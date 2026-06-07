@@ -288,10 +288,15 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 .featureCard:active{transform:scale(.97);}
 .featureCardIcon{font-size:36px;flex-shrink:0;}
 .featureCardBtn{margin-left:auto;padding:9px 18px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:12px;cursor:pointer;flex-shrink:0;}
-#homeScreen{overflow:hidden;}
+
 #spinScreen,#taskScreen,#leaderboardScreen,#referralScreen,#shopScreen,#missionScreen,#streakScreen,#puzzleScreen,#stakingScreen,#clanScreen,#petScreen{position:fixed!important;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.92)),url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200') center/cover fixed!important;z-index:500;display:none!important;padding-bottom:75px;}
 #spinScreen.active,#taskScreen.active,#leaderboardScreen.active,#referralScreen.active,#shopScreen.active,#missionScreen.active,#streakScreen.active,#puzzleScreen.active,#stakingScreen.active,#clanScreen.active,#petScreen.active{display:flex!important;flex-direction:column;}
-#homeScreen { overflow-y: auto; padding-bottom: 75px; }
+#homeScreen {
+  overflow-y: auto !important;
+  padding-bottom: 75px;
+  height: 100vh;
+  position: relative;
+}
 #spinScreen, #taskScreen, #leaderboardScreen, #referralScreen, #shopScreen, #missionScreen, #streakScreen, #puzzleScreen, #stakingScreen, #clanScreen, #petScreen {
   position: fixed !important;
   top: 0; left: 0; width: 100%; height: 100%;
