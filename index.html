@@ -321,7 +321,7 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
   <div style="position:absolute;inset:14px;border-radius:50%;border:2px solid transparent;border-top-color:var(--purple);border-left-color:var(--purple);animation:spin 2s linear infinite reverse;"></div>
   <div style="position:absolute;inset:28px;border-radius:50%;border:2px solid transparent;border-bottom-color:var(--green);animation:spin 4s linear infinite;"></div>
   <div style="position:absolute;inset:42px;border-radius:50%;background:radial-gradient(circle,rgba(0,20,40,.9),rgba(0,5,15,.95));display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(0,255,255,.2);">
-    <img src="https://cdn-icons-png.flaticon.com/512/825/825508.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentNode.innerHTML='<div style=\'font-size:36px;\'>💎</div>'">
+    <div style="font-size:36px;">💎</div>
   </div>
 </div>
 <div style="font-size:26px;font-weight:900;letter-spacing:6px;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">NILMA COIN</div>
@@ -1101,7 +1101,17 @@ try{
   db=firebase.firestore();
   const fbStatus=document.getElementById("loadFirebaseStatus");
   if(fbStatus)fbStatus.innerText="⏳ Connecting to server...";
-  firebase.auth().signInAnonymously().then(()=>{
+setTimeout(()=>{
+  if(!_authReady){
+    _authReady=true;
+    const fbStatus=document.getElementById("loadFirebaseStatus");
+    if(fbStatus){
+      fbStatus.innerText="⚠️ Offline mode";
+      fbStatus.style.color="rgba(255,150,0,.7)";
+    }
+  }
+},4000); 
+ firebase.auth().signInAnonymously().then(()=>{
     _authReady=true;
     const fbStatus=document.getElementById("loadFirebaseStatus");
     if(fbStatus){
@@ -4156,7 +4166,7 @@ function renderAll(){
 const loadMessages=["Initializing reactors...","Connecting to blockchain...","Loading machines...","Syncing cloud data...","Calibrating energy...","Ready! ✅"];
 let loadPct2=0,loadMsgIdx=0;
 const loadInt=setInterval(()=>{
-  loadPct2+=Math.random()*7+2;
+  loadPct2+=Math.random()*15+8;
   if(loadPct2>=100){
     loadPct2=100;clearInterval(loadInt);
     setTimeout(()=>{
@@ -4271,7 +4281,6 @@ window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();
 });
 
-window.onerror = function(msg,src,line){alert("ERROR line "+line+": "+msg);return true;};
  
 console.log("✅ Nilma Coin v4.0 — Fixed Edition Loaded");
 </script>
