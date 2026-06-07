@@ -1114,32 +1114,22 @@ try{
   firebase.initializeApp(firebaseConfig);
   db=firebase.firestore();
   const fbStatus=document.getElementById("loadFirebaseStatus");
-  if(fbStatus)fbStatus.innerText="⏳ Connecting to server...";
-setTimeout(()=>{
-  if(!_authReady){
-    _authReady=true;
-    const fbStatus=document.getElementById("loadFirebaseStatus");
-    if(fbStatus){
-      fbStatus.innerText="⚠️ Offline mode";
-      fbStatus.style.color="rgba(255,150,0,.7)";
-    }
+if(fbStatus)fbStatus.innerText="⏳ Connecting to server...";
+firebase.auth().signInAnonymously().then(()=>{
+  _authReady=true;
+  const el=document.getElementById("loadFirebaseStatus");
+  if(el){
+    el.innerText="✅ Server connected!";
+    el.style.color="rgba(0,255,153,.7)";
   }
-},4000); 
- firebase.auth().signInAnonymously().then(()=>{
-    _authReady=true;
-    const fbStatus=document.getElementById("loadFirebaseStatus");
-    if(fbStatus){
-      fbStatus.innerText="✅ Server connected!";
-      fbStatus.style.color="rgba(0,255,153,.7)";
-    }
-  }).catch(e=>{
-    console.log("Auth:",e);
-    const fbStatus=document.getElementById("loadFirebaseStatus");
-    if(fbStatus){
-      fbStatus.innerText="⚠️ Offline mode — progress may not sync";
-      fbStatus.style.color="rgba(255,150,0,.7)";
-    }
-  });
+}).catch(e=>{
+  console.log("Auth:",e);
+  const el=document.getElementById("loadFirebaseStatus");
+  if(el){
+    el.innerText="⚠️ Offline mode — progress may not sync";
+    el.style.color="rgba(255,150,0,.7)";
+  }
+});
 }catch(e){
   console.log("FB:",e);
   const fbStatus=document.getElementById("loadFirebaseStatus");
