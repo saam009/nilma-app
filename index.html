@@ -312,7 +312,6 @@ button{cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;user-
 </style>
 </head>
 <body onclick="unlockAudio()" onload="document.title='LOADED'">
-<body onclick="unlockAudio()" onload="document.title='LOADED'">
 
 <div id="debugBox" style="display:none;position:fixed;bottom:0;left:0;right:0;background:red;color:white;font-size:12px;padding:10px;z-index:99999999;max-height:200px;overflow-y:auto;word-break:break-all;"></div>
 
@@ -1674,10 +1673,10 @@ let xpPrice2=parseInt(localStorage.getItem("xpPrice"))||1000;
 async function loadPlayerData(){
   if(!db)return;
   try{
-    const fbStatus=document.getElementById("loadFirebaseStatus");
-    if(fbStatus){
-      fbStatus.innerText="⏳ Loading your data...";
-      fbStatus.style.color="rgba(0,255,255,.5)";
+    const fbStatus2=document.getElementById("loadFirebaseStatus");
+    if(fbStatus2){
+      fbStatus2.innerText="⏳ Loading your data...";
+      fbStatus2.style.color="rgba(0,255,255,.5)";
     }
     const doc=await db.collection("players").doc(playerId).get();
     if(doc.exists){
@@ -1695,21 +1694,21 @@ async function loadPlayerData(){
       if(d.myStakes!=null)myStakes=d.myStakes;
       if(d.totalStakeEarned!=null)totalStakeEarned=d.totalStakeEarned;
     }else{save();}
-    const fbStatus=document.getElementById("loadFirebaseStatus");
-    if(fbStatus){
-      fbStatus.innerText="✅ Data loaded!";
-      fbStatus.style.color="rgba(0,255,153,.7)";
+    const fbStatus2=document.getElementById("loadFirebaseStatus");
+    if(fbStatus2){
+      fbStatus2.innerText="✅ Data loaded!";
+      fbStatus2.style.color="rgba(0,255,153,.7)";
       setTimeout(()=>{
-        if(fbStatus)fbStatus.style.opacity="0";
+        if(fbStatus2)fbStatus2.style.opacity="0";
       },1500);
     }
     update();renderAll();
-  }catch(e){
+ }catch(e){
     console.log(e);
-    const fbStatus=document.getElementById("loadFirebaseStatus");
-    if(fbStatus){
-      fbStatus.innerText="⚠️ Could not load data — using local save";
-      fbStatus.style.color="rgba(255,150,0,.7)";
+    const fbStatus2=document.getElementById("loadFirebaseStatus");
+    if(fbStatus2){
+      fbStatus2.innerText="⚠️ Could not load data — using local save";
+      fbStatus2.style.color="rgba(255,150,0,.7)";
     }
   }
 }
