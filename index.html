@@ -1112,9 +1112,10 @@ let _authReady=false;
 try{
   firebase.initializeApp(firebaseConfig);
   db=firebase.firestore();
+  db.settings({experimentalForceLongPolling:true,merge:true});
   const fbStatus=document.getElementById("loadFirebaseStatus");
-if(fbStatus)fbStatus.innerText="⏳ Connecting to server...";
-firebase.auth().signInAnonymously().then(()=>{
+  if(fbStatus)fbStatus.innerText="⏳ Connecting to server...";
+  firebase.auth().signInAnonymously().then(()=>{
   _authReady=true;
   const el=document.getElementById("loadFirebaseStatus");
   if(el){
