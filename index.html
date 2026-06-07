@@ -11,7 +11,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;}
 :root{--gold:#ffd54a;--cyan:#00ffff;--purple:#8a2eff;--green:#00ff99;--pink:#ff00cc;}
-body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.9)),url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200') center/cover fixed;color:white;min-height:100vh;overflow-x:hidden;padding-bottom:75px;}
+body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.9)),url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200') center/cover fixed;color:white;min-height:100vh;overflow:hidden auto;padding-bottom:75px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes corePulse{0%,100%{transform:scale(1);filter:brightness(1);}50%{transform:scale(1.08);filter:brightness(1.4);}}
 @keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
@@ -43,7 +43,7 @@ body{font-family:Segoe UI,sans-serif;background:linear-gradient(rgba(0,0,0,.8),r
 @keyframes mach-scan{0%{top:-10%}100%{top:110%}}
 @keyframes mach-card-glow{0%,100%{box-shadow:0 0 8px rgba(255,0,200,0.5),0 0 20px rgba(255,0,200,0.2)}50%{box-shadow:0 0 22px rgba(255,0,200,0.9),0 0 50px rgba(255,0,200,0.4)}}
 @keyframes mach-dash{from{stroke-dashoffset:80}to{stroke-dashoffset:0}}
- .screen{display:none;padding-bottom:90px;min-height:100vh;}
+ .screen{display:none;padding-bottom:90px;}
 .screen.active{display:block!important;}
 #spinScreen.active{display:flex!important;flex-direction:column;}
 @keyframes mach-scan{
@@ -1285,7 +1285,9 @@ if(!localStorage.getItem("firstJoinTime"))localStorage.setItem("firstJoinTime",D
 let energy=parseInt(localStorage.getItem("energy"))||100;
 let level=parseInt(localStorage.getItem("level"))||1;
 let xp=parseInt(localStorage.getItem("xp"))||0;
-let xpMax = parseInt(localStorage.getItem("xpMax")) || (2000 * (parseInt(localStorage.getItem("level"))||1));
+let _lvSafe = parseInt(localStorage.getItem("level")) || 1;
+let xpMax = parseInt(localStorage.getItem("xpMax")) || 0;
+if (!xpMax || isNaN(xpMax) || xpMax < 100) xpMax = 2000 * _lvSafe;
 let maxEnergy=parseInt(localStorage.getItem("maxEnergy"))||100;
 let minePower=parseInt(localStorage.getItem("minePower"))||1;
  function getLevelTitle(lv){
@@ -1355,8 +1357,17 @@ if(lastDailyReset!==todayStr){
 
 let tasksClaimed=JSON.parse(localStorage.getItem("tasksClaimed")||"{}");
 let taskVisited={};
-let machineOwned=JSON.parse(localStorage.getItem("machineOwned")||"[1,0,0,0]");
-let currentMachine=parseInt(localStorage.getItem("currentMachine"))||0;
+let machineOwned = (()=>{
+  try {
+    const raw = localStorage.getItem("machineOwned");
+    if (!raw) return [1,0,0,0];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || arr.length < 4) return [1,0,0,0];
+    return arr.map(v => isNaN(parseInt(v)) ? 0 : Math.min(5, Math.max(0, parseInt(v))));
+  } catch(e) { return [1,0,0,0]; }
+})();
+let currentMachine = parseInt(localStorage.getItem("currentMachine")) || 0;
+if (currentMachine < 0 || currentMachine > 3) currentMachine = 0;
 let pendingPayment=null;
 
 // Telegram
@@ -1977,7 +1988,8 @@ function updatePassiveDisplay(){
 }
 // ===== REACTOR =====
 function updateReactor(){
-  const m=machineData[currentMachine];
+  if (!machineData[currentMachine]) return;
+  const m = machineData[currentMachine];
   const owned=machineOwned[currentMachine]||1;
   const lv=m.levels[Math.max(0,owned-1)];
   const wrap=document.getElementById("reactorCoreWrap");
@@ -2208,7 +2220,8 @@ function triggerOverheat(){
   },5000);
 }
 function mine(e){
-  if(energy<=0){showToast("⚡ No energy!");return;}
+  if (!machineData[currentMachine]) { showToast("Still loading..."); return; }
+  if (energy <= 0) { showToast("⚡ No energy!"); return; }
  if(heatLevel>=100){
   showToast("🌡 Reactor overheated! Wait a moment!");
   triggerOverheat();
@@ -2275,7 +2288,8 @@ if(crit){
   showCoin(e?.clientX||window.innerWidth/2,e?.clientY||200,earned);
 }
 function checkLevelUp(){
-  while(xp>=xpMax){
+  let safeGuard = 0;
+  while(xp >= xpMax && safeGuard < 50){ safeGuard++;
     xp-=xpMax;level++;
     coins+=level*100;lifetimeCoins+=level*100;
   xpMax = 2000 * level;
@@ -4165,8 +4179,10 @@ document.getElementById("reactorWrap").addEventListener("touchstart",e=>{
     mine({clientX:touch.clientX,clientY:touch.clientY});
   });
 },{passive:false});
-if(db)whenAuthReady(loadPlayerData);
-update();renderAll();showScreen("homeScreen");
+if(db) setTimeout(()=> whenAuthReady(loadPlayerData), 500);
+update();
+try { renderAll(); } catch(e) { console.error("renderAll error:", e); }
+showScreen("homeScreen");
 updateChestLabel();syncToggles();
  if(localStorage.getItem("tapToMineSeen")==="yes"){
   const ttm=document.getElementById("tapToMine");
