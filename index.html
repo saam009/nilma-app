@@ -3243,7 +3243,7 @@ function renderClanJoin(content){
         <button onclick="switchClanTab('members')" id="clanTabMembers" style="flex:1;padding:8px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#aaa;font-size:11px;font-weight:700;cursor:pointer;">👥 By Members</button>
       </div>
       <div id="topClanList"><div style="text-align:center;opacity:.4;font-size:13px;">Loading...</div></div>
-    </div>
+    </div>`;
   loadTopClans();
 }
 
@@ -3424,7 +3424,7 @@ function loadTopClans(){
     let html="";let r=1;
     snap.forEach(doc=>{
       const c=doc.data();
-      const isMyClан=myClan&&myClan.id===doc.id;
+      const isMyClan=myClan&&myClan.id===doc.id;
       const medal=r===1?"🥇":r===2?"🥈":r===3?"🥉":`<span style='font-size:11px;opacity:.5;'>#${r}</span>`;
       const statVal=currentClanTab==="treasury"
         ?"💰 "+(c.treasury||0).toLocaleString()
@@ -3861,7 +3861,8 @@ setInterval(updateAirdropTimer,1000);updateAirdropTimer();
 // ===== AVATAR & PROFILE =====
 const AVATARS=["🧑","👨‍💻","👩‍💻","🤖","👾","🧙","🦸","🥷","👨‍🚀","👩‍🚀","🎮","💎","🔥","⚡","🌕","🦊","🐉","🦁","🐺","🦅"];
 let selectedAvatar=localStorage.getItem("selectedAvatar")||"🧑";
-function openProfileModal(){
+function closeProfileModal(){document.getElementById("profileModal").classList.remove("open");}
+ function openProfileModal(){
   playClick();document.getElementById("profileModal").classList.add("open");
   document.getElementById("profileBigAvatar").innerText=selectedAvatar;
   const ap=PET_DATA.find(p=>p.id===activePetId);
