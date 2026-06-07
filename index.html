@@ -4277,6 +4277,10 @@ window.addEventListener('unhandledrejection', (event) => {
 
  
 console.log("✅ Nilma Coin v4.0 — Fixed Edition Loaded");
+}catch(e){
+  console.error("Main script error:",e);
+  document.getElementById("loadFirebaseStatus").innerText="❌ Error: "+e.message;
+}
 </script>
 </body>
 </html>
