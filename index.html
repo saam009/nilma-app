@@ -4269,7 +4269,7 @@ window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();
 });
 
-window.onerror = function(msg, url, line, col, error) {
+window.onerror = function(msg,src,line){alert("ERROR line "+line+": "+msg);return true;};
   console.error("Error:", msg, "at line", line);
   // Don't show to users for minor errors
   if(msg.includes("Firebase") || msg.includes("network")) {
