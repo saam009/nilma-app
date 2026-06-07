@@ -4272,13 +4272,6 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 window.onerror = function(msg,src,line){alert("ERROR line "+line+": "+msg);return true;};
-  console.error("Error:", msg, "at line", line);
-  // Don't show to users for minor errors
-  if(msg.includes("Firebase") || msg.includes("network")) {
-    showToast("Network issue, retrying...");
-  }
-  return false;
-}; 
  
 console.log("✅ Nilma Coin v4.0 — Fixed Edition Loaded");
 </script>
