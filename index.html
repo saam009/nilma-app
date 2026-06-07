@@ -1673,11 +1673,8 @@ let xpPrice2=parseInt(localStorage.getItem("xpPrice"))||1000;
 async function loadPlayerData(){
   if(!db)return;
   try{
-    const fbStatus2=document.getElementById("loadFirebaseStatus");
-    if(fbStatus2){
-      fbStatus2.innerText="⏳ Loading your data...";
-      fbStatus2.style.color="rgba(0,255,255,.5)";
-    }
+    document.getElementById("loadFirebaseStatus").innerText="⏳ Loading your data...";
+    document.getElementById("loadFirebaseStatus").style.color="rgba(0,255,255,.5)";
     const doc=await db.collection("players").doc(playerId).get();
     if(doc.exists){
       const d=doc.data();
@@ -1694,22 +1691,16 @@ async function loadPlayerData(){
       if(d.myStakes!=null)myStakes=d.myStakes;
       if(d.totalStakeEarned!=null)totalStakeEarned=d.totalStakeEarned;
     }else{save();}
-    const fbStatus2=document.getElementById("loadFirebaseStatus");
-    if(fbStatus2){
-      fbStatus2.innerText="✅ Data loaded!";
-      fbStatus2.style.color="rgba(0,255,153,.7)";
-      setTimeout(()=>{
-        if(fbStatus2)fbStatus2.style.opacity="0";
-      },1500);
-    }
+    document.getElementById("loadFirebaseStatus").innerText="✅ Data loaded!";
+    document.getElementById("loadFirebaseStatus").style.color="rgba(0,255,153,.7)";
+    setTimeout(()=>{
+      document.getElementById("loadFirebaseStatus").style.opacity="0";
+    },1500);
     update();renderAll();
- }catch(e){
+  }catch(e){
     console.log(e);
-    const fbStatus2=document.getElementById("loadFirebaseStatus");
-    if(fbStatus2){
-      fbStatus2.innerText="⚠️ Could not load data — using local save";
-      fbStatus2.style.color="rgba(255,150,0,.7)";
-    }
+    document.getElementById("loadFirebaseStatus").innerText="⚠️ Could not load data — using local save";
+    document.getElementById("loadFirebaseStatus").style.color="rgba(255,150,0,.7)";
   }
 }
 
