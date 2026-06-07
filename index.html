@@ -3794,12 +3794,12 @@ function addNotification(title,body,icon="🔔"){
   notifications.unshift(notif);if(notifications.length>30)notifications=notifications.slice(0,30);
   unreadNotifs++;localStorage.setItem("notifications",JSON.stringify(notifications));
   localStorage.setItem("unreadNotifs",unreadNotifs);updateNotifDot();
-  if(Notification?.permission==="granted"){try{new Notification("Nilma Coin: "+title,{body});}catch(e){}}
+  if(typeof Notification!=="undefined"&&Notification?.permission==="granted"){try{new Notification("Nilma Coin: "+title,{body});}catch(e){}}
 }
 function updateNotifDot(){const dot=document.getElementById("notifDot");if(dot)dot.style.display=unreadNotifs>0?"block":"none";}
 function openNotifPanel(){
   playClick();document.getElementById("notifPanel").classList.add("open");document.getElementById("notifOverlay").style.display="block";
-  const pb=document.getElementById("notifPermBtn");if(pb)pb.style.display=(Notification&&Notification.permission==="default")?"block":"none";
+  const pb=document.getElementById("notifPermBtn");if(pb)pb.style.display=(typeof Notification!=="undefined"&&Notification.permission==="default")?"block":"none";
   renderNotifList();notifications.forEach(n=>n.read=true);unreadNotifs=0;
   localStorage.setItem("notifications",JSON.stringify(notifications));localStorage.setItem("unreadNotifs","0");updateNotifDot();
 }
@@ -3818,7 +3818,7 @@ function clearNotifs(){
   showToast("Cleared — will re-notify weekly");
 }
 function requestNotifPermission(){
-  if(!("Notification" in window)){showToast("Not supported");return;}
+  if(typeof Notification==="undefined"||!("Notification" in window)){showToast("Not supported");return;}
   Notification.requestPermission().then(p=>{
     if(p==="granted"){document.getElementById("notifPermBtn").style.display="none";showToast("✅ Notifications enabled!");}
     else showToast("Notifications blocked");
