@@ -1090,6 +1090,8 @@ function doHaptic(type="light"){if(!hapticOn)return;if(window.Telegram?.WebApp)t
 </script>
 
 <script>
+ try{
+window.onerror=function(m,s,l){document.body.innerHTML='<div style="color:red;font-size:20px;padding:20px;background:black;position:fixed;top:0;left:0;width:100%;z-index:999999;">ERROR line '+l+':<br>'+m+'</div>';return true;};
 // ===== FIREBASE =====
 const firebaseConfig={apiKey:"AIzaSyCmIuzJc_FvRNr60JOZ6xwVsJMMUG7-_rc",authDomain:"nilma-coin.firebaseapp.com",projectId:"nilma-coin",storageBucket:"nilma-coin.firebasestorage.app",messagingSenderId:"225704570854",appId:"1:225704570854:web:c0389fb2e31a1adb643027"};
 let db=null;
