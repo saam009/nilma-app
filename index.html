@@ -337,6 +337,7 @@ button:active, .clickable:active {
 <div style="font-size:26px;font-weight:900;letter-spacing:6px;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">NILMA COIN</div>
 <div style="margin-top:5px;font-size:10px;letter-spacing:3px;color:rgba(0,255,255,.45);">⚡ CYBER MINING NETWORK ⚡</div>
 <div id="loadStatus" style="margin-top:22px;font-size:12px;color:rgba(255,255,255,.38);letter-spacing:1px;">Initializing reactors...</div>
+<div id="loadFirebaseStatus" style="margin-top:6px;font-size:11px;color:rgba(0,255,255,.5);letter-spacing:1px;">⏳ Connecting to server...</div>
 <div style="width:220px;height:2px;background:rgba(255,255,255,.05);border-radius:30px;overflow:hidden;margin-top:16px;">
 <div id="loadingBar" style="width:0%;height:100%;border-radius:30px;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--green));transition:.4s;"></div>
 </div>
@@ -730,6 +731,11 @@ button:active, .clickable:active {
   <div class="shopCard epic">
     <div class="badge">EPIC</div>
     <h3>⚡ Turbo Miner</h3><p>Mining power +2, activated for 2 hours</p>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(0,255,255,.08);border:1px solid rgba(0,255,255,.2);font-size:10px;color:var(--cyan);">⏱ 2 hours</div>
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(0,255,255,.08);border:1px solid rgba(0,255,255,.2);font-size:10px;color:var(--cyan);">⚡ +2 power</div>
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(0,255,255,.08);border:1px solid rgba(0,255,255,.2);font-size:10px;color:var(--cyan);">🔄 Stackable</div>
+    </div>
     <div class="price">💰 <span id="turboPriceText">200</span> Coins</div>
     <button class="shopBtn" id="turboBtn" onclick="buyTurbo()">UPGRADE</button>
     <div id="turboTimer" style="margin-top:8px;font-size:12px;opacity:.7;"></div>
@@ -737,6 +743,11 @@ button:active, .clickable:active {
   <div class="shopCard rare">
     <div class="badge">RARE</div>
     <h3>🔋 Energy Core</h3><p>Auto-mines every 15s for 2 hours</p>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(138,46,255,.08);border:1px solid rgba(138,46,255,.2);font-size:10px;color:#ce93d8;">⏱ 2 hours</div>
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(138,46,255,.08);border:1px solid rgba(138,46,255,.2);font-size:10px;color:#ce93d8;">🤖 Auto mines</div>
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(138,46,255,.08);border:1px solid rgba(138,46,255,.2);font-size:10px;color:#ce93d8;">⚡ Every 15s</div>
+    </div>
     <div class="price">💰 <span id="autoMinerPriceText">300</span> Coins</div>
     <button class="shopBtn" id="energyBtn" onclick="buyEnergy()">INSTALL</button>
     <div id="energyTimer" style="margin-top:8px;font-size:12px;opacity:.7;"></div>
@@ -744,10 +755,16 @@ button:active, .clickable:active {
   <div class="shopCard legendary">
     <div class="badge">LEGENDARY</div>
     <h3>💎 XP Booster</h3><p>3x XP gain for 4 hours</p>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);font-size:10px;color:var(--gold);">⏱ 4 hours</div>
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);font-size:10px;color:var(--gold);">💎 3× XP</div>
+      <div style="padding:4px 10px;border-radius:8px;background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);font-size:10px;color:var(--gold);">🚀 Level faster</div>
+    </div>
     <div class="price">💰 <span id="xpPriceText">400</span> Coins</div>
     <button class="shopBtn" id="xpBtn" onclick="buyXP()">ACTIVATE</button>
     <div id="xpTimer" style="margin-top:8px;font-size:12px;opacity:.7;"></div>
   </div>
+    
   <div style="font-size:11px;letter-spacing:2px;opacity:.5;margin:18px 0 12px;">⚙️ MINING MACHINES</div>
   <div id="shopMachineList"></div>
 </div>
@@ -920,6 +937,10 @@ button:active, .clickable:active {
     <div id="profileBigAvatar" style="font-size:72px;margin-bottom:8px;">🧑</div>
     <div style="font-size:20px;font-weight:900;" id="profileModalName">Player</div>
     <div style="font-size:12px;color:var(--cyan);opacity:.7;margin-top:4px;">ID: <span id="profileModalId"></span></div>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+      <input id="usernameInput" placeholder="Set custom name..." maxlength="20" style="flex:1;padding:8px 12px;border-radius:10px;border:1px solid rgba(0,255,255,.2);background:rgba(255,255,255,.05);color:white;font-size:13px;outline:none;">
+      <button onclick="saveUsername()" style="padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-size:12px;font-weight:700;cursor:pointer;">SAVE</button>
+    </div>
   </div>
   <div style="background:rgba(255,255,255,.04);border-radius:16px;padding:14px;margin-bottom:16px;">
     <div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-bottom:8px;">📊 YOUR STATS</div>
@@ -1047,8 +1068,8 @@ button:active, .clickable:active {
   </div>
  <button onclick="exportSaveData()" style="padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,rgba(255,213,74,.15),rgba(255,150,0,.1));border:1px solid rgba(255,213,74,.3);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;">💾 Export Save</button> 
 </div>
-   <div><div class="settingLabel">📱 App Version</div><div class="settingDesc">Nilma Coin v4.0 — Fixed Edition</div></div>
-    <div style="font-size:12px;color:var(--cyan);opacity:.7;">v4.0</div>
+   <div><div class="settingLabel">📱 App Version</div><div class="settingDesc">Nilma Coin v5.0 — Enhanced Edition</div></div>
+    <div style="font-size:12px;color:var(--cyan);opacity:.7;">v5.0</div>
   </div>
   <div class="settingRow">
     <div><div class="settingLabel">🆔 Player ID</div><div class="settingDesc" id="settingsPlayerId">—</div></div>
@@ -1087,10 +1108,31 @@ let _authReady=false;
 try{
   firebase.initializeApp(firebaseConfig);
   db=firebase.firestore();
+  const fbStatus=document.getElementById("loadFirebaseStatus");
+  if(fbStatus)fbStatus.innerText="⏳ Connecting to server...";
   firebase.auth().signInAnonymously().then(()=>{
     _authReady=true;
-  }).catch(e=>console.log("Auth:",e));
-}catch(e){console.log("FB:",e);}
+    const fbStatus=document.getElementById("loadFirebaseStatus");
+    if(fbStatus){
+      fbStatus.innerText="✅ Server connected!";
+      fbStatus.style.color="rgba(0,255,153,.7)";
+    }
+  }).catch(e=>{
+    console.log("Auth:",e);
+    const fbStatus=document.getElementById("loadFirebaseStatus");
+    if(fbStatus){
+      fbStatus.innerText="⚠️ Offline mode — progress may not sync";
+      fbStatus.style.color="rgba(255,150,0,.7)";
+    }
+  });
+}catch(e){
+  console.log("FB:",e);
+  const fbStatus=document.getElementById("loadFirebaseStatus");
+  if(fbStatus){
+    fbStatus.innerText="❌ Server unavailable — offline mode";
+    fbStatus.style.color="rgba(255,50,50,.7)";
+  }
+}
 
 function whenAuthReady(fn){
   if(_authReady){fn();return;}
@@ -1335,7 +1377,7 @@ let profilePhoto="https://cdn-icons-png.flaticon.com/512/149/149071.png";
 try{
   if(tg)tg.expand();
   const user=tg?.initDataUnsafe?.user;
-  if(user){username=user.username||user.first_name||"Player";profilePhoto=user.photo_url||profilePhoto;telegramId=user.id;playerId=telegramId.toString();}
+ if(user){username=localStorage.getItem("customUsername")||user.username||user.first_name||"Player";profilePhoto=user.photo_url||profilePhoto;telegramId=user.id;playerId=telegramId.toString();}
 }catch(e){}
 
 if(!localStorage.getItem("firstJoin")){coins+=500;localStorage.setItem("firstJoin","yes");}
@@ -1616,6 +1658,11 @@ let xpPrice2=parseInt(localStorage.getItem("xpPrice"))||1000;
 async function loadPlayerData(){
   if(!db)return;
   try{
+    const fbStatus=document.getElementById("loadFirebaseStatus");
+    if(fbStatus){
+      fbStatus.innerText="⏳ Loading your data...";
+      fbStatus.style.color="rgba(0,255,255,.5)";
+    }
     const doc=await db.collection("players").doc(playerId).get();
     if(doc.exists){
       const d=doc.data();
@@ -1632,8 +1679,23 @@ async function loadPlayerData(){
       if(d.myStakes!=null)myStakes=d.myStakes;
       if(d.totalStakeEarned!=null)totalStakeEarned=d.totalStakeEarned;
     }else{save();}
+    const fbStatus=document.getElementById("loadFirebaseStatus");
+    if(fbStatus){
+      fbStatus.innerText="✅ Data loaded!";
+      fbStatus.style.color="rgba(0,255,153,.7)";
+      setTimeout(()=>{
+        if(fbStatus)fbStatus.style.opacity="0";
+      },1500);
+    }
     update();renderAll();
-  }catch(e){console.log(e);}
+  }catch(e){
+    console.log(e);
+    const fbStatus=document.getElementById("loadFirebaseStatus");
+    if(fbStatus){
+      fbStatus.innerText="⚠️ Could not load data — using local save";
+      fbStatus.style.color="rgba(255,150,0,.7)";
+    }
+  }
 }
 
 // ===== SAVE =====
@@ -3174,9 +3236,14 @@ function renderClanJoin(content){
       <button onclick="joinClanByCode()" style="width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-weight:900;font-size:14px;cursor:pointer;margin-top:6px;">🔗 JOIN CLAN</button>
     </div>
     <div class="clanCard" style="margin-top:14px;">
-      <div style="font-size:11px;letter-spacing:2px;color:var(--gold);opacity:.8;margin-bottom:12px;">🏆 TOP CLANS</div>
+      <div style="font-size:11px;letter-spacing:2px;color:var(--gold);opacity:.8;margin-bottom:12px;">🏆 TOP 10 CLANS</div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <button onclick="switchClanTab('power')" id="clanTabPower" style="flex:1;padding:8px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:white;font-size:11px;font-weight:700;cursor:pointer;">⚡ By Power</button>
+        <button onclick="switchClanTab('treasury')" id="clanTabTreasury" style="flex:1;padding:8px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#aaa;font-size:11px;font-weight:700;cursor:pointer;">💰 By Treasury</button>
+        <button onclick="switchClanTab('members')" id="clanTabMembers" style="flex:1;padding:8px;border:none;border-radius:10px;background:rgba(255,255,255,.07);color:#aaa;font-size:11px;font-weight:700;cursor:pointer;">👥 By Members</button>
+      </div>
       <div id="topClanList"><div style="text-align:center;opacity:.4;font-size:13px;">Loading...</div></div>
-    </div>`;
+    </div>
   loadTopClans();
 }
 
@@ -3265,7 +3332,7 @@ function createClan(){
   if(coins<500){showToast("Need 500 coins to create clan");return;}
   coins-=500;
   const code=Math.random().toString(36).substring(2,8).toUpperCase();
-  const clan={id:"clan_"+Date.now(),name,tag,flag,leaderId:playerId,leaderName:username,inviteCode:code,members:[{id:playerId,name:username,power:minePower,role:"Leader"}],totalPower:minePower,treasury:0,createdAt:Date.now()};
+  const clan={id:"clan_"+Date.now(),name,tag,flag,leaderId:playerId,leaderName:username,inviteCode:code,members:[{id:playerId,name:username,power:minePower,role:"Leader"}],totalPower:minePower,treasury:0,memberCount:1,createdAt:Date.now()};
   myClan=clan;localStorage.setItem("myClan",JSON.stringify(myClan));
   if(db){
     db.collection("clans").doc(clan.id).set(clan).catch(e=>console.log(e));
@@ -3287,7 +3354,7 @@ function joinClanByCode(){
     if((clan.members||[]).find(m=>m.id===playerId)){showToast("Already in this clan!");return;}
     clan.members.push({id:playerId,name:username,power:minePower,role:"Member"});
     clan.totalPower=(clan.totalPower||0)+minePower;
-    db.collection("clans").doc(doc.id).update({members:clan.members,totalPower:clan.totalPower}).then(()=>{
+    db.collection("clans").doc(doc.id).update({members:clan.members,totalPower:clan.totalPower,memberCount:clan.members.length}).then(()=>{
      myClan=clan;localStorage.setItem("myClan",JSON.stringify(myClan));
       db.collection("players").doc(playerId).update({clanId:doc.id,clanName:clan.name}).catch(()=>{});
       addClanActivity("⚔️ "+username+" joined the clan!");
@@ -3333,22 +3400,49 @@ function renderClanMemberList(members){
       ${isLeader&&m.id!==playerId?`<button onclick="kickMember('${m.id}','${m.name}')" style="padding:4px 10px;border:none;border-radius:8px;background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.3);font-size:10px;cursor:pointer;">KICK</button>`:`<span class="clanBadge">${m.role}</span>`}
     </div>`).join("");
 }
+let currentClanTab="power";
+
+function switchClanTab(tab){
+  currentClanTab=tab;
+  const tabs=["power","treasury","members"];
+  tabs.forEach(t=>{
+    const btn=document.getElementById("clanTab"+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn){
+      btn.style.background=t===tab?"linear-gradient(90deg,var(--cyan),var(--purple))":"rgba(255,255,255,.07)";
+      btn.style.color=t===tab?"white":"#aaa";
+    }
+  });
+  loadTopClans();
+}
+
 function loadTopClans(){
   const list=document.getElementById("topClanList");if(!list||!db)return;
-  db.collection("clans").orderBy("totalPower","desc").limit(5).get().then(snap=>{
+  list.innerHTML="<div style='text-align:center;opacity:.4;font-size:13px;padding:10px;'>Loading...</div>";
+  const orderField=currentClanTab==="treasury"?"treasury":currentClanTab==="members"?"memberCount":"totalPower";
+  db.collection("clans").orderBy(orderField,"desc").limit(10).get().then(snap=>{
     if(snap.empty){list.innerHTML="<div style='text-align:center;opacity:.4;'>No clans yet</div>";return;}
     let html="";let r=1;
     snap.forEach(doc=>{
       const c=doc.data();
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+      const isMyClан=myClan&&myClan.id===doc.id;
+      const medal=r===1?"🥇":r===2?"🥈":r===3?"🥉":`<span style='font-size:11px;opacity:.5;'>#${r}</span>`;
+      const statVal=currentClanTab==="treasury"
+        ?"💰 "+(c.treasury||0).toLocaleString()
+        :currentClanTab==="members"
+        ?"👥 "+(c.members||[]).length
+        :"⚡ "+(c.totalPower||0).toLocaleString();
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-bottom:6px;border-radius:12px;background:${isMyClan?"rgba(0,255,255,.06)":"rgba(255,255,255,.03)"};border:1px solid ${isMyClan?"rgba(0,255,255,.2)":"rgba(255,255,255,.05)"};">
         <div style="display:flex;align-items:center;gap:8px;">
-          <div style="font-size:11px;opacity:.5;">#${r}</div>
-          <div style="font-size:20px;">${c.flag||"⚔️"}</div>
-          <div><div style="font-weight:700;font-size:13px;">${c.name} [${c.tag||"?"}]</div><div style="font-size:10px;opacity:.5;">${(c.members||[]).length} members</div></div>
+          <div style="font-size:18px;min-width:24px;text-align:center;">${medal}</div>
+          <div style="font-size:22px;">${c.flag||"⚔️"}</div>
+          <div>
+            <div style="font-weight:700;font-size:13px;">${c.name} <span style="font-size:10px;color:var(--purple);">[${c.tag||"?"}]</span>${isMyClan?"<span style='font-size:9px;color:var(--cyan);margin-left:4px;'>(yours)</span>":""}</div>
+            <div style="font-size:10px;opacity:.5;margin-top:2px;">👥 ${(c.members||[]).length} members · 💰 ${(c.treasury||0).toLocaleString()} treasury</div>
+          </div>
         </div>
-        <div>
-          <div style="font-size:12px;color:var(--gold);">⚡ ${(c.totalPower||0).toLocaleString()}</div>
-          <button onclick="joinClanByCode2('${c.inviteCode}')" style="padding:4px 10px;border:none;border-radius:8px;background:linear-gradient(90deg,var(--purple),#c060ff);color:white;font-size:10px;font-weight:700;cursor:pointer;margin-top:4px;">JOIN</button>
+        <div style="text-align:right;">
+          <div style="font-size:12px;font-weight:900;color:var(--gold);">${statVal}</div>
+          ${!isMyClan&&!myClan?`<button onclick="joinClanByCode2('${c.inviteCode}')" style="margin-top:4px;padding:4px 10px;border:none;border-radius:8px;background:linear-gradient(90deg,var(--purple),#c060ff);color:white;font-size:10px;font-weight:700;cursor:pointer;">JOIN</button>`:""}
         </div>
       </div>`;r++;
     });
@@ -3773,6 +3867,8 @@ function openProfileModal(){
   const ap=PET_DATA.find(p=>p.id===activePetId);
   document.getElementById("profileModalName").innerText=username+(ap?" "+ap.icon:"");
   document.getElementById("profileModalId").innerText=playerId;
+  const ui=document.getElementById("usernameInput");
+  if(ui)ui.value=localStorage.getItem("customUsername")||"";
   document.getElementById("statLifetimeCoins").innerText=lifetimeCoins.toLocaleString();
   document.getElementById("statMines").innerText=lifetimeMines.toLocaleString();
   document.getElementById("statChests").innerText=lifetimeChests.toLocaleString();
@@ -3781,7 +3877,25 @@ function openProfileModal(){
   document.getElementById("statRefs").innerText=referrals;
   renderAvatarGrid();
 }
-function closeProfileModal(){document.getElementById("profileModal").classList.remove("open");}
+function saveUsername(){
+  const input=document.getElementById("usernameInput");
+  if(!input)return;
+  const val=input.value.trim();
+  if(!val||val.length<2){showToast("Name must be 2+ characters");return;}
+  if(val.length>20){showToast("Max 20 characters");return;}
+  username=val;
+  localStorage.setItem("customUsername",val);
+  document.getElementById("profileModalName").innerText=username;
+  document.getElementById("profileName").innerText=username;
+  if(db){
+    db.collection("players").doc(playerId).update({
+      username:val
+    }).catch(e=>console.log(e));
+  }
+  save();
+  showToast("✅ Username updated to: "+val);
+  playSuccess();
+}
 function renderAvatarGrid(){
   const grid=document.getElementById("avatarGrid");if(!grid)return;grid.innerHTML="";
   AVATARS.forEach(av=>{
