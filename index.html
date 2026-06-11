@@ -2085,61 +2085,147 @@ function buyChestPack(){
   document.getElementById("payTxHash").value="";
   document.getElementById("payModal").classList.add("open");
 }
+async function verifyPayment() {
+  const txHash = document.getElementById("payTxHash").value.trim();
+  if (!txHash || txHash.length < 20) { showToast("Enter a valid transaction hash"); return; }
 
-async function verifyPayment(){
-  const txHash=document.getElementById("payTxHash").value.trim();
-  if(!txHash||txHash.length<20){showToast("Enter a valid transaction hash");return;}
-  const usedKey="usedTx_"+txHash;
-  if(localStorage.getItem(usedKey)){showToast("❌ Transaction already used!");return;}
-  if(db){
-    try{
-      const txDoc=await db.collection("payments").doc(txHash).get();
-      if(txDoc.exists){showToast("❌ Transaction already used!");return;}
-      await db.collection("payments").doc(txHash).set({playerId,type:pendingPayment?.type||"machine",data:JSON.stringify(pendingPayment),timestamp:Date.now(),status:"pending_review"});
-    }catch(e){console.log(e);}
-  }
-  localStorage.setItem(usedKey,"used_"+Date.now());
+  const usedKey = "usedTx_" + txHash;
+  if (localStorage.getItem(usedKey)) { showToast("❌ Transaction already used!"); return; }
 
-  if(pendingPayment?.type==="vip"){
-    const addMs=pendingPayment.days*86400000;
-    vipEnd=Math.max(Date.now(),vipEnd)+addMs;
-    localStorage.setItem("vipEnd",vipEnd);
-    isVip=true;applyVipPerks();closePayModal();
-    showToast("👑 VIP ACTIVATED for "+pendingPayment.days+" days!");
-    addNotification("VIP Activated 👑","Your VIP perks are now active!","👑");
-    save();update();return;
+  // Check Firestore first — prevents multi-device reuse
+  if (db) {
+    try {
+      const txDoc = await db.collection("payments").doc(txHash).get();
+      if (txDoc.exists) { showToast("❌ Transaction already redeemed!"); return; }
+    } catch(e) { console.log("Firestore check failed, continuing:", e); }
   }
-  if(pendingPayment?.type==="chestpack"){
-    freeSpins+=50;localStorage.setItem("freeSpins",freeSpins);
-    save();update();closePayModal();
-    showToast("✅ 50 Chest Packs unlocked!");
-    return;
-  }
- if(pendingPayment?.type==="pet"){
-    const petId=pendingPayment.petId;
-    if(!ownedPets.includes(petId)){
-      ownedPets.push(petId);
-      if(!activePetId)activePetId=petId;
-      savePets();applyActivePet();
-      closePayModal();
-      const pet=PET_DATA.find(p=>p.id===petId);
-      showRewardPopup(pet.name+" ACQUIRED!",0,pet.icon);
-      showToast("✅ "+pet.icon+" "+pet.name+" added to backpack!");
-      addNotification("Pet Acquired! "+pet.icon,"You own "+pet.name+"! "+pet.perk,"🐾");
-      renderPetScreen();updatePetHeader();
-    }else{
-      closePayModal();
-      showToast("Already own this pet!");
+
+  // Show loading state
+  const verifyBtn = document.querySelector(".payVerifyBtn");
+  if (verifyBtn) { verifyBtn.disabled = true; verifyBtn.innerText = "⏳ Verifying on blockchain..."; }
+
+  try {
+    // Step 1: Look up the TX on TON Center public API
+    const apiUrl = `https://toncenter.com/api/v2/getTransactions?address=${TON_WALLET}&limit=50&archival=false`;
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error("TON API unreachable");
+    const data = await res.json();
+
+    if (!data.ok || !Array.isArray(data.result)) throw new Error("Invalid API response");
+
+    // Step 2: Find our TX by hash in the recent transaction list
+    const match = data.result.find(tx => {
+      const hash = tx.transaction_id?.hash || "";
+      return hash === txHash || hash.toLowerCase() === txHash.toLowerCase();
+    });
+
+    if (!match) {
+      // TX not found in last 50 — could be older; fall back to hash-only path with a warning
+      if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
+      showToast("⚠️ TX not found in recent transactions. Submit for manual review.");
+      // Still write to Firestore for admin review — status = pending_review
+      if (db) {
+        await db.collection("payments").doc(txHash).set({
+          playerId, type: pendingPayment?.type || "unknown",
+          data: JSON.stringify(pendingPayment),
+          timestamp: Date.now(), status: "pending_review",
+          note: "TX not found in API — manual review needed"
+        }).catch(() => {});
+      }
+      return;
     }
+
+    // Step 3: Validate destination matches YOUR wallet
+    const dest = match.in_msg?.destination || "";
+    if (dest.toLowerCase() !== TON_WALLET.toLowerCase()) {
+      if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
+      showToast("❌ TX destination doesn't match our wallet!");
+      return;
+    }
+
+    // Step 4: Validate amount (TON value in nanotons — 1 TON = 1,000,000,000 nanotons)
+    const expectedTon = pendingPayment?.tonAmount || 0;
+    const expectedNano = expectedTon * 1e9;
+    const actualNano = parseInt(match.in_msg?.value || "0");
+    // Allow 1% tolerance for network fees
+    if (actualNano < expectedNano * 0.99) {
+      if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
+      showToast(`❌ Wrong amount! Expected ${expectedTon} TON, got ${(actualNano / 1e9).toFixed(2)} TON`);
+      return;
+    }
+
+    // Step 5: All checks passed — lock in Firestore and grant item
+    localStorage.setItem(usedKey, "used_" + Date.now());
+    if (db) {
+      await db.collection("payments").doc(txHash).set({
+        playerId, type: pendingPayment?.type || "unknown",
+        data: JSON.stringify(pendingPayment),
+        timestamp: Date.now(), status: "verified",
+        amountNano: actualNano, destination: dest
+      }).catch(() => {});
+    }
+
+    // Grant the purchased item (your existing logic)
+    grantPendingPaymentItem();
+
+  } catch(e) {
+    console.log("Verification error:", e);
+    if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
+    showToast("⚠️ Could not reach blockchain. Saved for manual review.");
+    // Still save for admin to manually verify
+    if (db) {
+      db.collection("payments").doc(txHash).set({
+        playerId, type: pendingPayment?.type || "unknown",
+        data: JSON.stringify(pendingPayment),
+        timestamp: Date.now(), status: "pending_review",
+        error: e.message
+      }).catch(() => {});
+    }
+  } finally {
+    if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
+  }
+}
+
+// Extract the item-granting logic into its own function
+function grantPendingPaymentItem() {
+  if (!pendingPayment) return;
+
+  if (pendingPayment.type === "vip") {
+    const addMs = pendingPayment.days * 86400000;
+    vipEnd = Math.max(Date.now(), vipEnd) + addMs;
+    localStorage.setItem("vipEnd", vipEnd);
+    isVip = true; applyVipPerks(); closePayModal();
+    showToast("👑 VIP ACTIVATED for " + pendingPayment.days + " days!");
+    addNotification("VIP Activated 👑", "Your VIP perks are now active!", "👑");
+    save(); update(); return;
+  }
+  if (pendingPayment.type === "chestpack") {
+    freeSpins += 50; localStorage.setItem("freeSpins", freeSpins);
+    save(); update(); closePayModal();
+    showToast("✅ 50 Chest Packs unlocked!"); return;
+  }
+  if (pendingPayment.type === "pet") {
+    const petId = pendingPayment.petId;
+    if (!ownedPets.includes(petId)) {
+      ownedPets.push(petId);
+      if (!activePetId) activePetId = petId;
+      savePets(); applyActivePet(); closePayModal();
+      const pet = PET_DATA.find(p => p.id === petId);
+      showRewardPopup(pet.name + " ACQUIRED!", 0, pet.icon);
+      showToast("✅ " + pet.icon + " " + pet.name + " added!");
+      addNotification("Pet Acquired! " + pet.icon, "You own " + pet.name + "! " + pet.perk, "🐾");
+      renderPetScreen(); updatePetHeader();
+    } else { closePayModal(); showToast("Already own this pet!"); }
     return;
   }
-  const{machineId,lvNum}=pendingPayment||{};
-  if(machineId!=null&&machineOwned[machineId]<lvNum){
-    machineOwned[machineId]=lvNum;
-    localStorage.setItem("machineOwned",JSON.stringify(machineOwned));
-    currentMachine=machineId;localStorage.setItem("currentMachine",machineId);
-    updateReactor();renderMachineGrid();renderShopMachines();save();update();
-    showToast("✅ "+machineData[machineId].name+" LV"+lvNum+" UNLOCKED!");
+  // Machine upgrade
+  const { machineId, lvNum } = pendingPayment;
+  if (machineId != null && machineOwned[machineId] < lvNum) {
+    machineOwned[machineId] = lvNum;
+    localStorage.setItem("machineOwned", JSON.stringify(machineOwned));
+    currentMachine = machineId; localStorage.setItem("currentMachine", machineId);
+    updateReactor(); renderMachineGrid(); renderShopMachines(); save(); update();
+    showToast("✅ " + machineData[machineId].name + " LV" + lvNum + " UNLOCKED!");
   }
   closePayModal();
 }
