@@ -1004,7 +1004,77 @@ window.addEventListener('unhandledrejection', function(e) {
 </div>
 
 <div id="toast"></div>
+<!-- PRIVACY POLICY MODAL -->
+<div class="settingsModal" id="privacyModal">
+<div class="settingsSheet" style="max-height:90vh;overflow-y:auto;">
+  <div style="width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;margin:0 auto 18px;"></div>
+  <h2 style="color:var(--cyan);">🔒 Privacy Policy</h2>
+  <div style="font-size:10px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:18px;letter-spacing:1px;">Last updated: June 2025</div>
 
+  <div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,.8);display:flex;flex-direction:column;gap:14px;">
+
+    <div style="background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.15);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;">🏢 WHO WE ARE</div>
+      <p>Nilma Coin is developed by <strong style="color:white;">SamX</strong>, an independent developer based in Pakistan. Contact us at: <span style="color:var(--cyan);">nilmacoin@hotmail.com</span></p>
+    </div>
+
+    <div style="background:rgba(0,255,153,.05);border:1px solid rgba(0,255,153,.15);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:var(--green);letter-spacing:2px;margin-bottom:8px;">📋 WHAT DATA WE COLLECT</div>
+      <p>We collect only what is necessary to run the game:</p>
+      <ul style="margin:8px 0 0 16px;display:flex;flex-direction:column;gap:5px;">
+        <li><strong style="color:white;">Telegram User ID</strong> — to identify your account</li>
+        <li><strong style="color:white;">Telegram Username / First Name</strong> — to display your profile</li>
+        <li><strong style="color:white;">Game Progress</strong> — coins, level, machines, staking, streak (stored in Firebase)</li>
+        <li><strong style="color:white;">TON Wallet Transactions</strong> — only the transaction hash you manually submit for purchases</li>
+      </ul>
+      <p style="margin-top:8px;color:rgba(255,255,255,.5);font-size:12px;">We do NOT collect your phone number, email, location, device info, or any data beyond what is listed above.</p>
+    </div>
+
+    <div style="background:rgba(138,46,255,.05);border:1px solid rgba(138,46,255,.15);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:#ce93d8;letter-spacing:2px;margin-bottom:8px;">🎯 HOW WE USE YOUR DATA</div>
+      <ul style="margin:0 0 0 16px;display:flex;flex-direction:column;gap:5px;">
+        <li>To save and sync your game progress across devices</li>
+        <li>To display your name and rank on the leaderboard</li>
+        <li>To process and verify TON payments you initiate</li>
+        <li>To send in-app notifications about game events</li>
+      </ul>
+    </div>
+
+    <div style="background:rgba(255,213,74,.05);border:1px solid rgba(255,213,74,.15);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">🔗 THIRD-PARTY SERVICES</div>
+      <p>We use the following third-party services:</p>
+      <ul style="margin:8px 0 0 16px;display:flex;flex-direction:column;gap:5px;">
+        <li><strong style="color:white;">Google Firebase</strong> — cloud database to store game data (<a href="https://firebase.google.com/support/privacy" style="color:var(--cyan);">Firebase Privacy Policy</a>)</li>
+        <li><strong style="color:white;">Telegram</strong> — login and user identity (<a href="https://telegram.org/privacy" style="color:var(--cyan);">Telegram Privacy Policy</a>)</li>
+        <li><strong style="color:white;">TON Blockchain</strong> — public ledger for payment verification (transactions are public by nature)</li>
+      </ul>
+    </div>
+
+    <div style="background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.15);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:#4fc3f7;letter-spacing:2px;margin-bottom:8px;">🧒 CHILDREN'S PRIVACY</div>
+      <p>Nilma Coin is not directed at children under 13. We do not knowingly collect data from children under 13. If you believe a child has provided us data, contact us to have it removed.</p>
+    </div>
+
+    <div style="background:rgba(0,255,153,.05);border:1px solid rgba(0,255,153,.15);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:var(--green);letter-spacing:2px;margin-bottom:8px;">✅ YOUR RIGHTS</div>
+      <ul style="margin:0 0 0 16px;display:flex;flex-direction:column;gap:5px;">
+        <li><strong style="color:white;">Access</strong> — request a copy of your stored data</li>
+        <li><strong style="color:white;">Deletion</strong> — request your data be deleted from our servers</li>
+        <li><strong style="color:white;">Correction</strong> — request your data be corrected</li>
+      </ul>
+      <p style="margin-top:8px;">To exercise any right, email us: <span style="color:var(--cyan);">nilmacoin@hotmail.com</span></p>
+    </div>
+
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:900;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:8px;">📝 POLICY UPDATES</div>
+      <p>We may update this policy as the app grows. Significant changes will be announced via in-app notification. Continued use of the app means you accept the updated policy.</p>
+    </div>
+
+  </div>
+
+  <button onclick="closePrivacyModal()" style="width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.07);color:white;font-size:15px;font-weight:700;margin-top:18px;cursor:pointer;">Close</button>
+</div>
+</div>
 <!-- SETTINGS MODAL -->
 <div class="settingsModal" id="settingsModal">
 <div class="settingsSheet">
@@ -1077,6 +1147,10 @@ window.addEventListener('unhandledrejection', function(e) {
     <div><div class="settingLabel">🆔 Player ID</div><div class="settingDesc" id="settingsPlayerId">—</div></div>
   </div>
   <button onclick="closeSettings()" style="width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.07);color:white;font-size:15px;font-weight:700;margin-top:12px;cursor:pointer;">Close</button>
+<div class="settingRow" style="cursor:pointer;" onclick="openPrivacyModal()">
+  <div><div class="settingLabel">🔒 Privacy Policy</div><div class="settingDesc">View our data & privacy practices</div></div>
+  <div style="font-size:18px;opacity:.5;">›</div>
+</div>
 </div>
 </div>
 
@@ -3916,7 +3990,14 @@ updateNotifDot();
 // ===== SETTINGS =====
 function openSettings(){playClick();document.getElementById("settingsModal").classList.add("open");document.getElementById("settingsPlayerId").innerText=playerId;syncToggles();}
 function closeSettings(){document.getElementById("settingsModal").classList.remove("open");}
-function syncToggles(){document.getElementById("soundToggle").classList.toggle("on",soundOn);document.getElementById("musicToggle").classList.toggle("on",musicOn);document.getElementById("hapticToggle").classList.toggle("on",hapticOn);}
+function openPrivacyModal(){
+  closeSettings();
+  document.getElementById("privacyModal").classList.add("open");
+}
+function closePrivacyModal(){
+  document.getElementById("privacyModal").classList.remove("open");
+}
+  function syncToggles(){document.getElementById("soundToggle").classList.toggle("on",soundOn);document.getElementById("musicToggle").classList.toggle("on",musicOn);document.getElementById("hapticToggle").classList.toggle("on",hapticOn);}
 function toggleSound(){soundOn=!soundOn;localStorage.setItem("soundOn",soundOn);syncToggles();if(soundOn){unlockAudio();playClick();}}
 function toggleMusic(){musicOn=!musicOn;localStorage.setItem("musicOn",musicOn);syncToggles();if(musicOn){unlockAudio();startBgMusic();}else stopBgMusic();}
 function toggleHaptic(){hapticOn=!hapticOn;localStorage.setItem("hapticOn",hapticOn);syncToggles();}
