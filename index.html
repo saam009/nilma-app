@@ -1215,7 +1215,7 @@ try{
   console.log("FB:",e);
   const fbStatus=document.getElementById("loadFirebaseStatus");
   if(fbStatus){
-    fbStatus.innerText="❌ Server unavailable — offline mode";
+    fbStatus.innerText="❌ "+e.message;
     fbStatus.style.color="rgba(255,50,50,.7)";
   }
 }
