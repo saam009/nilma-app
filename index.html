@@ -1207,7 +1207,7 @@ try{
   console.log("Auth:",e);
   const el=document.getElementById("loadFirebaseStatus");
   if(el){
-    el.innerText="⚠️ Offline mode — progress may not sync";
+    el.innerText="⚠️ "+e.code+": "+e.message;
     el.style.color="rgba(255,150,0,.7)";
   }
 });
