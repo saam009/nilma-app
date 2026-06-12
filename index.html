@@ -3988,7 +3988,7 @@ function requestNotifPermission(){
 updateNotifDot();
 
 // ===== SETTINGS =====
-function openSettings(){playClick();document.getElementById("settingsModal").classList.add("open");document.getElementById("settingsPlayerId").innerText=playerId;syncToggles();}
+function openSettings(){playClick();document.getElementById("settingsModal").classList.add("open");document.getElementById("settingsPlayerId").innerText=playerId;syncToggles();document.getElementById("privacyModal").classList.remove("open");}
 function closeSettings(){document.getElementById("settingsModal").classList.remove("open");}
 function openPrivacyModal(){
   closeSettings();
