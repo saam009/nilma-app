@@ -1775,13 +1775,81 @@ if(_fb2){_fb2.innerText="✅ Data loaded!";_fb2.style.color="rgba(0,255,153,.7)"
 if(_fb3){_fb3.innerText="⚠️ Could not load data — using local save";_fb3.style.color="rgba(255,150,0,.7)";}
   }
 }
+// ===== ANTI-CHEAT =====
+const _AC = {
+  salt: "nilma_" + (localStorage.getItem("firstJoinTime") || "coin"),
+  _hash(n) {
+    let h = 0, s = String(Math.floor(n)) + this.salt;
+    for (let i = 0; i < s.length; i++) {
+      h = ((h << 5) - h) + s.charCodeAt(i);
+      h |= 0;
+    }
+    return h.toString(36);
+  },
+  save(n) {
+    const v = Math.floor(Math.abs(n));
+    localStorage.setItem("_cv", v);
+    localStorage.setItem("_ch", this._hash(v));
+    localStorage.setItem("_ct", Date.now());
+  },
+  load() {
+    const v = parseInt(localStorage.getItem("_cv") || "0");
+    const h = localStorage.getItem("_ch");
+    if (!h || this._hash(v) !== h) return null;
+    return v;
+  },
+  _lastCheck: Date.now(),
+  _lastValue: 0,
+  _violations: 0,
+  check(current) {
+    const now = Date.now();
+    const elapsed = (now - this._lastCheck) / 1000;
+    // Max legitimate gain: best machine (3000/tap) * 20 taps/sec + auto miner buffer
+    const maxGainPerSec = 3000 * 20 + 500;
+    const gained = current - this._lastValue;
+    if (elapsed > 0 && gained > 0) {
+      const rate = gained / elapsed;
+      if (rate > maxGainPerSec && elapsed < 5) {
+        this._violations++;
+        if (this._violations >= 2) {
+          this._violations = 0;
+          return false; // flag as cheat
+        }
+      } else {
+        this._violations = Math.max(0, this._violations - 1);
+      }
+    }
+    this._lastCheck = now;
+    this._lastValue = current;
+    return true;
+  }
+};
 
+// Init anti-cheat on load
+(function initAC() {
+  const saved = _AC.load();
+  const local = parseInt(localStorage.getItem("coins") || "0");
+  if (saved !== null && local > saved * 1.05 + 100) {
+    // Local value is suspiciously higher than verified value — silent restore
+    localStorage.setItem("coins", saved);
+  }
+  _AC._lastValue = saved !== null ? saved : local;
+})();
 // ===== SAVE =====
 let saveTimeout = null;
 let savePending = false;
 
 function save() {
+  // Anti-cheat: validate before saving
+  if (!_AC.check(coins)) {
+    const safe = _AC.load();
+    if (safe !== null && coins > safe * 1.05 + 100) {
+      coins = safe;
+    }
+  }
+  coins = Math.max(0, Math.floor(coins));
   localStorage.setItem("coins", coins);
+  _AC.save(coins);
   localStorage.setItem("energy", energy);
   localStorage.setItem("level", level);
   localStorage.setItem("xp", xp);
@@ -1805,9 +1873,9 @@ function save() {
   localStorage.setItem("bestStreak", bestStreak);
   localStorage.setItem("weeklyEarned", weeklyEarned);
   
-  const maxPossible=machineData[3].levels[4].power*5*8*3600*720;
-if(coins>maxPossible)coins=Math.floor(maxPossible);
-if(coins<0)coins=0;
+  const maxPossible = machineData[3].levels[4].power * 5 * 8 * 3600 * 720;
+  if (coins > maxPossible) { coins = Math.floor(maxPossible); _AC.save(coins); }
+  if (coins < 0) coins = 0;
 if(energy<0)energy=0;
 if(energy>maxEnergy*2)energy=maxEnergy;
   if(energy < 0) energy = 0;
