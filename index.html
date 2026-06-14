@@ -1908,7 +1908,11 @@ if(energy>maxEnergy*2)energy=maxEnergy;
   lifetimeMines, lifetimeChests, streakDay, bestStreak,
   weekCoins: weeklyEarned, lastActive: Date.now(),
   vipEnd: vipEnd, myStakes, totalStakeEarned
-}, {merge: true})
+}, {merge: true}).catch(e => console.log("Save error:", e));
+    }
+    savePending = false;
+  }, 5000);
+}
   
 // ===== UPDATE UI =====
 function update(){
