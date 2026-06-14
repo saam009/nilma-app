@@ -1760,6 +1760,7 @@ if(_fb){_fb.innerText="⏳ Loading your data...";_fb.style.color="rgba(0,255,255
     const doc=await db.collection("players").doc(playerId).get();
     if(doc.exists){
       const d=doc.data();
+     if(d.weekCoins != null) weeklyEarned = d.weekCoins;
       if(d.coins!=null)coins=d.coins;
       if(d.level!=null)level=d.level;
       if(d.xp!=null)xp=d.xp;
@@ -1772,7 +1773,15 @@ if(_fb){_fb.innerText="⏳ Loading your data...";_fb.style.color="rgba(0,255,255
       if(d.lifetimeChests!=null)lifetimeChests=d.lifetimeChests;
       if(d.myStakes!=null)myStakes=d.myStakes;
       if(d.totalStakeEarned!=null)totalStakeEarned=d.totalStakeEarned;
-    }else{save();}
+    } else {
+  db.collection("players").doc(playerId).set({
+    username, coins, energy, level, xp, minePower,
+    machineOwned, currentMachine, referrals,
+    lifetimeCoins, lifetimeMines, lifetimeChests,
+    streakDay, bestStreak, weekCoins: weeklyEarned,
+    lastActive: Date.now(), vipEnd: vipEnd
+  }).catch(e => console.log("New player save error:", e));
+}
     const _fb2=document.getElementById("loadFirebaseStatus");
 if(_fb2){_fb2.innerText="✅ Data loaded!";_fb2.style.color="rgba(0,255,153,.7)";setTimeout(()=>{if(_fb2)_fb2.style.opacity="0";},1500);}
     update();renderAll();
@@ -1885,8 +1894,7 @@ function save() {
   if (coins < 0) coins = 0;
 if(energy<0)energy=0;
 if(energy>maxEnergy*2)energy=maxEnergy;
-  if(energy < 0) energy = 0;
-  
+
   // Don't save to Firebase too often
   if(savePending) return;
   savePending = true;
@@ -1895,16 +1903,12 @@ if(energy>maxEnergy*2)energy=maxEnergy;
   saveTimeout = setTimeout(() => {
     if(db) {
       db.collection("players").doc(playerId).set({
-        username, coins, energy, level, xp, xpMax, minePower,
-        machineOwned, currentMachine, referrals, lifetimeCoins,
-        lifetimeMines, lifetimeChests, streakDay, bestStreak,
-        weekCoins: weeklyEarned, lastActive: Date.now(),
-        vipEnd: vipEnd
-      }, {merge: true}).catch(e => console.log("Save error:", e));
-    }
-    savePending = false;
-  }, 5000);
-}
+  username, coins, energy, level, xp, xpMax, minePower,
+  machineOwned, currentMachine, referrals, lifetimeCoins,
+  lifetimeMines, lifetimeChests, streakDay, bestStreak,
+  weekCoins: weeklyEarned, lastActive: Date.now(),
+  vipEnd: vipEnd, myStakes, totalStakeEarned
+}, {merge: true})
   
 // ===== UPDATE UI =====
 function update(){
@@ -4425,7 +4429,7 @@ document.getElementById("reactorWrap").addEventListener("touchstart",e=>{
     mine({clientX:touch.clientX,clientY:touch.clientY});
   });
 },{passive:false});
-if(db) setTimeout(()=> whenAuthReady(loadPlayerData), 500);
+if(db) whenAuthReady(loadPlayerData);
 update();
 try { renderAll(); } catch(e) { console.error("renderAll error:", e); }
 showScreen("homeScreen");
