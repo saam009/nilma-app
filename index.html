@@ -1093,8 +1093,8 @@ window.addEventListener('unhandledrejection', function(e) {
     <div class="toggle" id="hapticToggle" onclick="toggleHaptic()"></div>
   </div>
   <div class="airdropTimer">
-    <div class="airdropTitle">🚀 AIRDROP COUNTDOWN</div>
-    <div style="font-size:11px;opacity:.6;margin-bottom:10px;">Mining ends — tokens launch!</div>
+    <div class="airdropTitle">🚀 ROADMAP COUNTDOWN</div>
+    <div style="font-size:11px;opacity:.6;margin-bottom:10px;">Future updates and features</div>
     <div class="airdropCountdown">
       <div class="airdropUnit"><div class="airdropNum" id="adDays">000</div><div class="airdropLabel">DAYS</div></div>
       <div style="font-size:24px;color:var(--gold);opacity:.5;align-self:center;">:</div>
@@ -1104,7 +1104,7 @@ window.addEventListener('unhandledrejection', function(e) {
       <div style="font-size:24px;color:var(--gold);opacity:.5;align-self:center;">:</div>
       <div class="airdropUnit"><div class="airdropNum" id="adSecs">00</div><div class="airdropLabel">SEC</div></div>
     </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--gold);opacity:.7;">Hold your coins — rewards incoming 🔥</div>
+    <div style="margin-top:12px;font-size:11px;color:var(--gold);opacity:.7;">Stay active for upcoming features 🔥</div>
   </div>
   <div style="background:linear-gradient(135deg,rgba(0,255,255,.06),rgba(138,46,255,.06));border:1px solid rgba(0,255,255,.15);border-radius:18px;padding:16px;margin:14px 0;">
     <div style="font-size:11px;letter-spacing:3px;color:var(--cyan);opacity:.8;margin-bottom:14px;">🚀 COMING SOON</div>
@@ -1121,12 +1121,12 @@ window.addEventListener('unhandledrejection', function(e) {
       </div>
       <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
         <div style="font-size:24px;">💱</div>
-        <div><div style="font-size:13px;font-weight:700;">Convert Coins</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Swap coins to real crypto tokens</div></div>
+        <div><div style="font-size:13px;font-weight:700;">Coin Utility</div><div style="font-size:11px;opacity:.5;margin-top:2px;">More ways to use your coins in-app</div></div>
         <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(255,213,74,.1);color:var(--gold);font-weight:700;border:1px solid rgba(255,213,74,.2);">SOON</div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
         <div style="font-size:24px;">👛</div>
-        <div><div style="font-size:13px;font-weight:700;">Bind Wallet</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Connect TON wallet for airdrop</div></div>
+        <div><div style="font-size:13px;font-weight:700;">Bind Wallet</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Connect your TON wallet for payments</div></div>
         <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(0,255,153,.1);color:var(--green);font-weight:700;border:1px solid rgba(0,255,153,.2);">SOON</div>
       </div>
     </div>
@@ -1656,11 +1656,11 @@ function renderPetScreen(){
   // Airdrop announcement banner
   html+=`<div style="background:linear-gradient(135deg,rgba(255,213,74,.12),rgba(255,100,0,.08));border:1px solid rgba(255,213,74,.35);border-radius:18px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden;">
     <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transform:skewX(-20deg);animation:shimmerSweep 4s infinite;"></div>
-    <div style="font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.8;margin-bottom:8px;">🚀 AIRDROP ANNOUNCEMENT</div>
-    <div style="font-size:15px;font-weight:900;color:white;margin-bottom:6px;">Pet Owners = High Value Holders</div>
-    <div style="font-size:12px;opacity:.7;line-height:1.6;margin-bottom:10px;">Pet owners will be recognized as <strong style="color:var(--gold);">HIGH VALUE</strong> holders in the Nilma Coin airdrop. The rarer your pet, the bigger your airdrop multiplier!</div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.8;margin-bottom:8px;">🚀 EARLY SUPPORTER PERKS</div>
+    <div style="font-size:15px;font-weight:900;color:white;margin-bottom:6px;">Pet Owners Get Recognized</div>
+    <div style="font-size:12px;opacity:.7;line-height:1.6;margin-bottom:10px;">Pet owners may get special recognition in future programs and updates. Pets are cosmetic and gameplay perks — they don't represent or guarantee any token, payout, or financial return.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      ${PET_DATA.map(p=>`<div style="padding:5px 10px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid ${p.rarityColor}44;font-size:10px;font-weight:700;color:${p.rarityColor};">${p.icon} ${p.airdropStars} ${p.airdropMult} airdrop</div>`).join("")}
+      ${PET_DATA.map(p=>`<div style="padding:5px 10px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid ${p.rarityColor}44;font-size:10px;font-weight:700;color:${p.rarityColor};">${p.icon} ${p.rarity}</div>`).join("")}
     </div>
   </div>`;
 
