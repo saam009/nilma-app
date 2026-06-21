@@ -1778,13 +1778,16 @@ if(_fb){_fb.innerText="⏳ Loading your data...";_fb.style.color="rgba(0,255,255
       if(d.lifetimeChests!=null)lifetimeChests=d.lifetimeChests;
       if(d.myStakes!=null)myStakes=d.myStakes;
       if(d.totalStakeEarned!=null)totalStakeEarned=d.totalStakeEarned;
+      if(d.vipEnd!=null){vipEnd=d.vipEnd;localStorage.setItem("vipEnd",vipEnd);}
+      if(d.ownedPets!=null){ownedPets=d.ownedPets;localStorage.setItem("ownedPets",JSON.stringify(ownedPets));}
+      if(d.freeSpins!=null){freeSpins=d.freeSpins;localStorage.setItem("freeSpins",freeSpins);}
     } else {
   db.collection("players").doc(playerId).set({
     username, coins, energy, level, xp, minePower,
     machineOwned, currentMachine, referrals,
     lifetimeCoins, lifetimeMines, lifetimeChests,
     streakDay, bestStreak, weekCoins: weeklyEarned,
-    lastActive: Date.now(), vipEnd: vipEnd
+    lastActive: Date.now()
   }).catch(e => console.log("New player save error:", e));
 }
     const _fb2=document.getElementById("loadFirebaseStatus");
@@ -1912,7 +1915,7 @@ if(energy>maxEnergy*2)energy=maxEnergy;
   machineOwned, currentMachine, referrals, lifetimeCoins,
   lifetimeMines, lifetimeChests, streakDay, bestStreak,
   weekCoins: weeklyEarned, lastActive: Date.now(),
-  vipEnd: vipEnd, myStakes, totalStakeEarned
+  myStakes, totalStakeEarned
 }, {merge: true}).catch(e => console.log("Save error:", e));
     }
     savePending = false;
