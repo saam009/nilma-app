@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nilma Coin</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -992,13 +993,11 @@ window.addEventListener('unhandledrejection', function(e) {
 <div class="payBox">
   <div style="font-size:40px;margin-bottom:10px;">💎</div>
   <h3 id="payTitle">Unlock Machine</h3>
-  <p id="payDesc">Send exact TON to unlock</p>
+  <p id="payDesc">Connect your wallet and pay securely</p>
   <div style="font-size:13px;color:var(--gold);font-weight:bold;margin:10px 0;" id="payAmount">0.00 TON</div>
-  <div style="font-size:11px;opacity:.6;margin-bottom:6px;">Send to this wallet:</div>
-  <div class="payAddress" id="payWallet" onclick="copyWallet()">UQDTWVSYBC1KozbeO73kZsMyqogTJlC9ptWNIUNthfJ11P3m<br><span style="color:var(--cyan);font-size:9px;">📋 Tap to copy</span></div>
-  <div style="font-size:11px;opacity:.6;margin-bottom:4px;">Enter your transaction hash after sending:</div>
-  <input class="payInput" id="payTxHash" placeholder="Transaction hash / TX ID">
-  <button class="payVerifyBtn" onclick="verifyPayment()">✅ VERIFY PAYMENT</button>
+  <div id="tonConnectButtonRoot" style="display:flex;justify-content:center;margin:14px 0;"></div>
+  <div id="payStatusText" style="font-size:12px;opacity:.7;min-height:18px;margin-bottom:6px;"></div>
+  <button class="payVerifyBtn" id="payVerifyBtn" onclick="payWithTonConnect()">✅ PAY WITH TON</button>
   <button class="payClose" onclick="closePayModal()">Cancel</button>
 </div>
 </div>
@@ -1226,6 +1225,13 @@ function whenAuthReady(fn){
 }
 
 const TON_WALLET="UQDTWVSYBC1KozbeO73kZsMyqogTJlC9ptWNIUNthfJ11P3m";
+let tonConnectUI=null;
+try{
+  tonConnectUI=new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl:'https://ton-verify.vercel.app/tonconnect-manifest.json',
+    buttonRootId:'tonConnectButtonRoot'
+  });
+}catch(e){console.log("TonConnect init error:",e);}
 
 // ===== MACHINE DATA =====
 const machineData=[
@@ -1625,12 +1631,10 @@ function buyPetTon(petId){
   if(ownedPets.includes(petId)){showToast("Already own this pet!");return;}
   pendingPayment={type:"pet",petId,tonAmount:pet.tonCost,petName:pet.name};
   document.getElementById("payTitle").innerText="Buy "+pet.icon+" "+pet.name;
-  document.getElementById("payDesc").innerText="Send EXACTLY "+pet.tonCost+" TON. Enter TX hash to unlock.";
+  document.getElementById("payDesc").innerText="Tap PAY WITH TON below to send "+pet.tonCost+" TON.";
   document.getElementById("payAmount").innerText=pet.tonCost+" TON";
-  document.getElementById("payTxHash").value="";
   document.getElementById("payModal").classList.add("open");
 }
-
 function switchPet(petId){
   if(!ownedPets.includes(petId)){showToast("You don't own this pet!");return;}
   activePetId=petId;
@@ -2223,9 +2227,8 @@ function openPayModal(machineId,lvNum){
   const m=machineData[machineId];const lv=m.levels[lvNum-1];
   pendingPayment={machineId,lvNum,tonAmount:lv.tonCost,machineName:m.name};
   document.getElementById("payTitle").innerText="Unlock "+m.name+" LV"+lvNum;
-  document.getElementById("payDesc").innerText="Send EXACTLY "+lv.tonCost+" TON to wallet, then enter TX hash.";
+  document.getElementById("payDesc").innerText="Tap PAY WITH TON below to send "+lv.tonCost+" TON.";
   document.getElementById("payAmount").innerText=lv.tonCost+" TON";
-  document.getElementById("payTxHash").value="";
   document.getElementById("payModal").classList.add("open");
 }
 function closePayModal(){document.getElementById("payModal").classList.remove("open");pendingPayment=null;}
@@ -2238,156 +2241,88 @@ function copyWallet(){
 function buyChestPack(){
   pendingPayment={type:"chestpack",tonAmount:9.3};
   document.getElementById("payTitle").innerText="Buy 50 Free Chests";
-  document.getElementById("payDesc").innerText="Send EXACTLY 9.3 TON to wallet. Enter TX hash to unlock.";
+  document.getElementById("payDesc").innerText="Tap PAY WITH TON below to send 9.3 TON.";
   document.getElementById("payAmount").innerText="9.3 TON";
-  document.getElementById("payTxHash").value="";
   document.getElementById("payModal").classList.add("open");
 }
-async function verifyPayment() {
-  const txHash = document.getElementById("payTxHash").value.trim();
-  if (!txHash || txHash.length < 20) { showToast("Enter a valid transaction hash"); return; }
-
-  const usedKey = "usedTx_" + txHash;
-  if (localStorage.getItem(usedKey)) { showToast("❌ Transaction already used!"); return; }
-
-  // Check Firestore first — prevents multi-device reuse
-  if (db) {
-    try {
-      const txDoc = await db.collection("payments").doc(txHash).get();
-      if (txDoc.exists) { showToast("❌ Transaction already redeemed!"); return; }
-    } catch(e) { console.log("Firestore check failed, continuing:", e); }
+async function payWithTonConnect(){
+  if(!tonConnectUI){ showToast("Wallet connector not ready yet"); return; }
+  if(!pendingPayment){ showToast("Nothing to pay for"); return; }
+  if(!tonConnectUI.connected){ showToast("Connect your wallet first using the button above"); return; }
+  const verifyBtn=document.getElementById("payVerifyBtn");
+  const statusEl=document.getElementById("payStatusText");
+  const amountNano=Math.round(pendingPayment.tonAmount*1e9).toString();
+  const tx={ validUntil: Math.floor(Date.now()/1000)+300, messages:[{ address: TON_WALLET, amount: amountNano }] };
+  try{
+    if(verifyBtn){verifyBtn.disabled=true;verifyBtn.innerText="⏳ Confirm in your wallet...";}
+    if(statusEl)statusEl.innerText="Waiting for wallet confirmation...";
+    await tonConnectUI.sendTransaction(tx);
+    await callServerVerify();
+  }catch(e){
+    console.log("sendTransaction error:",e);
+    showToast("Payment cancelled or failed");
+    if(statusEl)statusEl.innerText="";
+  }finally{
+    if(verifyBtn){verifyBtn.disabled=false;verifyBtn.innerText="✅ PAY WITH TON";}
   }
+}
 
-  // Show loading state
-  const verifyBtn = document.querySelector(".payVerifyBtn");
-  if (verifyBtn) { verifyBtn.disabled = true; verifyBtn.innerText = "⏳ Verifying on blockchain..."; }
-
-  try {
-    // Step 1: Look up the TX on TON Center public API
-    const apiUrl = `https://toncenter.com/api/v2/getTransactions?address=${TON_WALLET}&limit=50&archival=false`;
-    const res = await fetch(apiUrl);
-    if (!res.ok) throw new Error("TON API unreachable");
-    const data = await res.json();
-
-    if (!data.ok || !Array.isArray(data.result)) throw new Error("Invalid API response");
-
-    // Step 2: Find our TX by hash in the recent transaction list
-    const match = data.result.find(tx => {
-      const hash = tx.transaction_id?.hash || "";
-      return hash === txHash || hash.toLowerCase() === txHash.toLowerCase();
+async function callServerVerify(){
+  const statusEl=document.getElementById("payStatusText");
+  if(statusEl)statusEl.innerText="⏳ Verifying on the blockchain...";
+  try{
+    const resp=await fetch("https://ton-verify.vercel.app/api/verifyTonPayment",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ playerId, itemType: pendingPayment.type || "machine", itemData: pendingPayment })
     });
-
-    if (!match) {
-      // TX not found in last 50 — could be older; fall back to hash-only path with a warning
-      if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
-      showToast("⚠️ TX not found in recent transactions. Submit for manual review.");
-      // Still write to Firestore for admin review — status = pending_review
-      if (db) {
-        await db.collection("payments").doc(txHash).set({
-          playerId, type: pendingPayment?.type || "unknown",
-          data: JSON.stringify(pendingPayment),
-          timestamp: Date.now(), status: "pending_review",
-          note: "TX not found in API — manual review needed"
-        }).catch(() => {});
-      }
-      return;
+    const d=await resp.json();
+    if(d.status==="granted"){
+      if(statusEl)statusEl.innerText="✅ Payment verified!";
+      await loadPlayerData();
+      grantPendingPaymentItemUI();
+    }else if(d.status==="pending"){
+      if(statusEl)statusEl.innerText="⏳ "+(d.message||"Not confirmed yet — try again in a bit.");
+    }else{
+      if(statusEl)statusEl.innerText="⚠️ "+(d.error||"Verification failed, try again.");
     }
-
-    // Step 3: Validate destination matches YOUR wallet
-    const dest = match.in_msg?.destination || "";
-    if (dest.toLowerCase() !== TON_WALLET.toLowerCase()) {
-      if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
-      showToast("❌ TX destination doesn't match our wallet!");
-      return;
-    }
-
-    // Step 4: Validate amount (TON value in nanotons — 1 TON = 1,000,000,000 nanotons)
-    const expectedTon = pendingPayment?.tonAmount || 0;
-    const expectedNano = expectedTon * 1e9;
-    const actualNano = parseInt(match.in_msg?.value || "0");
-    // Allow 1% tolerance for network fees
-    if (actualNano < expectedNano * 0.99) {
-      if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
-      showToast(`❌ Wrong amount! Expected ${expectedTon} TON, got ${(actualNano / 1e9).toFixed(2)} TON`);
-      return;
-    }
-
-    // Step 5: All checks passed — lock in Firestore and grant item
-    localStorage.setItem(usedKey, "used_" + Date.now());
-    if (db) {
-      await db.collection("payments").doc(txHash).set({
-        playerId, type: pendingPayment?.type || "unknown",
-        data: JSON.stringify(pendingPayment),
-        timestamp: Date.now(), status: "verified",
-        amountNano: actualNano, destination: dest
-      }).catch(() => {});
-    }
-
-    // Grant the purchased item (your existing logic)
-    grantPendingPaymentItem();
-
-  } catch(e) {
-    console.log("Verification error:", e);
-    if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
-    showToast("⚠️ Could not reach blockchain. Saved for manual review.");
-    // Still save for admin to manually verify
-    if (db) {
-      db.collection("payments").doc(txHash).set({
-        playerId, type: pendingPayment?.type || "unknown",
-        data: JSON.stringify(pendingPayment),
-        timestamp: Date.now(), status: "pending_review",
-        error: e.message
-      }).catch(() => {});
-    }
-  } finally {
-    if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerText = "✅ VERIFY PAYMENT"; }
+  }catch(e){
+    console.log("verify error:",e);
+    if(statusEl)statusEl.innerText="⚠️ Could not reach server, try again.";
   }
 }
 
 // Extract the item-granting logic into its own function
-function grantPendingPaymentItem() {
-  if (!pendingPayment) return;
-
+function grantPendingPaymentItemUI() {
+  if (!pendingPayment) { closePayModal(); return; }
   if (pendingPayment.type === "vip") {
-    const addMs = pendingPayment.days * 86400000;
-    vipEnd = Math.max(Date.now(), vipEnd) + addMs;
-    localStorage.setItem("vipEnd", vipEnd);
-    isVip = true; applyVipPerks(); closePayModal();
+    isVip = Date.now() < vipEnd; applyVipPerks();
     showToast("👑 VIP ACTIVATED for " + pendingPayment.days + " days!");
     addNotification("VIP Activated 👑", "Your VIP perks are now active!", "👑");
-    save(); update(); return;
-  }
-  if (pendingPayment.type === "chestpack") {
-    freeSpins += 50; localStorage.setItem("freeSpins", freeSpins);
-    save(); update(); closePayModal();
-    showToast("✅ 50 Chest Packs unlocked!"); return;
-  }
-  if (pendingPayment.type === "pet") {
-    const petId = pendingPayment.petId;
-    if (!ownedPets.includes(petId)) {
-      ownedPets.push(petId);
-      if (!activePetId) activePetId = petId;
-      savePets(); applyActivePet(); closePayModal();
-      const pet = PET_DATA.find(p => p.id === petId);
+  } else if (pendingPayment.type === "chestpack") {
+    showToast("✅ 50 Chest Packs unlocked!");
+  } else if (pendingPayment.type === "pet") {
+    const pet = PET_DATA.find(p => p.id === pendingPayment.petId);
+    if (pet) {
+      if (!activePetId) { activePetId = pendingPayment.petId; savePets(); }
+      applyActivePet();
       showRewardPopup(pet.name + " ACQUIRED!", 0, pet.icon);
       showToast("✅ " + pet.icon + " " + pet.name + " added!");
       addNotification("Pet Acquired! " + pet.icon, "You own " + pet.name + "! " + pet.perk, "🐾");
       renderPetScreen(); updatePetHeader();
-    } else { closePayModal(); showToast("Already own this pet!"); }
-    return;
+    }
+  } else {
+    const { machineId, lvNum } = pendingPayment;
+    if (machineId != null) {
+      currentMachine = machineId; localStorage.setItem("currentMachine", machineId);
+      updateReactor(); renderMachineGrid(); renderShopMachines();
+      showToast("✅ " + machineData[machineId].name + " LV" + lvNum + " UNLOCKED!");
+    }
   }
-  // Machine upgrade
-  const { machineId, lvNum } = pendingPayment;
-  if (machineId != null && machineOwned[machineId] < lvNum) {
-    machineOwned[machineId] = lvNum;
-    localStorage.setItem("machineOwned", JSON.stringify(machineOwned));
-    currentMachine = machineId; localStorage.setItem("currentMachine", machineId);
-    updateReactor(); renderMachineGrid(); renderShopMachines(); save(); update();
-    showToast("✅ " + machineData[machineId].name + " LV" + lvNum + " UNLOCKED!");
-  }
+  update();
   closePayModal();
 }
-
+  
  let overheatActive=false;
 let overheatTimeout=null;
 
@@ -3280,9 +3215,8 @@ function buyVip(){
   const ton=vipPlanSelected===1?9.3:79;const days=vipPlanSelected===1?30:365;
   pendingPayment={type:"vip",days,tonAmount:ton};
   document.getElementById("payTitle").innerText="Unlock VIP "+(days===30?"Monthly":"Yearly");
-  document.getElementById("payDesc").innerText="Send EXACTLY "+ton+" TON. Enter TX hash to activate.";
+  document.getElementById("payDesc").innerText="Tap PAY WITH TON below to send "+ton+" TON.";
   document.getElementById("payAmount").innerText=ton+" TON";
-  document.getElementById("payTxHash").value="";
   closeVipModal();document.getElementById("payModal").classList.add("open");
 }
 document.getElementById("vipModal").addEventListener("click",function(e){if(e.target===this)closeVipModal();});
