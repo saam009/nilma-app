@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BubuCoin</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@tonconnect/ui@latest/dist/tonconnect-ui.min.js';document.head.appendChild(s);"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1226,12 +1226,20 @@ function whenAuthReady(fn){
 
 const TON_WALLET="UQDTWVSYBC1KozbeO73kZsMyqogTJlC9ptWNIUNthfJ11P3m";
 let tonConnectUI=null;
-try{
-  tonConnectUI=new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl:'https://ton-verify.vercel.app/tonconnect-manifest.json',
-    buttonRootId:'tonConnectButtonRoot'
-  });
-}catch(e){console.log("TonConnect init error:",e);}
+function ensureTonConnectUI(){
+  if(tonConnectUI)return tonConnectUI;
+  try{
+    if(typeof TON_CONNECT_UI==="undefined")return null;
+    tonConnectUI=new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl:'https://ton-verify.vercel.app/tonconnect-manifest.json',
+      buttonRootId:'tonConnectButtonRoot'
+    });
+  }catch(e){console.log("TonConnect init error:",e);}
+  return tonConnectUI;
+}
+ensureTonConnectUI();
+// Retry a few times in case the TonConnect script was still loading over a slow connection
+[1000,3000,6000,10000,15000].forEach(delay=>setTimeout(ensureTonConnectUI,delay));
 
 // ===== MACHINE DATA =====
 const machineData=[
@@ -2248,8 +2256,9 @@ function buyChestPack(){
   document.getElementById("payAmount").innerText="9.3 TON";
   document.getElementById("payModal").classList.add("open");
 }
-async function payWithTonConnect(){
-  if(!tonConnectUI){ showToast("Wallet connector not ready yet"); return; }
+window.payWithTonConnect = async function(){
+  if(!tonConnectUI) ensureTonConnectUI();
+  if(!tonConnectUI){ showToast("Wallet connector still loading — try again in a few seconds"); return; }
   if(!pendingPayment){ showToast("Nothing to pay for"); return; }
   if(!tonConnectUI.connected){ showToast("Connect your wallet first using the button above"); return; }
   const verifyBtn=document.getElementById("payVerifyBtn");
@@ -2277,7 +2286,7 @@ async function callServerVerify(){
     const resp=await fetch("https://ton-verify.vercel.app/api/verifyTonPayment",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ playerId, itemType: pendingPayment.type || "machine", itemData: pendingPayment })
+      body:JSON.stringify({ playerId, itemType: pendingPayment.type || "machine", itemData: pendingPayment, senderAddress: tonConnectUI.account ? tonConnectUI.account.address : null })
     });
     const d=await resp.json();
     if(d.status==="granted"){
