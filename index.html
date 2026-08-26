@@ -1234,6 +1234,17 @@ function ensureTonConnectUI(){
       manifestUrl:'https://ton-verify.vercel.app/tonconnect-manifest.json',
       buttonRootId:'tonConnectButtonRoot'
     });
+    // Our payment modal's z-index is higher than TonConnect's own connect modal,
+    // which hides the QR code / wallet list behind it. Temporarily lower ours
+    // whenever TonConnect's modal is open, and restore it when closed.
+    try{
+      tonConnectUI.onModalStateChange(function(state){
+        const pm=document.getElementById("payModal");
+        if(!pm)return;
+        if(state && state.status==="opened"){ pm.style.zIndex="1"; }
+        else{ pm.style.zIndex="999998"; }
+      });
+    }catch(e){console.log("onModalStateChange hook error:",e);}
   }catch(e){console.log("TonConnect init error:",e);}
   return tonConnectUI;
 }
