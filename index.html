@@ -1123,11 +1123,6 @@ window.addEventListener('unhandledrejection', function(e) {
         <div><div style="font-size:13px;font-weight:700;">Coin Utility</div><div style="font-size:11px;opacity:.5;margin-top:2px;">More ways to use your coins in-app</div></div>
         <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(255,213,74,.1);color:var(--gold);font-weight:700;border:1px solid rgba(255,213,74,.2);">SOON</div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
-        <div style="font-size:24px;">👛</div>
-        <div><div style="font-size:13px;font-weight:700;">Bind Wallet</div><div style="font-size:11px;opacity:.5;margin-top:2px;">Connect your TON wallet for payments</div></div>
-        <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(0,255,153,.1);color:var(--green);font-weight:700;border:1px solid rgba(0,255,153,.2);">SOON</div>
-      </div>
     </div>
   </div>
   <div class="settingRow">
@@ -1383,9 +1378,8 @@ const TASK_CHAINS=[
   ]},
 ];
 const allTasks=[
-  {id:"instagram",icon:"📸",title:"Follow Instagram",reward:30,link:"https://www.instagram.com/bubucoin?igsh=bWJ5dzJ0ZXVucmU1",type:"social"},
-  {id:"facebook",icon:"📘",title:"Follow Facebook",reward:30,link:"https://www.facebook.com/share/14eXqwaWvzK/",type:"social"},
-  {id:"telegram",icon:"📢",title:"Join BubuCoin Channel",reward:50,link:"https://t.me/bubucoin",type:"social"},
+  {id:"facebook",icon:"📘",title:"Follow Facebook",reward:30,link:"https://www.facebook.com/profile.php?id=61589917980012",type:"social"},
+  {id:"telegram",icon:"📢",title:"Join BubuCoin Channel",reward:50,link:"https://t.me/bubucoin1",type:"social"},
 ];
 // ===== MISSIONS =====
 const allMissions=[
@@ -4425,7 +4419,7 @@ setTimeout(()=>{
   if(Date.now()-lastSettingsNotif>oneWeek){
     lastSettingsNotif=Date.now();
     localStorage.setItem("lastSettingsNotif_v3",lastSettingsNotif);
-    addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins, Bind Wallet & more! Check Settings for details 🚀","🚀");
+    addNotification("⚙️ Visit Settings!","New features coming soon — Convert Coins & more! Check Settings for details 🚀","🚀");
   }
 },3000);
 let energyNotifSent=false;
